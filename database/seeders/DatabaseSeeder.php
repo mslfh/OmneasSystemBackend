@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\SpecialRole;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,11 +14,29 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $admin = User::factory()->create([
+            'name' =>  env('ADMIN_NAME'),
+            'email' => env('ADMIN_EMAIL'),
+            'password' => env('ADMIN_DEFAULT_PASSWORD')
+        ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $desk = User::factory()->create([
+            'name' =>  env('DESK_NAME'),
+            'email' => env('DESK_EMAIL'),
+            'password' => env('DESK_DEFAULT_PASSWORD')
+        ]);
+
+        SpecialRole::create([
+            'name' => 'Admin',
+            'description' => 'Administrator Role',
+            'is_active' => true,
+            'user_id' => $admin->id
+        ]);
+        SpecialRole::create([
+            'name' => 'Desk',
+            'description' => 'Front Desk Role',
+            'is_active' => true,
+            'user_id' => $desk->id
         ]);
     }
 }

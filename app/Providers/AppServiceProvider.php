@@ -2,8 +2,24 @@
 
 namespace App\Providers;
 
+use App\Contracts\ServiceContract;
+use App\Repositories\ServiceRepository;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\ServiceProvider;
+use App\Contracts\PackageContract;
+use App\Repositories\PackageRepository;
+use App\Contracts\ServiceAppointmentContract;
+use App\Repositories\ServiceAppointmentRepository;
+use App\Contracts\StaffContract;
+use App\Repositories\StaffRepository;
+use App\Contracts\ScheduleContract;
+use App\Repositories\ScheduleRepository;
+use App\Contracts\ScheduleHistoryContract;
+use App\Repositories\ScheduleHistoryRepository;
+use App\Contracts\OrderContract;
+use App\Repositories\OrderRepository;
+use App\Contracts\AppointmentContract;
+use App\Repositories\AppointmentRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -12,7 +28,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(PackageContract::class, PackageRepository::class);
+        $this->app->bind(ServiceContract::class, ServiceRepository::class);
+        $this->app->bind(ServiceAppointmentContract::class, ServiceAppointmentRepository::class);
+        $this->app->bind(StaffContract::class, StaffRepository::class);
+        $this->app->bind(ScheduleContract::class, ScheduleRepository::class);
+        $this->app->bind(ScheduleHistoryContract::class, ScheduleHistoryRepository::class);
+        $this->app->bind(OrderContract::class, OrderRepository::class);
+        $this->app->bind(AppointmentContract::class, AppointmentRepository::class);
     }
 
     /**

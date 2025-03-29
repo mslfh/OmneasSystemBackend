@@ -15,20 +15,21 @@ return [
     |
     */
 
-    'paths' => ['*'],
+    'paths' => ['api/*'],  // 仅允许API路由跨域
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['*'],  // 允许所有HTTP方法
 
-    'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:3000')],
+    'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:9000')],  // 允许的前端地址
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'],
+    'allowed_headers' => ['*'],  // 允许所有请求头（可以根据需求调整）
 
     'exposed_headers' => [],
 
     'max_age' => 0,
 
-    'supports_credentials' => true,
+    'supports_credentials' => true,  // 允许携带cookie和token
 
 ];
+

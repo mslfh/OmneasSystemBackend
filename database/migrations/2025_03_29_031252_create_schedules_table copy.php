@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('break_start_time')->nullable();
             $table->string('break_end_time')->nullable();
             $table->string('status')->default('available')
-            ->comment('available, working, breaking, off');
+            ->comment('working, breaking, off');
             $table->string('remark')->nullable();
             $table->timestamps();
         });

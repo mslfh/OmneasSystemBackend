@@ -12,16 +12,18 @@ class StaffRepository implements StaffContract
         return Staff::all();
     }
 
-    public function getAvailableStaffFromScheduletime($dateTime, $schedule_ids)
+    public function getAvailableStaffFromScheduletime($dateTime)
     {
+        $formatDateTime = \Carbon\Carbon::createFromFormat('Y/m/d H:i', $dateTime);
         return Staff::where('status', 'active')
-            ->whereHas('schedules', function ($query) use ($schedule_ids) {
-                $query->whereIn('id', $schedule_ids);
+            ->whereHas('schedules', function ($query) use ($formatDateTime) {
+                $query->where('work_date', '=', $formatDateTime->format('Y-m-d'))
+                    ->where('start_time', '<=', $formatDateTime->format('H:i'))
+                    ->where('end_time', '>=', $formatDateTime->format('H:i'));
             })
-            ->whereDoesntHave('bookingServices',
-            function ($query) use ($dateTime) {
-                $query->where('booking_time', '<=', $dateTime)
-                    ->where('expected_end_time', '>=', $dateTime);
+            ->whereDoesntHave('bookingServices', function ($query) use ($formatDateTime) {
+                $query->where('booking_time', '<=', $formatDateTime)
+                    ->where('expected_end_time', '>=', $formatDateTime);
             })
             ->get();
     }

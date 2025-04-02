@@ -9,20 +9,20 @@ class AppointmentRepository implements AppointmentContract
 {
     public function getAll()
     {
-        return Appointment::all();
+        return Appointment::all()->load('services');
     }
     public function getByDate($date)
     {
         return Appointment::whereDate('booking_time', $date)
-        ->whereNotIn(
+        ->whereNot(
             'status',
-            ['cancelled', 'completed']
+            'cancelled'
         )->with('services')->orderBy('booking_time')->get();
     }
 
     public function getById($id)
     {
-        return Appointment::findOrFail($id);
+        return Appointment::findOrFail($id)->load('services');
     }
 
     public function create(array $data)

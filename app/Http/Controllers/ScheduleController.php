@@ -57,17 +57,29 @@ class ScheduleController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'staff_id' => 'required|exists:staff,id',
-            'work_date' => 'required|date',
+            'staff_id' => 'required',
+            'work_date' => 'required',
             'start_time' => 'required|string',
             'end_time' => 'required|string',
             'break_start_time' => 'nullable|string',
             'break_end_time' => 'nullable|string',
-            'status' => 'nullable|string',
-            'remark' => 'nullable|string',
         ]);
+        $wordDateBegin = Carbon::createFromFormat('Y/m/d', $data['work_date']['from']);
+        $wordDateEnd = Carbon::createFromFormat('Y/m/d', $data['work_date']['to']);
 
-        return response()->json($this->scheduleService->createSchedule($data), 201);
+        for($wordDateBegin; $wordDateBegin->lte($wordDateEnd); $wordDateBegin->addDay()) {
+
+            $insert_data = $data;
+            $insert_data['work_date'] = $wordDateBegin->format('Y/m/d');
+            $insert_data['status'] = 'active';
+            $this->scheduleService->createSchedule($insert_data);
+        }
+        return response()->json(
+            [
+                'message' => 'Schedule created successfully',
+                'data' => '',
+            ]
+        );
     }
 
     public function update(Request $request, $id)

@@ -15,4 +15,12 @@ class Schedule extends Model
     {
         return $this->belongsTo(Staff::class);
     }
+    public function setBookingAttribute($value)
+    {
+        $this->attributes['booking'] = json_encode($value);
+    }
+    public function getBookingAttribute($value)
+    {
+        return json_decode($value, true);
+    }
 }

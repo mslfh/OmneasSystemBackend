@@ -10,6 +10,7 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ScheduleHistoryController;
+use App\Http\Controllers\ServiceAppointmentController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
@@ -36,6 +37,10 @@ Route::get('/schedules/{id}', [ScheduleController::class, 'show']);
 Route::get('/get-available-shedules', [ScheduleController::class, 'getAvailableShedules']);
 Route::get('/get-unavailable-time-from-date', [ScheduleController::class, 'getUnavailableTimeFromShedules']);
 
+Route::post('/make-appointment', [AppointmentController::class, 'makeAppointment']);
+Route::get('/appointments', [AppointmentController::class, 'index']);
+Route::get('/appointments/{id}', [AppointmentController::class, 'show']);
+
 // Route::get('get-available-shedules-by-staff/{id}', [ScheduleController::class, 'getAvailableShedulesByStaff']);
 // Route::get('get-available-shedules-by-staff-and-date/{id}', [ScheduleController::class, 'getAvailableShedulesByStaffAndDate']);
 
@@ -50,8 +55,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('services', ServiceController::class)->except(['index','show']);
     Route::apiResource('staff', StaffController::class)->except(['index','show']);
     Route::apiResource('schedules', ScheduleController::class)->except(['index','show']);
-    Route::apiResource('appointments', AppointmentController::class);
+    Route::apiResource('appointments', AppointmentController::class)->except(['index','show']);
+    Route::get('/getBookedServiceByDate', [AppointmentController::class, 'getBookedServiceByDate']);
     Route::apiResource('orders', OrderController::class);
     Route::apiResource('schedule-histories', ScheduleHistoryController::class);
+    Route::apiResource('service-appointments', ServiceAppointmentController::class);
 });
 

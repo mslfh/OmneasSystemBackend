@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users');
             $table->string('profile_photo_path',2048)->nullable();
+            $table->string('name')->nullable();
             $table->string('position')->nullable();
             $table->string('description')->nullable();
             $table->string('tag')->nullable();

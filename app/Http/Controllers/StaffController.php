@@ -27,30 +27,34 @@ class StaffController extends Controller
     public function getAvailableStaffFromScheduletime(Request $request)
     {
         $time = $request->input('time');
-        $schedule_ids = $request->input('schedule_id');
-        $schedule_ids = is_array($schedule_ids) ? $schedule_ids : explode(',', $schedule_ids);
         $date = $request->input('date');
         $dateTimeString = $date . ' ' . $time;
-        $dateTime = \Carbon\Carbon::createFromFormat('Y/m/d H:i', $dateTimeString);
-
-        $availableStaff = $this->staffService->getAvailableStaffFromScheduletime($dateTime, $schedule_ids);
+        $availableStaff = $this->staffService->getAvailableStaffFromScheduletime($dateTimeString);
         return response()->json($availableStaff);
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'user_id' => 'required|exists:users,id',
             'profile_photo_path' => 'nullable|string|max:2048',
             'position' => 'nullable|string',
             'description' => 'nullable|string',
             'tag' => 'nullable|string',
             'has_certificate' => 'boolean',
-            'status' => 'string|in:active,inactive',
             'level' => 'numeric|min:0|max:5',
             'sort' => 'nullable|integer',
+            'name' => 'required|string|max:255',
         ]);
-
+        //Create a user for this staff
+        $userData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required',
+            'password' => 'required',
+            'phone' => 'nullable|string|max:15'
+        ]);
+        $user = \App\Models\User::create($userData);
+        $data['user_id'] = $user->id;
+        $data['status'] = "active";
         return response()->json($this->staffService->createStaff($data), 201);
     }
 
@@ -66,8 +70,8 @@ class StaffController extends Controller
             'status' => 'string|in:active,inactive',
             'level' => 'numeric|min:0|max:5',
             'sort' => 'nullable|integer',
+            'name' => 'sometimes|string|max:255',
         ]);
-
         return response()->json($this->staffService->updateStaff($id, $data));
     }
 

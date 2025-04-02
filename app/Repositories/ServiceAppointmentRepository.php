@@ -15,6 +15,7 @@ class ServiceAppointmentRepository implements ServiceAppointmentContract
     public function update(int $id, array $data)
     {
         $serviceAppointment = ServiceAppointment::findOrFail($id);
+        //
         $serviceAppointment->update($data);
         return $serviceAppointment;
     }

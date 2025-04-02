@@ -30,7 +30,7 @@ return new class extends Migration
             $table->double('service_price');
 
             $table->string('customer_name')->nullable();
-            $table->string('customer_comments')->nullable();
+            $table->string('comments')->nullable();
 
             $table->foreignId('staff_id')->constrained('staff')->nullable();
             $table->string('staff_name')->nullable();

@@ -3,16 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\ServiceAppointment;
+use App\Services\ServiceAppointmentService;
 use Illuminate\Http\Request;
 
 class ServiceAppointmentController extends Controller
 {
+    protected $serviceAppointmentService;
+
+    public function __construct(ServiceAppointmentService $serviceAppointmentService)
+    {
+        $this->serviceAppointmentService = $serviceAppointmentService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return response()->json($this->serviceAppointmentService->getAllServiceAppointments());
     }
 
     /**
@@ -28,15 +36,24 @@ class ServiceAppointmentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'appointment_id' => 'required|exists:appointments,id',
+            'service_id' => 'required|exists:services,id',
+            'staff_id' => 'nullable|exists:staff,id',
+            'booking_time' => 'required|date',
+            'expected_end_time' => 'required|date',
+            'comments' => 'nullable|string',
+        ]);
+
+        return response()->json($this->serviceAppointmentService->createServiceAppointment($data), 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(ServiceAppointment $serviceAppointment)
+    public function show($id)
     {
-        //
+        return response()->json($this->serviceAppointmentService->getServiceAppointmentById($id));
     }
 
     /**
@@ -50,16 +67,25 @@ class ServiceAppointmentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, ServiceAppointment $serviceAppointment)
+    public function update(Request $request, $id)
     {
-        //
+        $data = $request->validate([
+            'service_id' => 'sometimes|exists:services,id',
+            'staff_id' => 'nullable|exists:staff,id',
+            'staff_name' => 'nullable|string',
+            'customer_name' => 'nullable|string',
+            'booking_time' => 'nullable|string',
+            'comments' => 'nullable|string',
+        ]);
+        return response()->json($this->serviceAppointmentService->updateServiceAppointment($id, $data));
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ServiceAppointment $serviceAppointment)
+    public function destroy($id)
     {
-        //
+        $this->serviceAppointmentService->deleteServiceAppointment($id);
+        return response()->json(null, 204);
     }
 }

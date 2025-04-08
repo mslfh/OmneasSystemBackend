@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ScheduleController;
@@ -14,8 +15,6 @@ use App\Http\Controllers\ServiceAppointmentController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
-
-
 
 Route::get('/packages', [PackageController::class, 'index']); // Public route to fetch packages
 Route::get('/packages/{id}', [PackageController::class, 'show']); // Public route to fetch a single package
@@ -47,9 +46,9 @@ Route::put('/cancel-appointments/{id}', [AppointmentController::class, 'cancelAp
 // Route::get('get-available-shedules-by-staff-and-date/{id}', [ScheduleController::class, 'getAvailableShedulesByStaffAndDate']);
 
 
-Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 Route::middleware(['auth:sanctum'])->group(function () {
     // Protected routes
@@ -62,5 +61,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('schedule-histories', ScheduleHistoryController::class);
     Route::apiResource('service-appointments', ServiceAppointmentController::class);
     Route::apiResource('staff', StaffController::class)->except(['index','show']);
+    Route::apiResource('user', UserController::class);
+    Route::post('/importUser', [UserController::class, 'importUser']);
+
 });
 

@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Contracts\UserServiceContract;
+use App\Contracts\UserContract;
 use App\Repositories\UserRepository;
 
-class UserService implements UserServiceContract
+class UserService implements UserContract
 {
     protected $userRepository;
 

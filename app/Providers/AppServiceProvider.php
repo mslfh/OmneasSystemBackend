@@ -17,7 +17,9 @@ use App\Repositories\ScheduleRepository;
 use App\Contracts\ScheduleHistoryContract;
 use App\Repositories\ScheduleHistoryRepository;
 use App\Contracts\OrderContract;
+use App\Contracts\UserContract;
 use App\Repositories\OrderRepository;
+use App\Repositories\UserRepository;
 use App\Contracts\AppointmentContract;
 use App\Repositories\AppointmentRepository;
 
@@ -36,6 +38,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ScheduleHistoryContract::class, ScheduleHistoryRepository::class);
         $this->app->bind(OrderContract::class, OrderRepository::class);
         $this->app->bind(AppointmentContract::class, AppointmentRepository::class);
+        $this->app->bind(UserContract::class, UserRepository::class);
     }
 
     /**

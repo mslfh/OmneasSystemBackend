@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\UserServiceContract;
 use Illuminate\Http\Request;
-
+use App\Services\UserService;
 class UserController extends BaseController
 {
     protected $userService;
 
-    public function __construct(UserServiceContract $userService)
+    public function __construct(UserService $userService)
     {
         $this->userService = $userService;
     }
@@ -35,6 +34,11 @@ class UserController extends BaseController
 
         $data['password'] = bcrypt($data['password']);
         return response()->json($this->userService->createUser($data), 201);
+    }
+
+    public function importUser(Request $request)
+    {
+
     }
 
     public function update(Request $request, $id)

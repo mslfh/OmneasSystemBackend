@@ -63,6 +63,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('staff', StaffController::class)->except(['index','show']);
     Route::apiResource('user', UserController::class);
     Route::post('/importUser', [UserController::class, 'importUser']);
+    Route::get('/findUserByField', [UserController::class, 'findByField']);
 
 });
 

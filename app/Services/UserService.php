@@ -24,6 +24,11 @@ class UserService implements UserContract
         return $this->userRepository->findById($id);
     }
 
+    public function findByField($field, $value)
+    {
+        return $this->userRepository->findByField($field, $value);
+    }
+
     public function createUser(array $data)
     {
         return $this->userRepository->create($data);

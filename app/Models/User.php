@@ -13,6 +13,7 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable,HasApiTokens ,SoftDeletes;
 
+    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
@@ -23,9 +24,10 @@ class User extends Authenticatable
         'email',
         'password',
         'phone',
+        'first_name',
+        'last_name',
+        'phone'
     ];
-
-
 
     /**
      * The attributes that should be hidden for serialization.

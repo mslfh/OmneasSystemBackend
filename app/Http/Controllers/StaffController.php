@@ -45,13 +45,14 @@ class StaffController extends BaseController
             'status' => 'string|in:active,inactive',
             'description' => 'nullable|string',
             'tag' => 'nullable|string',
-            'level' => 'numeric|min:0|max:5',
+
             'has_certificate' => 'nullable|string',
-            'sort' => 'nullable|integer',
+            // 'level' => 'numeric|min:0|max:5',
+            // 'sort' => 'nullable|integer',
             'email' => 'required|email|max:255|unique:users,email',
             'phone' => 'nullable|string|max:15',
             'password' => 'required|string|min:8',
-            'avatar' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:4096',
+            'avatar' => 'nullable',
         ]);
 
         //Create a user for this staff
@@ -89,12 +90,12 @@ class StaffController extends BaseController
             'tag' => 'nullable|string',
             'has_certificate' => 'nullable|string',
             'status' => 'string|in:active,inactive',
-            'level' => 'numeric|min:0|max:5',
-            'sort' => 'nullable|integer',
+            // 'level' => 'numeric|min:0|max:5',
+            // 'sort' => 'nullable|integer',
             'name' => 'sometimes|string|max:255',
             'phone' => 'nullable|string|max:15',
             'password' => 'nullable|string|min:8',
-            'avatar' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:4096',
+            'avatar' => 'nullable',
         ]);
 
         DB::beginTransaction();

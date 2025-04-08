@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\UserService;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\UsersImport;
+
 class UserController extends BaseController
 {
     protected $userService;
@@ -16,6 +19,18 @@ class UserController extends BaseController
     public function index()
     {
         return response()->json($this->userService->getAllUsers());
+    }
+
+    public function findByField(Request $request)
+    {
+        $field = $request->input('field');
+        $value = $request->input('value');
+
+        if (!$field || !$value) {
+            return response()->json(['error' => 'Field and value are required'], 400);
+        }
+
+        return response()->json($this->userService->findByField($field, $value));
     }
 
     public function show($id)
@@ -38,7 +53,16 @@ class UserController extends BaseController
 
     public function importUser(Request $request)
     {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,csv|max:2048',
+        ]);
 
+        try {
+            Excel::import(new UsersImport, $request->file('file'));
+            return response()->json(['message' => 'Users imported successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to import users: ' . $e->getMessage()], 500);
+        }
     }
 
     public function update(Request $request, $id)

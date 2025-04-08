@@ -8,7 +8,12 @@ class UserRepository
 {
     public function getAll()
     {
-        return User::all();
+        return User::limit(200)->get();
+    }
+
+    public function findByField($field, $value)
+    {
+        return User::where($field, $value)->get();
     }
 
     public function findById($id)

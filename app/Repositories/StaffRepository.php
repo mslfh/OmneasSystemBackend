@@ -15,6 +15,21 @@ class StaffRepository implements StaffContract
     public function getAvailableStaffFromScheduletime($dateTime)
     {
         $formatDateTime = \Carbon\Carbon::createFromFormat('Y/m/d H:i', $dateTime);
+
+        // Check if max work_date of schedules is less than the current date
+        $allStaff = Staff::with('schedules')
+            ->where('status', 'active')
+            ->get();
+        $maxWorkDate = $allStaff
+            ->pluck('schedules')
+            ->flatten()
+            ->max('work_date');
+        if ($maxWorkDate && $maxWorkDate < $formatDateTime->format('Y-m-d')) {
+            return $allStaff;
+        }
+
+
+
         return Staff::where('status', 'active')
             ->whereHas('schedules', function ($query) use ($formatDateTime) {
                 $query->where('work_date', '=', $formatDateTime->format('Y-m-d'))

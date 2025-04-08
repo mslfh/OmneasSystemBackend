@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\ScheduleHistoryService;
 use Illuminate\Http\Request;
 
-class ScheduleHistoryController extends Controller
+class ScheduleHistoryController extends BaseController
 {
     protected $service;
 

@@ -6,7 +6,7 @@ use App\Models\ServiceAppointment;
 use App\Services\ServiceAppointmentService;
 use Illuminate\Http\Request;
 
-class ServiceAppointmentController extends Controller
+class ServiceAppointmentController extends BaseController
 {
     protected $serviceAppointmentService;
 

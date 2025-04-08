@@ -6,7 +6,7 @@ use App\Models\Service;
 use App\Services\ServiceService;
 use Illuminate\Http\Request;
 
-class ServiceController extends Controller
+class ServiceController extends BaseController
 {
     protected $serviceService;
 

@@ -37,6 +37,11 @@ class AppointmentRepository implements AppointmentContract
         return $appointment;
     }
 
+    public function getServiceAppointments($id)
+    {
+        return Appointment::findOrFail($id)->services;
+    }
+
     public function delete($id)
     {
         $appointment = Appointment::findOrFail($id);

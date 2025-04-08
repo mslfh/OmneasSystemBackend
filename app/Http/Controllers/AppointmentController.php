@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 
-class AppointmentController extends Controller
+class AppointmentController extends BaseController
 {
     protected $appointmentService;
 
@@ -26,6 +26,22 @@ class AppointmentController extends Controller
     public function show($id)
     {
         return response()->json($this->appointmentService->getAppointmentById($id));
+    }
+
+    public function getServiceAppointments($id)
+    {
+        return response()->json($this->appointmentService->getServiceAppointments($id));
+    }
+
+    public function cancelAppointments($id)
+    {
+        $appointment = $this->appointmentService->getAppointmentById($id);
+        if (!$appointment) {
+            return response()->json(['error' => 'Appointment not found'], 404);
+        }
+        $appointment->status = 'cancelled';
+        $appointment->save();
+        return response()->json($appointment);
     }
 
     public function getBookedServiceByDate(Request $request)
@@ -67,6 +83,7 @@ class AppointmentController extends Controller
 
         return response()->json($response);
     }
+
     public function store(Request $request)
     {
         $data = $request->all();
@@ -76,7 +93,7 @@ class AppointmentController extends Controller
         unset($appointmentData['booking_date']);
         // Create the appointment
         DB::beginTransaction();
-        try {
+        // try {
             $appointment = $this->appointmentService->createAppointment($appointmentData);
             // Create associated service appointments
             foreach ($data['customer_service'] as $serviceData) {
@@ -98,16 +115,16 @@ class AppointmentController extends Controller
                 $serviceData['booking_time'] = $appointment->booking_time;
                 $serviceData['expected_end_time'] = Carbon::parse($appointment->booking_time)->addMinutes($service->duration);
 
-                $serviceData['staff_id'] = $serviceData['staff']['id'];
-                $serviceData['staff_name'] = $serviceData['staff']['name'];
+                $serviceData['staff_id'] = $serviceData['staff']['id']??'0';
+                $serviceData['staff_name'] = $serviceData['staff']['name']??'';
                 $this->appointmentService->createServiceAppointment($serviceData);
             }
             DB::commit();
             return response()->json($appointment->load('services'), 201);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['error' => 'Failed to create appointment'], 500);
-        }
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return response()->json(['error' => 'Failed to create appointment'], 500);
+        // }
     }
 
     public function makeAppointment(Request $request)
@@ -120,7 +137,7 @@ class AppointmentController extends Controller
         $appointmentData['tag'] = implode(',', $data['tag']);
         // Create the appointment
         DB::beginTransaction();
-        try {
+        // try {
             $appointment = $this->appointmentService->createAppointment($appointmentData);
             // Create associated service appointments
             foreach ($data['customer_service'] as $serviceData) {
@@ -139,21 +156,20 @@ class AppointmentController extends Controller
                 $serviceData['appointment_id'] = $appointment->id;
                 $serviceData['booking_time'] = $appointment->booking_time;
                 $serviceData['expected_end_time'] = Carbon::parse($appointment->booking_time)->addMinutes($service->duration);
-
+                $serviceData['staff_id'] = $serviceData["staff_id"]??'0';
+                $serviceData['staff_name'] = $serviceData["staff_name"]??'';
                 $this->appointmentService->createServiceAppointment($serviceData);
             }
             DB::commit();
             return response()->json($appointment->load('services'), 201);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['error' => 'Failed to create appointment'], 500);
-        }
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return response()->json(['error' => 'Failed to create appointment'], 500);
+        // }
     }
-
 
     public function update(Request $request, $id)
     {
-
         $data = $request->validate([
             'booking_time' => 'sometimes|date',
             'customer_first_name' => 'sometimes|string',
@@ -167,7 +183,6 @@ class AppointmentController extends Controller
             'end_time' => 'nullable|date',
             'status' => 'nullable|string|in:pending,confirmed,cancelled,in_progress,completed',
         ]);
-
         return response()->json($this->appointmentService->updateAppointment($id, $data));
     }
 

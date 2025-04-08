@@ -12,13 +12,30 @@ class Staff extends Model
 
     protected $guarded = ['id'];
 
-    protected $appends = ['profile_photo_url'];
+    protected $appends = ['profile_photo_url','email','phone'];
+
+    protected $hidden = [
+        'deleted_at',
+        'created_at',
+        'updated_at',
+    ];
 
     public function getProfilePhotoUrlAttribute()
     {
-        return $this->profile_photo ? asset('storage/' . $this->profile_photo) : asset('default-avatar.png');
+        return $this->profile_photo_path ? asset('storage/' . $this->profile_photo_path	) :
+         asset('default-avatar.png');
     }
 
+    public function getEmailAttribute()
+    {
+        $user = $this->user()->first();
+        return  $user->email;
+    }
+    public function getPhoneAttribute()
+    {
+        $user = $this->user()->first();
+        return  $user->phone;
+    }
     public function schedules()
     {
         return $this->hasMany(Schedule::class);

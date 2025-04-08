@@ -31,6 +31,11 @@ class AppointmentService
         return $this->appointmentRepository->getById($id);
     }
 
+    public function getServiceAppointments($id)
+    {
+        return $this->serviceAppointmentService->getServiceAppointments($id);
+    }
+
     public function createAppointment(array $data)
     {
         return $this->appointmentRepository->create($data);

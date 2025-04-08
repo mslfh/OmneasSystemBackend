@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('position')->nullable();
             $table->string('description')->nullable();
             $table->string('tag')->nullable();
-            $table->boolean('has_certificate')->default(false);
+            $table->string('has_certificate')->default("false");
             $table->string('status')->default('active');
             $table->double('level')->default('5.0');
             $table->integer('sort')->nullable();

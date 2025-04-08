@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\PackageService;
 use Illuminate\Http\Request;
 
-class PackageController extends Controller
+class PackageController extends BaseController
 {
     protected $packageService;
 

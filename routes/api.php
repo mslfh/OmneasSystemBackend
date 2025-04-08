@@ -40,6 +40,8 @@ Route::get('/get-unavailable-time-from-date', [ScheduleController::class, 'getUn
 Route::post('/make-appointment', [AppointmentController::class, 'makeAppointment']);
 Route::get('/appointments', [AppointmentController::class, 'index']);
 Route::get('/appointments/{id}', [AppointmentController::class, 'show']);
+Route::get('/getServiceAppointments/{id}', [AppointmentController::class, 'getServiceAppointments']);
+Route::put('/cancel-appointments/{id}', [AppointmentController::class, 'cancelAppointments']);
 
 // Route::get('get-available-shedules-by-staff/{id}', [ScheduleController::class, 'getAvailableShedulesByStaff']);
 // Route::get('get-available-shedules-by-staff-and-date/{id}', [ScheduleController::class, 'getAvailableShedulesByStaffAndDate']);
@@ -53,12 +55,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Protected routes
     Route::apiResource('packages', PackageController::class)->except(['index','show']);
     Route::apiResource('services', ServiceController::class)->except(['index','show']);
-    Route::apiResource('staff', StaffController::class)->except(['index','show']);
     Route::apiResource('schedules', ScheduleController::class)->except(['index','show']);
     Route::apiResource('appointments', AppointmentController::class)->except(['index','show']);
     Route::get('/getBookedServiceByDate', [AppointmentController::class, 'getBookedServiceByDate']);
     Route::apiResource('orders', OrderController::class);
     Route::apiResource('schedule-histories', ScheduleHistoryController::class);
     Route::apiResource('service-appointments', ServiceAppointmentController::class);
+    Route::apiResource('staff', StaffController::class)->except(['index','show']);
 });
 

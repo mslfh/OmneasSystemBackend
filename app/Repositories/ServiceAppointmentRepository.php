@@ -15,7 +15,6 @@ class ServiceAppointmentRepository implements ServiceAppointmentContract
     public function update(int $id, array $data)
     {
         $serviceAppointment = ServiceAppointment::findOrFail($id);
-        //
         $serviceAppointment->update($data);
         return $serviceAppointment;
     }
@@ -34,5 +33,10 @@ class ServiceAppointmentRepository implements ServiceAppointmentContract
     public function getAll()
     {
         return ServiceAppointment::all();
+    }
+
+    public function getAppointmentsFromDate($date)
+    {
+        return ServiceAppointment::whereDate('booking_time', $date)->get();
     }
 }

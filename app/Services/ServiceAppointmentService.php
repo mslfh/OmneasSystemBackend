@@ -37,4 +37,9 @@ class ServiceAppointmentService
     {
         return $this->repository->getAll();
     }
+
+    public function getAppointmentsFromDate($date)
+    {
+        return $this->repository->getAppointmentsFromDate($date);
+    }
 }

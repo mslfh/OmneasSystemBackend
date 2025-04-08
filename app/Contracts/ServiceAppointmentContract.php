@@ -9,4 +9,5 @@ interface ServiceAppointmentContract
     public function delete(int $id);
     public function findById(int $id);
     public function getAll();
+    public function getAppointmentsFromDate($date);
 }

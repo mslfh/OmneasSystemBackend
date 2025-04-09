@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\ServiceAppointment;
 use App\Services\ServiceAppointmentService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Models\Service;
 
 class ServiceAppointmentController extends BaseController
 {
@@ -44,7 +46,6 @@ class ServiceAppointmentController extends BaseController
             'expected_end_time' => 'required|date',
             'comments' => 'nullable|string',
         ]);
-
         return response()->json($this->serviceAppointmentService->createServiceAppointment($data), 201);
     }
 
@@ -69,14 +70,28 @@ class ServiceAppointmentController extends BaseController
      */
     public function update(Request $request, $id)
     {
-        $data = $request->validate([
-            'service_id' => 'sometimes|exists:services,id',
-            'staff_id' => 'nullable|exists:staff,id',
-            'staff_name' => 'nullable|string',
-            'customer_name' => 'nullable|string',
-            'booking_time' => 'nullable|string',
-            'comments' => 'nullable|string',
-        ]);
+        $data = $request->all();
+        $booking_time = Carbon::createFromFormat('Y-m-d H:i', $data['date'] . ' ' . $data['time']);
+        $data['booking_time'] = $booking_time;
+        unset($data['date']);
+        unset($data['time']);
+        if (isset($data['service']['id'])) {
+            $service = Service::with('package')->findOrFail($data['service']['id']);
+            $data['package_id'] = $service->package_id;
+            $data['package_title'] = $service->package->title;
+            $data['package_hint'] = $service->package->hint;
+            $data['service_id'] = $service->id;
+            $data['service_title'] = $service->title;
+            $data['service_description'] = $service->description;
+            $data['service_duration'] = $service->duration;
+            $data['service_price'] = $service->price;
+            unset($data['service']);
+        }
+        if (isset($data['staff']['id'])) {
+            $data['staff_id'] = $data['staff']['id'];
+            $data['staff_name'] = $data['staff']['name'];
+            unset($data['staff']);
+        }
         return response()->json($this->serviceAppointmentService->updateServiceAppointment($id, $data));
     }
 

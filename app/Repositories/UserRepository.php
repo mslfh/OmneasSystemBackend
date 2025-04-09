@@ -11,9 +11,12 @@ class UserRepository
         return User::limit(200)->get();
     }
 
-    public function findByField($field, $value)
+    public function findByField($field)
     {
-        return User::where($field, $value)->get();
+        return User::where('name', 'like', '%' . $field . '%')
+            ->orWhere('phone', 'like', '%' . $field . '%')
+            ->orWhere('email', 'like', '%' . $field . '%')
+            ->get();
     }
 
     public function findById($id)

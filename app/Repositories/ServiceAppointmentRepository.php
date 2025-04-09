@@ -15,6 +15,9 @@ class ServiceAppointmentRepository implements ServiceAppointmentContract
     public function update(int $id, array $data)
     {
         $serviceAppointment = ServiceAppointment::findOrFail($id);
+        if(isset($data['booking_time'])) {
+            $data['expected_end_time'] = \Carbon\Carbon::parse($data['booking_time'])->addMinutes($serviceAppointment->service_duration);
+        }
         $serviceAppointment->update($data);
         return $serviceAppointment;
     }

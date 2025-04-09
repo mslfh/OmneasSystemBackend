@@ -23,14 +23,8 @@ class UserController extends BaseController
 
     public function findByField(Request $request)
     {
-        $field = $request->input('field');
-        $value = $request->input('value');
-
-        if (!$field || !$value) {
-            return response()->json(['error' => 'Field and value are required'], 400);
-        }
-
-        return response()->json($this->userService->findByField($field, $value));
+        $search = $request->input('search');
+        return response()->json($this->userService->findByField($search));
     }
 
     public function show($id)

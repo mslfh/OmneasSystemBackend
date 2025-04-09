@@ -71,10 +71,13 @@ class ServiceAppointmentController extends BaseController
     public function update(Request $request, $id)
     {
         $data = $request->all();
-        $booking_time = Carbon::createFromFormat('Y-m-d H:i', $data['date'] . ' ' . $data['time']);
-        $data['booking_time'] = $booking_time;
-        unset($data['date']);
-        unset($data['time']);
+        if(isset($data['date']) && isset($data['time'])) {
+            $booking_time = Carbon::createFromFormat('Y-m-d H:i', $data['date'] . ' ' . $data['time']);
+            $data['booking_time'] = $booking_time;
+            unset($data['date']);
+            unset($data['time']);
+        }
+
         if (isset($data['service']['id'])) {
             $service = Service::with('package')->findOrFail($data['service']['id']);
             $data['package_id'] = $service->package_id;

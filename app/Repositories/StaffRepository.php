@@ -27,9 +27,6 @@ class StaffRepository implements StaffContract
         if ($maxWorkDate && $maxWorkDate < $formatDateTime->format('Y-m-d')) {
             return $allStaff;
         }
-
-
-
         return Staff::where('status', 'active')
             ->whereHas('schedules', function ($query) use ($formatDateTime) {
                 $query->where('work_date', '=', $formatDateTime->format('Y-m-d'))
@@ -45,7 +42,8 @@ class StaffRepository implements StaffContract
 
     public function getById($id)
     {
-        return Staff::findOrFail($id);
+        $staff = Staff::findOrFail($id);
+        return $staff;
     }
 
     public function create(array $data)

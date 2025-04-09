@@ -23,18 +23,18 @@ class Staff extends Model
     public function getProfilePhotoUrlAttribute()
     {
         return $this->profile_photo_path ? asset('storage/' . $this->profile_photo_path	) :
-         asset('default-avatar.png');
+         null;
     }
 
     public function getEmailAttribute()
     {
         $user = $this->user()->first();
-        return  $user->email;
+        return  $user->email?? null;
     }
     public function getPhoneAttribute()
     {
         $user = $this->user()->first();
-        return  $user->phone;
+        return  $user->phone?? null;
     }
     public function schedules()
     {

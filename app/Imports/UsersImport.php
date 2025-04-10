@@ -26,8 +26,8 @@ class UsersImport implements ToModel, WithHeadingRow, WithBatchInserts, WithChun
 
             return new User([
                 'name' => $row['full_name'],
-                'first_name' => $row['last_name'] ?? null,
-                'last_name' => $row['first_name'] ?? null,
+                'first_name' => $row['first_name'] ?? null,
+                'last_name' => $row['last_name'] ?? null,
                 'email' => $row['email'] ?? null,
                 'password' => Hash::make($row['mobile_number'] ?? '12345abc'),
                 'phone' => $row['mobile_number'] ?? null,

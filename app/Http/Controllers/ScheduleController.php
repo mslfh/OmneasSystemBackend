@@ -152,6 +152,59 @@ class ScheduleController extends BaseController
         );
     }
 
+    public function insert(Request $request)
+    {
+        $data = $request->validate([
+            'staff_id' => 'required|integer',
+            'schedule_type' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+            'week_days' => 'required|array',
+            'week_days.*.day' => 'required|string',
+            'week_days.*.start_time' => 'required|string',
+            'week_days.*.end_time' => 'required|string',
+            'week_days.*.additional_times' => 'nullable|array',
+            'week_days.*.additional_times.*.start' => 'required_with:week_days.*.additional_times|string',
+            'week_days.*.additional_times.*.end' => 'required_with:week_days.*.additional_times|string',
+        ]);
+
+        $startDate = Carbon::createFromFormat('Y-m-d', $data['start_date']);
+        $endDate = Carbon::createFromFormat('Y-m-d', $data['end_date']);
+        $weekDays = collect($data['week_days']);
+
+        for ($currentDate = $startDate; $currentDate->lte($endDate); $currentDate->addDay()) {
+            $dayName = $currentDate->format('l');
+
+            $matchingDay = $weekDays->firstWhere('day', $dayName);
+            if ($matchingDay) {
+                $this->scheduleService->createSchedule([
+                    'staff_id' => $data['staff_id'],
+                    'work_date' => $currentDate->format('Y-m-d'),
+                    'start_time' => $matchingDay['start_time'],
+                    'end_time' => $matchingDay['end_time'],
+                    'status' => 'active',
+                ]);
+
+                if (!empty($matchingDay['additional_times'])) {
+                    foreach ($matchingDay['additional_times'] as $additionalTime) {
+                        $this->scheduleService->createSchedule([
+                            'staff_id' => $data['staff_id'],
+                            'work_date' => $currentDate->format('Y-m-d'),
+                            'start_time' => $additionalTime['start'],
+                            'end_time' => $additionalTime['end'],
+                            'status' => 'active',
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return response()->json([
+            'message' => 'Schedule created successfully',
+            'data' => '',
+        ]);
+    }
+
     public function update(Request $request, $id)
     {
         $data = $request->validate([

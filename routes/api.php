@@ -64,6 +64,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('user', UserController::class);
     Route::post('/importUser', [UserController::class, 'importUser']);
     Route::get('/findUserByField', [UserController::class, 'findByField']);
-
+    Route::post('/insertSchedule', [ScheduleController::class, 'insert']);
 });
 

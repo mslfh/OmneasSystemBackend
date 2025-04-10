@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
             $table->boolean('is_first')->default(false);
-            $table->string('customer_first_name');
-            $table->string('customer_last_name');
+            $table->string('customer_first_name')->nullable();
+            $table->string('customer_last_name')->nullable();
             $table->string('customer_phone')->nullable();
             $table->string('customer_email')->nullable();
             $table->string('comments')->nullable();

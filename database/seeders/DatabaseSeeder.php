@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\SystemSetting;
 use App\Models\User;
 use App\Models\SpecialRole;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -37,6 +38,19 @@ class DatabaseSeeder extends Seeder
             'description' => 'Front Desk Role',
             'is_active' => true,
             'user_id' => $desk->id
+        ]);
+
+        SystemSetting::create([
+            'key' => 'opening_time',
+            'value' => '08:00',
+            'description' => 'Opening time of the system',
+            'type' => 'time'
+        ]);
+        SystemSetting::create([
+            'key' => 'closing_time',
+            'value' => '19:00',
+            'description' => 'Closing time of the system',
+            'type' => 'time'
         ]);
     }
 }

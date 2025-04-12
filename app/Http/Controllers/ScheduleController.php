@@ -9,20 +9,25 @@ use App\Services\ServiceAppointmentService;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use App\Services\SystemSettingService;
 
 class ScheduleController extends BaseController
 {
+    protected $systemSettingService;
     protected $scheduleService;
     protected $serviceAppointmentService;
     protected $appointmentService;
+
     public function __construct(
         ScheduleService $scheduleService,
         AppointmentService $appointmentService,
-        ServiceAppointmentService $serviceAppointmentService
+        ServiceAppointmentService $serviceAppointmentService,
+        SystemSettingService $systemSettingService
     ) {
         $this->scheduleService = $scheduleService;
         $this->serviceAppointmentService = $serviceAppointmentService;
         $this->appointmentService = $appointmentService;
+        $this->systemSettingService = $systemSettingService;
     }
 
     public function index()
@@ -38,39 +43,67 @@ class ScheduleController extends BaseController
     public function getUnavailableTimeFromShedules(Request $request)
     {
         $date = $request->input('date');
-
         $formatDate = Carbon::createFromFormat('Y/m/d', $date);
 
-        $unavilableTime = [];
+        // Get all staff schedules
+        $allStaffSchedules = Staff::select('id', 'status')
+            ->with('schedules', function ($query) use ($formatDate) {
+                $query->select('id','staff_id', 'start_time', 'end_time', 'work_date','status')
+                ->where('status', 'active')
+                    ->where('work_date', '=', $formatDate->format('Y-m-d'));
+            })
+            ->where('status', 'active')
+            ->get();
+
+        $allSchedules = $allStaffSchedules->pluck('schedules')->flatten();
+        $minScheduleTime = $allSchedules->min('start_time');
+        $maxScheduleTime = $allSchedules->max('end_time');
+        $unavilableTime = [
+            'start_time' => $minScheduleTime,
+            'end_time' => $maxScheduleTime,
+            'unavilable_time' => [],
+        ];
         //if date is today
         if ($formatDate->isToday()) {
-            $unavilableTime[] = [
-                'start_time' => "08:00",
-                'end_time' => Carbon::now('Australia/Sydney')->format('H:i'),
-            ];
+            //check today has schedule
+            $todaySchedule = $this->scheduleService->getAvailableScheduleByDate($formatDate->format('Y-m-d'));
+            if ($todaySchedule->isEmpty()) {
+                $unavilableTime['unavilable_time'][] = [
+                    'start_time' => $minScheduleTime,
+                    'end_time' => $maxScheduleTime
+                ];
+                return response()->json($unavilableTime);
+            } else {
+                $unavilableTime['unavilable_time'][] = [
+                    'start_time' => $minScheduleTime,
+                    'end_time' => Carbon::now('Australia/Sydney')->format('H:i'),
+                ];
+            }
         }
         // Get existing appointments of this schedule
         $existingAppointments = $this->serviceAppointmentService->getAppointmentsFromDate($formatDate);
+        $scheduleIntervals = collect($allSchedules)->map(function ($item) {
+            return [
+                'start' => Carbon::createFromFormat('H:i', $item->start_time),
+                'end' => Carbon::createFromFormat('H:i', $item->end_time),
+            ];
+        })->sortBy('start')->values();
 
-        $allStaff = Staff::with('schedules')
-            ->where('status', 'active')
-            ->get();
-        $maxWorkDate = $allStaff
-            ->pluck('schedules')
-            ->flatten()
-            ->max('work_date');
-        $staffNumber = 0;
-        if ($maxWorkDate && $maxWorkDate < $formatDate->format('Y-m-d')) {
-            $staffNumber = $allStaff->count();
-        } else {
-            $staffNumber = Staff::with('schedules')
-                ->where('status', 'active')->whereHas('schedules', function ($query) use ($formatDate) {
-                    $query->where('work_date', '=', $formatDate->format('Y-m-d'));
-                })->count();
+        $noScheduleIntervals = $this->findNoScheduleIntervals(
+            $minScheduleTime,
+            $maxScheduleTime,
+            $scheduleIntervals
+        );
+        foreach ($noScheduleIntervals as $noScheduleInterval) {
+            $unavilableTime['unavilable_time'][] = [
+                'start_time' => $noScheduleInterval['start_time'],
+                'end_time' => $noScheduleInterval['end_time'],
+            ];
         }
-        $busyIntervals = $this->findBusyIntervals( $existingAppointments,$staffNumber );
+        // Get all busy intervals
+        $busyIntervals = $this->findBusyIntervals($existingAppointments, $allSchedules);
         foreach ($busyIntervals as $busyInterval) {
-            $unavilableTime[] = [
+            $unavilableTime['unavilable_time'][] = [
                 'start_time' => $busyInterval['start_time'],
                 'end_time' => $busyInterval['end_time'],
             ];
@@ -78,7 +111,31 @@ class ScheduleController extends BaseController
         return response()->json($unavilableTime);
     }
 
-    public function findBusyIntervals(Collection $appointments, int $limit)
+    public function findNoScheduleIntervals($openingTime, $closingTime, Collection $scheduleIntervals)
+    {
+        $gaps = [];
+        $cursor = Carbon::createFromFormat('H:i', $openingTime);
+        foreach ($scheduleIntervals as $interval) {
+            if ($interval['start']->gt($cursor)) {
+                $gaps[] = [
+                    'start_time' => $cursor->format('H:i'),
+                    'end_time' => $interval['start']->format('H:i'),
+                ];
+            }
+            if ($interval['end']->gt($cursor)) {
+                $cursor = $interval['end']->copy();
+            }
+        }
+        if ($cursor->lt($closingTime)) {
+            $gaps[] = [
+                'start_time' => $cursor->format('H:i'),
+                'end_time' => $closingTime,
+            ];
+        }
+        return $gaps;
+    }
+
+    public function findBusyIntervals(Collection $appointments, Collection $schedules)
     {
         // 1. 提取所有时间点
         $events = [];
@@ -101,17 +158,21 @@ class ScheduleController extends BaseController
         $startTime = null;
 
         foreach ($events as $event) {
+            // 计算当前时间点的排班数
+            $limit = $schedules
+                ->where('start_time', '<=', $event['time']->toTimeString())
+                ->where('end_time', '>=', $event['time']->toTimeString())
+                ->count();
+
             if ($event['type'] === 'start') {
                 $currentCount++;
             } else {
                 $currentCount--;
             }
-
             // 进入满足条件的时间区间
             if ($currentCount >= $limit && !$startTime) {
                 $startTime = $event['time'];
             }
-
             // 离开满足条件的时间区间
             if ($currentCount < $limit && $startTime) {
                 $busyPeriods[] = [
@@ -151,7 +212,6 @@ class ScheduleController extends BaseController
             ]
         );
     }
-
     public function insert(Request $request)
     {
         $data = $request->validate([

@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PackageController;
@@ -12,6 +12,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ScheduleHistoryController;
 use App\Http\Controllers\ServiceAppointmentController;
+use App\Http\Controllers\SystemSettingController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
@@ -62,6 +63,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('service-appointments', ServiceAppointmentController::class);
     Route::apiResource('staff', StaffController::class)->except(['index','show']);
     Route::apiResource('user', UserController::class);
+    Route::apiResource('system-setting', SystemSettingController::class);
     Route::post('/importUser', [UserController::class, 'importUser']);
     Route::get('/findUserByField', [UserController::class, 'findByField']);
     Route::post('/insertSchedule', [ScheduleController::class, 'insert']);

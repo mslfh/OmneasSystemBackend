@@ -41,16 +41,15 @@ class StaffController extends BaseController
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:15',
             'position' => 'nullable|string',
             'status' => 'string|in:active,inactive',
             'description' => 'nullable|string',
             'tag' => 'nullable|string',
-
             'has_certificate' => 'nullable|string',
-            // 'level' => 'numeric|min:0|max:5',
-            // 'sort' => 'nullable|integer',
-            'email' => 'required|email|max:255|unique:users,email',
-            'phone' => 'nullable|string|max:15',
+            'level' => 'nullable|numeric',
+            'sort' => 'nullable|integer',
+            'email' => 'nullable|email|max:255',
             'password' => 'required|string|min:8',
             'avatar' => 'nullable',
         ]);
@@ -58,10 +57,11 @@ class StaffController extends BaseController
         //Create a user for this staff
         $userData = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required',
+            'phone' => 'required|string|max:15',
+            'email' => 'nullable|email|max:255',
             'password' => 'required',
-            'phone' => 'nullable|string|max:15'
         ]);
+
         DB::beginTransaction();
         try {
             $user = $this->userService->createUser($userData);
@@ -85,25 +85,27 @@ class StaffController extends BaseController
     public function update(Request $request, $id)
     {
         $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:15',
             'position' => 'nullable|string',
+            'status' => 'string|in:active,inactive',
             'description' => 'nullable|string',
             'tag' => 'nullable|string',
             'has_certificate' => 'nullable|string',
-            'status' => 'string|in:active,inactive',
-            // 'level' => 'numeric|min:0|max:5',
-            // 'sort' => 'nullable|integer',
-            'name' => 'sometimes|string|max:255',
-            'phone' => 'nullable|string|max:15',
-            'password' => 'nullable|string|min:8',
+            'level' => 'nullable|numeric',
+            'sort' => 'nullable|integer',
+            'email' => 'nullable|email|max:255',
+            'password' => 'required|string|min:8',
             'avatar' => 'nullable',
         ]);
 
         DB::beginTransaction();
-        // try {
+        try {
             $staff = $this->staffService->getStaffById($id);
 
             $userData = [
                 'name' => $data['name'] ?? $staff->user->name,
+                'email' => $data['email'] ?? $staff->user->email,
                 'phone' => $data['phone'] ?? $staff->user->phone,
                 'password' => $data['password'] ?? $staff->user->password,
             ];
@@ -123,10 +125,10 @@ class StaffController extends BaseController
 
             DB::commit();
             return response()->json($updatedStaff);
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     return response()->json(['error' => 'Failed to update staff'], 500);
-        // }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Failed to update staff'], 500);
+        }
     }
     public function destroy($id)
     {

@@ -67,7 +67,7 @@ class AppointmentController extends BaseController
                     'service_title' => $service->service_title,
                     'service_duration' => $service->service_duration,
                     'service_price' => $service->service_price,
-                    'customer_name' => $appointment->customer_first_name,
+                    'customer_name' =>  $service->customer_name,
                     'comments' => $appointment->comments,
 
                     'appointment_id' => $appointment->id,
@@ -137,7 +137,7 @@ class AppointmentController extends BaseController
         $appointmentData['tag'] = implode(',', $data['tag']);
         // Create the appointment
         DB::beginTransaction();
-        // try {
+        try {
             $appointment = $this->appointmentService->createAppointment($appointmentData);
             // Create associated service appointments
             foreach ($data['customer_service'] as $serviceData) {
@@ -162,10 +162,10 @@ class AppointmentController extends BaseController
             }
             DB::commit();
             return response()->json($appointment->load('services'), 201);
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     return response()->json(['error' => 'Failed to create appointment'], 500);
-        // }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Failed to create appointment'], 500);
+        }
     }
 
     public function update(Request $request, $id)

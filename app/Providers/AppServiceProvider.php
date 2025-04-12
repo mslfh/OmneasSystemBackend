@@ -22,6 +22,8 @@ use App\Repositories\OrderRepository;
 use App\Repositories\UserRepository;
 use App\Contracts\AppointmentContract;
 use App\Repositories\AppointmentRepository;
+use App\Contracts\SystemSettingContract;
+use App\Repositories\SystemSettingRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -39,6 +41,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(OrderContract::class, OrderRepository::class);
         $this->app->bind(AppointmentContract::class, AppointmentRepository::class);
         $this->app->bind(UserContract::class, UserRepository::class);
+        $this->app->bind(SystemSettingContract::class, SystemSettingRepository::class);
     }
 
     /**

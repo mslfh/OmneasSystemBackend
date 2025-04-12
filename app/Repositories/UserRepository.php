@@ -8,7 +8,11 @@ class UserRepository
 {
     public function getAll()
     {
-        return User::limit(200)->get();
+        // Get all users with a limit of 200
+        return User::where('id', '!=', 1)
+            ->where('id', '!=', 2)
+            ->whereDoesntHave('staff')
+            ->limit(200)->get();
     }
 
     public function findByField($field)
@@ -16,6 +20,7 @@ class UserRepository
         return User::where('name', 'like', '%' . $field . '%')
             ->orWhere('phone', 'like', '%' . $field . '%')
             ->orWhere('email', 'like', '%' . $field . '%')
+            ->limit(50)
             ->get();
     }
 

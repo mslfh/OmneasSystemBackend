@@ -21,6 +21,12 @@ class ScheduleRepository implements ScheduleContract
             ->get();
     }
 
+    public function getAvailableScheduleByDate($date)
+    {
+        return Schedule::whereDate('work_date', $date)
+        ->where('status', '!=','off')->get();
+    }
+
     public function getScheduleById($id)
     {
         return Schedule::findOrFail($id);

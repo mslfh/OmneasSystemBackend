@@ -22,6 +22,10 @@ class ScheduleService
         return $this->scheduleRepository->getAllAvailableSchedules();
     }
 
+    public function getAvailableScheduleByDate($date)
+    {
+        return $this->scheduleRepository->getAvailableScheduleByDate($date);
+    }
     public function getScheduleById($id)
     {
         return $this->scheduleRepository->getScheduleById($id);

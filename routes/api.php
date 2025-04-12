@@ -58,6 +58,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('schedules', ScheduleController::class)->except(['index','show']);
     Route::apiResource('appointments', AppointmentController::class)->except(['index','show']);
     Route::get('/getBookedServiceByDate', [AppointmentController::class, 'getBookedServiceByDate']);
+    Route::post('/takeBreakAppointment', [AppointmentController::class, 'takeBreakAppointment']);
     Route::apiResource('orders', OrderController::class);
     Route::apiResource('schedule-histories', ScheduleHistoryController::class);
     Route::apiResource('service-appointments', ServiceAppointmentController::class);

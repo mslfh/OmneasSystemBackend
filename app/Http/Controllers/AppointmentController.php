@@ -64,10 +64,11 @@ class AppointmentController extends BaseController
                     'booking_time' => $service->booking_time,
                     'expected_end_time' => $service->expected_end_time,
                     'package_title' => $service->package_title,
+                    'service_id' => $service->service_id,
                     'service_title' => $service->service_title,
                     'service_duration' => $service->service_duration,
                     'service_price' => $service->service_price,
-                    'customer_name' =>  $service->customer_name,
+                    'customer_name' => $service->customer_name,
                     'comments' => $appointment->comments,
 
                     'appointment_id' => $appointment->id,
@@ -94,38 +95,74 @@ class AppointmentController extends BaseController
         // Create the appointment
         DB::beginTransaction();
         // try {
-            $appointment = $this->appointmentService->createAppointment($appointmentData);
-            // Create associated service appointments
-            foreach ($data['customer_service'] as $serviceData) {
+        $appointment = $this->appointmentService->createAppointment($appointmentData);
+        // Create associated service appointments
+        foreach ($data['customer_service'] as $serviceData) {
 
-                $service = Service::with('package')->findOrFail($serviceData['service']['id']);
-                $serviceData['service_id'] = $service->id;
-                $serviceData['staff_id'] = $service->staff_id;
-                $serviceData['package_id'] = $service->package_id;
-                $serviceData['package_title'] = $service->package->title;
-                $serviceData['package_hint'] = $service->package->hint;
+            $service = Service::with('package')->findOrFail($serviceData['service']['id']);
+            $serviceData['service_id'] = $service->id;
+            $serviceData['staff_id'] = $service->staff_id;
+            $serviceData['package_id'] = $service->package_id;
+            $serviceData['package_title'] = $service->package->title;
+            $serviceData['package_hint'] = $service->package->hint;
 
-                $serviceData['service_id'] = $service->id;
-                $serviceData['service_title'] = $service->title;
-                $serviceData['service_description'] = $service->description;
-                $serviceData['service_duration'] = $service->duration;
-                $serviceData['service_price'] = $service->price;
+            $serviceData['service_id'] = $service->id;
+            $serviceData['service_title'] = $service->title;
+            $serviceData['service_description'] = $service->description;
+            $serviceData['service_duration'] = $service->duration;
+            $serviceData['service_price'] = $service->price;
 
-                $serviceData['appointment_id'] = $appointment->id;
-                $serviceData['booking_time'] = $appointment->booking_time;
-                $serviceData['expected_end_time'] = Carbon::parse($appointment->booking_time)->addMinutes($service->duration);
+            $serviceData['appointment_id'] = $appointment->id;
+            $serviceData['booking_time'] = $appointment->booking_time;
+            $serviceData['expected_end_time'] = Carbon::parse($appointment->booking_time)->addMinutes($service->duration);
 
-                $serviceData['staff_id'] = $serviceData['staff']['id']??'0';
-                $serviceData['staff_name'] = $serviceData['staff']['name']??'';
-                $this->appointmentService->createServiceAppointment($serviceData);
-            }
-            DB::commit();
-            return response()->json($appointment->load('services'), 201);
+            $serviceData['staff_id'] = $serviceData['staff']['id'] ?? '0';
+            $serviceData['staff_name'] = $serviceData['staff']['name'] ?? '';
+            $this->appointmentService->createServiceAppointment($serviceData);
+        }
+        DB::commit();
+        return response()->json($appointment->load('services'), 201);
         // } catch (\Exception $e) {
         //     DB::rollBack();
         //     return response()->json(['error' => 'Failed to create appointment'], 500);
         // }
     }
+
+    public function takeBreakAppointment(Request $request)
+    {
+        $data = $request->all();
+        $appointmentData = [
+            'status' => 'break',
+            'booking_time' => $data['date'] . ' ' . $data['time'],
+        ];
+        $appointmentServiceData = [
+            'booking_time' => $data['date'] . ' ' . $data['time'],
+            'expected_end_time' => $data['date'] . ' ' . $data['expected_end_time'],
+            'service_id' => 0,
+            'package_id' => 0,
+            'service_title' => $data['service_title'],
+            'service_duration' => $data['service_duration'],
+            'staff_id' => $data['staff_id'],
+            'staff_name' => $data['staff_name'],
+            'status' => 'break',
+            'customer_name' => $data['staff_name'],
+            'comments' => $data['comments'],
+        ];
+        // Create the appointment
+        DB::beginTransaction();
+        // try {
+        $appointment = $this->appointmentService->createAppointment($appointmentData);
+        // Create associated service appointments
+        $appointmentServiceData['appointment_id'] = $appointment->id;
+        $this->appointmentService->createServiceAppointment($appointmentServiceData);
+        DB::commit();
+        return response()->json($appointment->load('services'), 201);
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return response()->json(['error' => 'Failed to create appointment'], 500);
+        // }
+    }
+
 
     public function makeAppointment(Request $request)
     {
@@ -156,8 +193,8 @@ class AppointmentController extends BaseController
                 $serviceData['appointment_id'] = $appointment->id;
                 $serviceData['booking_time'] = $appointment->booking_time;
                 $serviceData['expected_end_time'] = Carbon::parse($appointment->booking_time)->addMinutes($service->duration);
-                $serviceData['staff_id'] = $serviceData["staff_id"]??'0';
-                $serviceData['staff_name'] = $serviceData["staff_name"]??'';
+                $serviceData['staff_id'] = $serviceData["staff_id"] ?? '0';
+                $serviceData['staff_name'] = $serviceData["staff_name"] ?? '';
                 $this->appointmentService->createServiceAppointment($serviceData);
             }
             DB::commit();

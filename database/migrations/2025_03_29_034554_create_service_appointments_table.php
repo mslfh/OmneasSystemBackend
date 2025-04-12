@@ -18,8 +18,8 @@ return new class extends Migration
             $table->dateTime('booking_time');
             $table->dateTime('expected_end_time')->nullable();
 
-            $table->foreignId('service_id')->constrained('services');
-            $table->foreignId('package_id')->constrained('packages')->nullable();
+            $table->foreignId('service_id')->nullable();;
+            $table->foreignId('package_id')->nullable();
 
             $table->string('package_title')->nullable();
             $table->string('package_hint')->nullable();

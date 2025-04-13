@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\AppointmentService;
+use App\Services\ServiceAppointmentService;
 use Carbon\Carbon;
 use App\Models\Service;
 use Illuminate\Http\Request;
@@ -12,10 +13,12 @@ use Illuminate\Support\Facades\DB;
 class AppointmentController extends BaseController
 {
     protected $appointmentService;
+    protected $serviceAppointmentService;
 
-    public function __construct(AppointmentService $appointmentService)
+    public function __construct(AppointmentService $appointmentService,ServiceAppointmentService $serviceAppointmentService)
     {
         $this->appointmentService = $appointmentService;
+        $this->serviceAppointmentService = $serviceAppointmentService;
     }
 
     public function index()
@@ -70,12 +73,11 @@ class AppointmentController extends BaseController
                     'service_price' => $service->service_price,
                     'customer_name' => $service->customer_name,
                     'comments' => $appointment->comments,
-
                     'appointment_id' => $appointment->id,
-                    'contact_first_name' => $appointment->customer_first_name,
-                    'contact_last_name' => $appointment->customer_last_name,
-                    'contact_phone' => $appointment->customer_phone,
-                    'contact_email' => $appointment->customer_email,
+                    'customer_first_name' => $appointment->customer_first_name,
+                    'customer_last_name' => $appointment->customer_last_name,
+                    'customer_phone' => $appointment->customer_phone,
+                    'customer_email' => $appointment->customer_email,
                     'tag' => $appointment->tag,
                     'status' => $appointment->status,
                 ];
@@ -163,7 +165,6 @@ class AppointmentController extends BaseController
         // }
     }
 
-
     public function makeAppointment(Request $request)
     {
         $data = $request->all();
@@ -207,8 +208,9 @@ class AppointmentController extends BaseController
 
     public function update(Request $request, $id)
     {
-        $data = $request->validate([
-            'booking_time' => 'sometimes|date',
+        $appointmentData = $request->validate([
+            'booking_time' => 'sometimes|string',
+            'booking_date' => 'sometimes|string',
             'customer_first_name' => 'sometimes|string',
             'customer_last_name' => 'sometimes|string',
             'is_first' => 'boolean',
@@ -216,11 +218,45 @@ class AppointmentController extends BaseController
             'customer_email' => 'nullable|email',
             'customer_comments' => 'nullable|string',
             'tag' => 'nullable|string',
+            'comments' => 'nullable|string',
             'start_time' => 'nullable|date',
             'end_time' => 'nullable|date',
-            'status' => 'nullable|string|in:pending,confirmed,cancelled,in_progress,completed',
         ]);
-        return response()->json($this->appointmentService->updateAppointment($id, $data));
+        $appointmentData['booking_time'] = $appointmentData['booking_date'] . ' ' . $appointmentData['booking_time'];
+
+        $inputService = $request->input('service');
+        $staff = $request->input('staff');
+        $serviceData = [];
+        $appointment = $this->appointmentService->getAppointmentById($id);
+        if (isset($inputService['id'])) {
+            $service = Service::with('package')->findOrFail($inputService['id']);
+            $serviceData['service_id'] = $service->id;
+            $serviceData['package_id'] = $service->package_id;
+            $serviceData['package_title'] = $service->package->title;
+            $serviceData['package_hint'] = $service->package->hint;
+
+            $serviceData['service_id'] = $service->id;
+            $serviceData['service_title'] = $service->title;
+            $serviceData['service_description'] = $service->description;
+            $serviceData['service_duration'] = $service->duration;
+            $serviceData['service_price'] = $service->price;
+            $serviceData['comments'] = $appointmentData['comments']??'';
+        }
+        $serviceAppointment = $appointment->services->first();
+        if ($appointment->booking_time != $appointmentData['booking_time']) {
+            $serviceData['booking_time'] = $appointmentData['booking_time'];
+            if (isset($inputService['id'])) {
+                $serviceData['expected_end_time'] = Carbon::parse($appointmentData['booking_time'])->addMinutes($service->duration);
+            }
+            else{
+                $serviceData['expected_end_time'] = Carbon::parse($appointmentData['booking_time'])
+                ->addMinutes($serviceAppointment->service_duration);
+            }
+        }
+        $serviceData['staff_id'] = $staff['id'];
+        $serviceData['staff_name'] = $staff['name'];
+        $this->serviceAppointmentService->updateServiceAppointment($serviceAppointment->id,$serviceData);
+        return response()->json( $this->appointmentService->updateAppointment($id,$appointmentData));
     }
 
     public function destroy($id)

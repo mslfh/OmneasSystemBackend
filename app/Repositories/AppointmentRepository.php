@@ -45,6 +45,7 @@ class AppointmentRepository implements AppointmentContract
     public function delete($id)
     {
         $appointment = Appointment::findOrFail($id);
+        $appointment->services()->delete();
         $appointment->delete();
         return $appointment;
     }

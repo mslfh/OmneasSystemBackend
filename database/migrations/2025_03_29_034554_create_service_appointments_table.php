@@ -35,6 +35,7 @@ return new class extends Migration
             $table->foreignId('staff_id')->nullable();
             $table->string('staff_name')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

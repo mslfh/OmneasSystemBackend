@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\AppointmentService;
 use App\Services\ServiceAppointmentService;
+use App\Services\UserService;
 use Carbon\Carbon;
 use App\Models\Service;
 use Illuminate\Http\Request;
@@ -14,11 +15,14 @@ class AppointmentController extends BaseController
 {
     protected $appointmentService;
     protected $serviceAppointmentService;
+    protected $userService;
 
-    public function __construct(AppointmentService $appointmentService,ServiceAppointmentService $serviceAppointmentService)
+    public function __construct(AppointmentService $appointmentService,ServiceAppointmentService $serviceAppointmentService,
+    UserService $userService)
     {
         $this->appointmentService = $appointmentService;
         $this->serviceAppointmentService = $serviceAppointmentService;
+        $this->userService = $userService;
     }
 
     public function index()
@@ -94,6 +98,17 @@ class AppointmentController extends BaseController
         $appointmentData = $data;
         unset($appointmentData['customer_service']);
         unset($appointmentData['booking_date']);
+        $userData = [];
+        if($data['is_first']){
+            $userData = [
+                'name' => $data['customer_service'][0]['customer_name'],
+                'first_name' => $data['customer_first_name']??'',
+                'last_name' => $data['customer_last_name']??'',
+                'phone' => $data['customer_phone']??'',
+                'email' => $data['customer_email']??'',
+                'password' => bcrypt($data['customer_phone']),
+            ];
+        }
         // Create the appointment
         DB::beginTransaction();
         // try {
@@ -121,6 +136,9 @@ class AppointmentController extends BaseController
             $serviceData['staff_id'] = $serviceData['staff']['id'] ?? '0';
             $serviceData['staff_name'] = $serviceData['staff']['name'] ?? '';
             $this->appointmentService->createServiceAppointment($serviceData);
+        }
+        if($data['is_first']){
+            $this->userService->createUser($userData);
         }
         DB::commit();
         return response()->json($appointment->load('services'), 201);
@@ -211,8 +229,8 @@ class AppointmentController extends BaseController
         $appointmentData = $request->validate([
             'booking_time' => 'sometimes|string',
             'booking_date' => 'sometimes|string',
-            'customer_first_name' => 'sometimes|string',
-            'customer_last_name' => 'sometimes|string',
+            'customer_first_name' => 'nullable|string',
+            'customer_last_name' => 'nullable|string',
             'is_first' => 'boolean',
             'customer_phone' => 'nullable|string',
             'customer_email' => 'nullable|email',
@@ -221,11 +239,11 @@ class AppointmentController extends BaseController
             'comments' => 'nullable|string',
             'start_time' => 'nullable|date',
             'end_time' => 'nullable|date',
+            'status' => 'nullable|string',
         ]);
         $appointmentData['booking_time'] = $appointmentData['booking_date'] . ' ' . $appointmentData['booking_time'];
-
-        $inputService = $request->input('service');
-        $staff = $request->input('staff');
+        $inputService = $request->input('service')??[];
+        $staff = $request->input('staff')??[];
         $serviceData = [];
         $appointment = $this->appointmentService->getAppointmentById($id);
         if (isset($inputService['id'])) {
@@ -253,8 +271,10 @@ class AppointmentController extends BaseController
                 ->addMinutes($serviceAppointment->service_duration);
             }
         }
-        $serviceData['staff_id'] = $staff['id'];
-        $serviceData['staff_name'] = $staff['name'];
+        if($staff ){
+            $serviceData['staff_id'] = $staff['id'];
+            $serviceData['staff_name'] = $staff['name'];
+        }
         $this->serviceAppointmentService->updateServiceAppointment($serviceAppointment->id,$serviceData);
         return response()->json( $this->appointmentService->updateAppointment($id,$appointmentData));
     }

@@ -137,6 +137,18 @@ class ScheduleController extends BaseController
             })
             ->where('status', 'active')
             ->get();
+        if($allStaffSchedules->isEmpty()){
+            return response()->json([
+                'start_time' => "07:00",
+                'end_time' => "19:00",
+                'unavilable_time' => [
+                    [
+                        'start_time' =>"07:00",
+                        'end_time' => "19:00",
+                    ]
+                 ],
+            ]);
+        }
 
         $allSchedules = $allStaffSchedules->pluck('schedules')->flatten();
         $minScheduleTime = $allSchedules->min('start_time');

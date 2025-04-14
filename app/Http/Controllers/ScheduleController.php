@@ -121,6 +121,10 @@ class ScheduleController extends BaseController
         // Get staff schedules and appointments
         $allStaffSchedules = Staff::select('id', 'status')
             ->where('id', $staff)
+            ->whereHas('schedules', function ($query) use ($formatDate) {
+                $query->where('status', 'active')
+                    ->where('work_date', '=', $formatDate->format('Y-m-d'));
+            })
             ->with('schedules', function ($query) use ($formatDate) {
                 $query->select('id', 'staff_id', 'start_time', 'end_time', 'work_date', 'status')
                     ->where('status', 'active')

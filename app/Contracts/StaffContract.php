@@ -6,7 +6,7 @@ interface StaffContract
 {
     public function getAll();
 
-    public function getAvailableStaffFromScheduletime( $dateTime);
+    public function getAvailableStaffFromScheduletime( $dateTime,$duration);
     public function getById($id);
     public function create(array $data);
     public function update($id, array $data);

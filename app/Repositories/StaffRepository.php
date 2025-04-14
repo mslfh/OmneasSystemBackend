@@ -12,30 +12,21 @@ class StaffRepository implements StaffContract
         return Staff::all();
     }
 
-    public function getAvailableStaffFromScheduletime($dateTime)
+    public function getAvailableStaffFromScheduletime($dateTime, $duration)
     {
-        $formatDateTime = \Carbon\Carbon::createFromFormat('Y/m/d H:i', $dateTime);
+        $dateTime = str_replace('-', '/', $dateTime);
+        $formatStartTime = \Carbon\Carbon::createFromFormat('Y/m/d H:i', $dateTime);
+        $formatEndTime = $formatStartTime->copy()->addMinutes($duration);
 
-        // Check if max work_date of schedules is less than the current date
-        $allStaff = Staff::with('schedules')
-            ->where('status', 'active')
-            ->get();
-        $maxWorkDate = $allStaff
-            ->pluck('schedules')
-            ->flatten()
-            ->max('work_date');
-        if ($maxWorkDate && $maxWorkDate < $formatDateTime->format('Y-m-d')) {
-            return $allStaff;
-        }
         return Staff::where('status', 'active')
-            ->whereHas('schedules', function ($query) use ($formatDateTime) {
-                $query->where('work_date', '=', $formatDateTime->format('Y-m-d'))
-                    ->where('start_time', '<=', $formatDateTime->format('H:i'))
-                    ->where('end_time', '>=', $formatDateTime->format('H:i'));
+            ->whereHas('schedules', function ($query) use ($formatStartTime) {
+                $query->where('work_date', '=', $formatStartTime->format('Y-m-d'));
             })
-            ->whereDoesntHave('bookingServices', function ($query) use ($formatDateTime) {
-                $query->where('booking_time', '<=', $formatDateTime)
-                    ->where('expected_end_time', '>=', $formatDateTime);
+            ->whereDoesntHave('bookingServices', function ($query) use ($formatStartTime, $formatEndTime) {
+                $query->where(function ($subQuery) use ($formatStartTime, $formatEndTime) {
+                    $subQuery->where('booking_time', '<', $formatEndTime)
+                             ->whereRaw('DATE_ADD(booking_time, INTERVAL service_duration MINUTE) > ?', [$formatStartTime]);
+                });
             })
             ->get();
     }

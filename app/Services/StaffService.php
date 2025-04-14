@@ -14,9 +14,9 @@ class StaffService
     }
 
 
-    public function getAvailableStaffFromScheduletime($dateTime)
+    public function getAvailableStaffFromScheduletime($dateTime,$duration)
     {
-        return $this->staffRepository->getAvailableStaffFromScheduletime($dateTime);
+        return $this->staffRepository->getAvailableStaffFromScheduletime($dateTime,$duration);
     }
     public function getAvailableStaffFromScheduledate($dateTime)
     {

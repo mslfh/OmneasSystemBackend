@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('appointment_id')->constrained('appointments');
 
             $table->dateTime('booking_time');
-            $table->dateTime('expected_end_time')->nullable();
 
             $table->foreignId('service_id')->nullable();;
             $table->foreignId('package_id')->nullable();

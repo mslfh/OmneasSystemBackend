@@ -40,6 +40,16 @@ class StaffRepository implements StaffContract
             ->get();
     }
 
+    public function getAvailableStaffFromScheduledate($date)
+    {
+        $formatDate = \Carbon\Carbon::createFromFormat('Y/m/d', $date);
+        return Staff::where('status', 'active')
+            ->whereHas('schedules', function ($query) use ($formatDate) {
+                $query->where('work_date', '=', $formatDate->format('Y-m-d'));
+            })
+            ->get();
+    }
+
     public function getById($id)
     {
         $staff = Staff::findOrFail($id);

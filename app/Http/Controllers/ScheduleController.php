@@ -191,7 +191,7 @@ class ScheduleController extends BaseController
         return response()->json($unavilableTime);
     }
 
-    public function findBusyIntervalsOfStaff(Collection $appointments)
+    public function findBusyIntervalsOfStaff(Collection $appointments,$limit = 1)
     {
         // 1. 提取所有时间点
         $events = [];
@@ -214,8 +214,6 @@ class ScheduleController extends BaseController
         $startTime = null;
 
         foreach ($events as $event) {
-            // 计算当前时间点的排班数
-            $limit = 1;
 
             if ($event['type'] === 'start') {
                 $currentCount++;

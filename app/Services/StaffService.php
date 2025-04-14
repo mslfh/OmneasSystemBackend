@@ -13,9 +13,14 @@ class StaffService
         $this->staffRepository = $staffRepository;
     }
 
+
     public function getAvailableStaffFromScheduletime($dateTime)
     {
         return $this->staffRepository->getAvailableStaffFromScheduletime($dateTime);
+    }
+    public function getAvailableStaffFromScheduledate($dateTime)
+    {
+        return $this->staffRepository->getAvailableStaffFromScheduledate($dateTime);
     }
 
     public function getAllStaff()

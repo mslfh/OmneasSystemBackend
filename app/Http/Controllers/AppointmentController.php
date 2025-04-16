@@ -257,6 +257,7 @@ class AppointmentController extends BaseController
         $appointmentData = $request->validate([
             'booking_time' => 'sometimes|string',
             'booking_date' => 'sometimes|string',
+            'customer_name' => 'nullable|string',
             'customer_first_name' => 'nullable|string',
             'customer_last_name' => 'nullable|string',
             'is_first' => 'boolean',
@@ -297,6 +298,9 @@ class AppointmentController extends BaseController
         if ($staff) {
             $serviceData['staff_id'] = $staff['id'];
             $serviceData['staff_name'] = $staff['name'];
+        }
+        if(isset($appointmentData['customer_name'])){
+            $serviceData['customer_name'] = $appointmentData['customer_name'];
         }
         $this->serviceAppointmentService->updateServiceAppointment($serviceAppointment->id, $serviceData);
         return response()->json($this->appointmentService->updateAppointment($id, $appointmentData));

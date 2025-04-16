@@ -40,7 +40,7 @@ class ScheduleController extends BaseController
         return response()->json($this->scheduleService->getScheduleById($id));
     }
 
-    public function getUnavailableTimeFromShedules(Request $request)
+    public function getUnavailableTimeFromDate(Request $request)
     {
         $date = $request->input('date');
         $formatDate = Carbon::createFromFormat('Y/m/d', $date);
@@ -173,7 +173,7 @@ class ScheduleController extends BaseController
         $allStaffSchedules = $this->getStaffSchedules($staff, $formatDate);
 
         if ($allStaffSchedules->isEmpty()) {
-            return $this->defaultUnavailableTimeResponse();
+            return $this->noScheduleTimeResponse();
         }
 
         $allSchedules = $allStaffSchedules->pluck('schedules')->flatten();
@@ -224,7 +224,7 @@ class ScheduleController extends BaseController
             ->get();
     }
 
-    private function defaultUnavailableTimeResponse()
+    private function noScheduleTimeResponse()
     {
         return response()->json([
             'start_time' => "07:00",
@@ -373,6 +373,7 @@ class ScheduleController extends BaseController
             ]
         );
     }
+
     public function insert(Request $request)
     {
         $data = $request->validate([
@@ -446,6 +447,7 @@ class ScheduleController extends BaseController
         $this->scheduleService->deleteSchedule($id);
         return response()->json(null, 204);
     }
+
     public function getAvailableShedules()
     {
         $availableSchedules = [];

@@ -35,7 +35,7 @@ Route::get('/schedules', [ScheduleController::class, 'index']);
 Route::get('/schedules/{id}', [ScheduleController::class, 'show']);
 
 Route::get('/get-available-shedules', [ScheduleController::class, 'getAvailableShedules']);
-Route::get('/get-unavailable-time-from-date', [ScheduleController::class, 'getUnavailableTimeFromShedules']);
+Route::get('/get-unavailable-time-from-date', [ScheduleController::class, 'getUnavailableTimeFromDate']);
 Route::get('/get-unavailable-time-from-staff', [ScheduleController::class, 'getUnavailableTimeFromStaff']);
 
 Route::post('/make-appointment', [AppointmentController::class, 'makeAppointment']);

@@ -91,6 +91,8 @@ class AppointmentController extends BaseController
                     'customer_email' => $appointment->customer_email,
                     'tag' => $appointment->tag,
                     'status' => $appointment->status,
+                    'actual_start_time' => $appointment->actual_start_time,
+                    'actual_end_time' => $appointment->actual_end_time,
                 ];
             }
         }
@@ -101,8 +103,10 @@ class AppointmentController extends BaseController
     public function store(Request $request)
     {
         $data = $request->all();
+
         $data['booking_time'] = $data['booking_date'] . ' ' . $data['booking_time'];
         $appointmentData = $data;
+        $appointmentData['tag'] = implode(',', $data['tag']);
         unset($appointmentData['customer_service']);
         unset($appointmentData['booking_date']);
         $userData = [];
@@ -260,23 +264,28 @@ class AppointmentController extends BaseController
             'customer_name' => 'nullable|string',
             'customer_first_name' => 'nullable|string',
             'customer_last_name' => 'nullable|string',
-            'is_first' => 'boolean',
+            'is_first' => 'nullable|boolean',
             'customer_phone' => 'nullable|string',
             'customer_email' => 'nullable|email',
             'customer_comments' => 'nullable|string',
             'tag' => 'nullable|string',
             'comments' => 'nullable|string',
-            'start_time' => 'nullable|date',
-            'end_time' => 'nullable|date',
+            'actual_start_time' => 'nullable|string',
+            'actual_end_time' => 'nullable|string',
             'status' => 'nullable|string',
         ]);
         $serviceData = [];
         $appointment = $this->appointmentService->getAppointmentById($id);
-        $appointmentData['booking_time'] = $appointmentData['booking_date'] . ' ' . $appointmentData['booking_time'];
-        if($appointment->booking_time !=  $appointmentData['booking_time']){
-            $serviceData['booking_time'] = $appointmentData['booking_time'];
-        }else{
+        if(isset($appointmentData['booking_date'] ) && isset($appointmentData['booking_time'])){
+            $booking_time = $appointmentData['booking_date'] . ' ' . $appointmentData['booking_time'].":00";
             unset($appointmentData['booking_time']);
+            unset($appointmentData['booking_date']);
+            if($appointment->booking_time !=  $booking_time){
+                $serviceData['booking_time'] = $booking_time;
+            }
+        }
+        if(isset($appointmentData['actual_start_time'])){
+            $serviceData['booking_time'] = $appointmentData['actual_start_time'];
         }
         $inputService = $request->input('service') ?? [];
         $staff = $request->input('staff') ?? [];

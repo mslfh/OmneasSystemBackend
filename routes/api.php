@@ -29,6 +29,7 @@ Route::get('get-service-by-package/{id}', [ServiceController::class, 'getService
 Route::get('/staff', [StaffController::class, 'index']); // Public route to fetch staff
 Route::get('/staff/{id}', [StaffController::class, 'show']); // Public route to fetch a single staff
 Route::get('/get-available-staff-from-scheduletime', [StaffController::class, 'getAvailableStaffFromScheduledate']);
+Route::get('/get-staff-schedule-from-date', [StaffController::class, 'getStaffScheduleFromDate']);
 
 
 Route::get('/schedules', [ScheduleController::class, 'index']);

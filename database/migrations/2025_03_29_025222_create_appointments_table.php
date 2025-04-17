@@ -22,7 +22,7 @@ return new class extends Migration
 
             $table->string('tag')->nullable();
 
-            $table->dateTime('booking_time');
+            $table->dateTime('booking_time')->comment('The time the appointment was booked');
 
             $table->dateTime('actual_start_time')->nullable();
             $table->dateTime('actual_end_time')->nullable();

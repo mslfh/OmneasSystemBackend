@@ -29,6 +29,7 @@ return new class extends Migration
 
             $table->foreignId('operator_id')->constrained('staff')->nullable();
             $table->string('operator_name')->nullable();
+            $table->string('payment_note')->nullable();
 
             $table->timestamps();
         });

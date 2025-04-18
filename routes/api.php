@@ -70,5 +70,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/importUser', [UserController::class, 'importUser']);
     Route::get('/findUserByField', [UserController::class, 'findByField']);
     Route::post('/insertSchedule', [ScheduleController::class, 'insert']);
+    Route::get('/getUserBookingHistory', [AppointmentController::class, 'getUserBookingHistory']);
 });
 

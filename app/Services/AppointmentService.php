@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Contracts\AppointmentContract;
 use App\Services\ServiceAppointmentService;
+use App\Models\Appointment;
+use App\Models\User;
 
 class AppointmentService
 {
@@ -20,10 +22,41 @@ class AppointmentService
     {
         return $this->appointmentRepository->getAll();
     }
+    public function getPaginatedAppointments($start, $count, $filter, $sortBy, $descending)
+    {
+        $query = Appointment::query();
+
+        if ($filter) {
+            $query->where('name', 'like', "%$filter%") // Example filter
+                  ->orWhere('status', 'like', "%$filter%");
+        }
+        $sortDirection = $descending ? 'desc' : 'asc';
+        $query->with('services')->orderBy($sortBy, $sortDirection);
+
+        $total = $query->count();
+        $data = $query->skip($start)->take($count)->get();
+
+        return [
+            'data' => $data,
+            'total' => $total,
+        ];
+    }
 
     public function getAppointmentsFromDate($date)
     {
         return $this->appointmentRepository->getByDate($date);
+    }
+
+    public function getUserBookingHistory($id)
+    {
+        $user =  User::find($id);
+        $data=[
+            'name' => $user->name,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'phone' => $user->phone,
+        ];
+        return $this->appointmentRepository->getUserBookingHistory($data);
     }
 
     public function getAppointmentById($id)
@@ -33,7 +66,7 @@ class AppointmentService
 
     public function getServiceAppointments($id)
     {
-        return $this->serviceAppointmentService->getServiceAppointments($id);
+        return $this->appointmentRepository->getServiceAppointments($id);
     }
 
     public function createAppointment(array $data)

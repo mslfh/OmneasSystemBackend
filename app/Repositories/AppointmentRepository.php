@@ -20,6 +20,25 @@ class AppointmentRepository implements AppointmentContract
         )->with('services')->orderBy('booking_time')->get();
     }
 
+    public function getUserBookingHistory($data)
+    {
+        $name = $data['name'] ;
+        return Appointment::where(
+            'customer_first_name', $data['first_name']
+        )
+        ->orWhere(
+            'customer_last_name', $data['last_name']
+        )
+        ->orWhere(
+            "customer_phone",$data['phone']
+        )
+        ->orWhereHas('services',function ($query) use ( $name){
+            $query->where('customer_name', $name);
+        }
+        )
+        ->with('services')->orderBy('booking_time')->get();
+    }
+
     public function getById($id)
     {
         return Appointment::findOrFail($id)->load('services');

@@ -17,9 +17,21 @@ class OrderController extends BaseController
         $this->orderService = $orderService;
     }
 
-    public function index()
+
+    public function index(Request $request)
     {
-        return response()->json($this->orderService->getAllOrders());
+        $start = $request->query('start', 0);
+        $count = $request->query('count', 10);
+        $filter = $request->query('filter', null);
+        $sortBy = $request->query('sortBy', 'id');
+        $descending = $request->query('descending', false);
+
+        $orders = $this->orderService->getPaginatedOrders($start, $count, $filter, $sortBy, $descending);
+
+        return response()->json([
+            'rows' => $orders['data'],
+            'total' => $orders['total'],
+        ]);
     }
 
     public function show($id)
@@ -50,12 +62,19 @@ class OrderController extends BaseController
         if($appointment->status == 'finished'){
             return response()->json(['message' => 'Appointment already done'], 400);
         }
+        if($data['payment_method'] == 'unpaid'){
+            $data['order_status'] = 'pending';
+            $data['payment_status'] = 'unpaid';
+        }
+        else{
+            $data['order_status'] = 'paid';
+            $data['payment_status'] = 'success';
+        }
         $appointment->status = 'finished';
         $appointment->actual_start_time = $data['actual_start_time'];
         $appointment->actual_end_time = $data['actual_end_time'];
         $appointment->save();
-        $data['order_status'] = 'paid';
-        $data['payment_status'] = 'success';
+
         unset($data['status']);
         unset($data['actual_start_time']);
         unset($data['actual_end_time']);

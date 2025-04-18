@@ -31,9 +31,28 @@ class AppointmentController extends BaseController
         $this->staffService = $staffService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json($this->appointmentService->getAllAppointments());
+        $start = $request->query('start', 0);
+        $count = $request->query('count', 10);
+        $filter = $request->query('filter', null);
+        $sortBy = $request->query('sortBy', 'id');
+        $descending = $request->query('descending', false);
+
+        $appointments = $this->appointmentService->getPaginatedAppointments($start, $count, $filter, $sortBy, $descending);
+
+        return response()->json([
+            'rows' => $appointments['data'],
+            'total' => $appointments['total'],
+        ]);
+    }
+
+    public function getUserBookingHistory(Request $request)
+    {
+        $data = $request->validate([
+            'id' => 'required|exists:users,id',
+        ]);
+        return response()->json($this->appointmentService->getUserBookingHistory($data['id']));
     }
 
     public function show($id)

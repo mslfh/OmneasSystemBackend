@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\OrderContract;
+use App\Models\Order;
 
 class OrderService
 {
@@ -36,5 +37,26 @@ class OrderService
     public function deleteOrder($id)
     {
         return $this->orderRepository->deleteOrder($id);
+    }
+
+    public function getPaginatedOrders($start, $count, $filter, $sortBy, $descending)
+    {
+        $query = Order::query();
+
+        if ($filter) {
+            $query->where('name', 'like', "%$filter%") // Example filter
+                  ->orWhere('status', 'like', "%$filter%");
+        }
+
+        $sortDirection = $descending ? 'desc' : 'asc';
+        $query->orderBy($sortBy, $sortDirection);
+
+        $total = $query->count();
+        $data = $query->skip($start)->take($count)->get();
+
+        return [
+            'data' => $data,
+            'total' => $total,
+        ];
     }
 }

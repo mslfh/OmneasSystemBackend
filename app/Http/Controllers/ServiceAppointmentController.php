@@ -77,7 +77,6 @@ class ServiceAppointmentController extends BaseController
             unset($data['date']);
             unset($data['time']);
         }
-
         if (isset($data['service']['id'])) {
             $service = Service::with('package')->findOrFail($data['service']['id']);
             $data['package_id'] = $service->package_id;

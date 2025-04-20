@@ -21,4 +21,8 @@ class Order extends Model
     {
         return $this->belongsTo(Staff::class, 'operator_id');
     }
+    public function payment()
+    {
+        return $this->hasMany(OrderPayment::class);
+    }
 }

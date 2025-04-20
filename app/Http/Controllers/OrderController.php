@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\OrderService;
 use App\Services\AppointmentService;
+use DB;
 use Illuminate\Http\Request;
 
 class OrderController extends BaseController
@@ -43,7 +44,7 @@ class OrderController extends BaseController
     {
         $data = $request->validate([
             'appointment_id' => 'required|exists:appointments,id',
-            'status' => 'required|string',
+            'order_status' => 'required|string',
             'payment_method' => 'required|string',
             'total_amount' => 'required|numeric',
             'paid_amount' => 'required|numeric',
@@ -52,6 +53,7 @@ class OrderController extends BaseController
             'payment_note' => 'nullable|string',
             'actual_end_time' => 'nullable',
             'actual_start_time' => 'nullable',
+            'split_payment' => 'nullable',
         ]);
         // get the appointment
         $appointment = $this->appointmentService->getAppointmentById($data['appointment_id']);
@@ -63,22 +65,43 @@ class OrderController extends BaseController
             return response()->json(['message' => 'Appointment already done'], 400);
         }
         if($data['payment_method'] == 'unpaid'){
-            $data['order_status'] = 'pending';
-            $data['payment_status'] = 'unpaid';
+            $data['payment_status'] = 'Unpaid';
+        }
+        else if($data['payment_method'] == 'split_payment' && $data['order_status'] == 'Unsettled'){
+            $data['payment_status'] = 'Unsettled';
         }
         else{
-            $data['order_status'] = 'paid';
-            $data['payment_status'] = 'success';
+            $data['payment_status'] = 'Paid';
         }
+        DB::beginTransaction();
         $appointment->status = 'finished';
         $appointment->actual_start_time = $data['actual_start_time'];
         $appointment->actual_end_time = $data['actual_end_time'];
         $appointment->save();
+        if($data['split_payment']){
+            $payment = [];
+            foreach($data['split_payment'] as $index=>$split_payment){
+                $payment[$index]['payment_method'] = $split_payment['method']['label'];
+                if( $split_payment['method']['label'] != 'Unpaid'){
+                    $payment[$index]['payment_status'] = 'Paid';
+                    $payment[$index]['paid_amount'] = $split_payment['amount'];
+                }
+                else{
+                    $payment[$index]['payment_status'] = 'Unpaid';
+                    $payment[$index]['paid_amount'] = 0;
+                }
+                $payment[$index]['total_amount'] = $split_payment['amount'];
+                $payment[$index]['remark'] = $data['payment_note'];
+            }
+            $data['payment'] = $payment;
+            unset($data['split_payment']);
+        }
 
-        unset($data['status']);
         unset($data['actual_start_time']);
         unset($data['actual_end_time']);
-        return response()->json($this->orderService->createOrder($data), 201);
+        $order = $this->orderService->createOrder($data);
+        DB::commit();
+        return response()->json($order, 201);
     }
 
     public function update(Request $request, $id)

@@ -9,7 +9,7 @@ class OrderRepository implements OrderContract
 {
     public function getAllOrders()
     {
-        return Order::all();
+        return Order::all()->with('payment');
     }
 
     public function getOrderById($id)
@@ -19,7 +19,14 @@ class OrderRepository implements OrderContract
 
     public function createOrder(array $data)
     {
-        return Order::create($data);
+        $order = Order::create($data);
+        if(isset($data['payment'])) {
+            foreach ($data['payment'] as $key => $value) {
+                $data['payment'][$key]['order_id'] = $order->id;
+            }
+            $order->payment()->createMany($data['payment']);
+        }
+        return $order;
     }
 
     public function updateOrder($id, array $data)

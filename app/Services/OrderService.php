@@ -52,7 +52,7 @@ class OrderService
         $query->orderBy($sortBy, $sortDirection);
 
         $total = $query->count();
-        $data = $query->skip($start)->take($count)->get();
+        $data = $query->skip($start)->take($count)->with('payment')->get();
 
         return [
             'data' => $data,

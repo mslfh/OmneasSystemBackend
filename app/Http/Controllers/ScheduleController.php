@@ -180,7 +180,6 @@ class ScheduleController extends BaseController
         $minScheduleTime = $allSchedules->min('start_time');
         $maxScheduleTime = $allSchedules->max('end_time');
         $unavailableTime = $this->initializeUnavailableTime($minScheduleTime, $maxScheduleTime);
-
         if ($formatDate->isToday()) {
             $this->handleTodaySchedules($formatDate, $minScheduleTime, $maxScheduleTime, $unavailableTime);
         }
@@ -228,12 +227,12 @@ class ScheduleController extends BaseController
     {
         return response()->json([
             'start_time' => "07:00",
-            'end_time' => "19:00",
+            'end_time' => "20:00",
             'no_schedule' => true,
             'unavilable_time' => [
                 [
                     'start_time' => "07:00",
-                    'end_time' => "19:00",
+                    'end_time' => "20:00",
                 ]
             ],
         ]);
@@ -257,10 +256,13 @@ class ScheduleController extends BaseController
                 'end_time' => $maxScheduleTime,
             ];
         } else {
-            $unavailableTime['unavilable_time'][] = [
-                'start_time' => $minScheduleTime,
-                'end_time' => Carbon::now('Australia/Sydney')->format('H:i'),
-            ];
+            $now = Carbon::now('Australia/Sydney')->format('H:i');
+            if( $now > $minScheduleTime) {
+                $unavailableTime['unavilable_time'][] = [
+                    'start_time' => $minScheduleTime,
+                    'end_time' => $now
+                ];
+            }
         }
     }
 

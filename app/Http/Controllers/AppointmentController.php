@@ -278,8 +278,8 @@ class AppointmentController extends BaseController
     public function update(Request $request, $id)
     {
         $appointmentData = $request->validate([
-            'booking_time' => 'sometimes|string',
-            'booking_date' => 'sometimes|string',
+            'booking_time' => 'nullable|string',
+            'booking_date' => 'nullable|string',
             'customer_name' => 'nullable|string',
             'customer_first_name' => 'nullable|string',
             'customer_last_name' => 'nullable|string',
@@ -300,32 +300,39 @@ class AppointmentController extends BaseController
             unset($appointmentData['booking_time']);
             unset($appointmentData['booking_date']);
             if($appointment->booking_time !=  $booking_time){
+                $appointmentData['booking_time'] = $booking_time;
                 $serviceData['booking_time'] = $booking_time;
             }
         }
         if(isset($appointmentData['actual_start_time'])){
             $serviceData['booking_time'] = $appointmentData['actual_start_time'];
         }
+        $serviceAppointment = $appointment->services->first();
+
         $inputService = $request->input('service') ?? [];
         $staff = $request->input('staff') ?? [];
 
         if (isset($inputService['id'])) {
-            $service = Service::with('package')->findOrFail($inputService['id']);
-            $serviceData['service_id'] = $service->id;
-            $serviceData['package_id'] = $service->package_id;
-            $serviceData['package_title'] = $service->package->title;
-            $serviceData['package_hint'] = $service->package->hint;
-            $serviceData['service_id'] = $service->id;
-            $serviceData['service_title'] = $service->title;
-            $serviceData['service_description'] = $service->description;
-            $serviceData['service_duration'] = $service->duration;
-            $serviceData['service_price'] = $service->price;
-            $serviceData['comments'] = $appointmentData['comments'] ?? '';
+            if($serviceAppointment->id != $inputService['id']){
+                $service = Service::with('package')->findOrFail($inputService['id']);
+                $serviceData['service_id'] = $service->id;
+                $serviceData['package_id'] = $service->package_id;
+                $serviceData['package_title'] = $service->package->title;
+                $serviceData['package_hint'] = $service->package->hint;
+                $serviceData['service_id'] = $service->id;
+                $serviceData['service_title'] = $service->title;
+                $serviceData['service_description'] = $service->description;
+                $serviceData['service_duration'] = $service->duration;
+                $serviceData['service_price'] = $service->price;
+                $serviceData['comments'] = $appointmentData['comments'] ?? '';
+            }
         }
-        $serviceAppointment = $appointment->services->first();
-        if ($staff) {
+
+        if (isset($staff['id'])) {
+            if($serviceAppointment->staff_id != $staff['id']){
             $serviceData['staff_id'] = $staff['id'];
             $serviceData['staff_name'] = $staff['name'];
+            }
         }
         if(isset($appointmentData['customer_name'])){
             $serviceData['customer_name'] = $appointmentData['customer_name'];

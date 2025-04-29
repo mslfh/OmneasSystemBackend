@@ -27,12 +27,15 @@ class SmsRepository implements SmsContract
         return $response->json();
     }
 
-    public function sendSms($text, $phone_number)
+    public function sendSms($text, $phone_number, $schedule_time = null)
     {
+
+        return "{\"status\":200,\"msg\":\"SMS sent successfully\",\"result\":{\"meta\":{\"code\":200,\"status\":\"SUCCESS\"},\"msg\":\"Queued\",\"data\":{\"messages\":[{\"message_id\":\"5D64C2FD-D68E-96E5-0D34-3ED1A3AD327C\",\"from\":\"61481076130\",\"to\":\"61491928668\",\"body\":\"Hello, this is a test message\",\"date\":\"2025-04-29 14:09:39\",\"custom_string\":\"\",\"direction\":\"out\"}],\"total_numbers\":1,\"success_number\":1,\"credits_used\":1},\"low_sms_alert\":\"Your account credits are low, you have 29.00 credits remaining, please top-up via the platform\"}}";
+
         $url = "{$this->apiUrl}/send-sms";
         $fields = [
             'sms_text' => $text, // SMS text
-            'numbers' => [$phone_number] // Numbers array
+            'numbers' => $phone_number // Numbers array
         ];
         $headers = [
             "APPKEY: {$this->apiKey}",

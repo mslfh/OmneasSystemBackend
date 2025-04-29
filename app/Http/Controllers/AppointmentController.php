@@ -241,7 +241,7 @@ class AppointmentController extends BaseController
 
         // Create the appointment
         DB::beginTransaction();
-        try {
+        // try {
             if($data['customer_service'][0]['staff_id'] == 0){
                 $appointmentData['status'] = 'unassigned';
             }
@@ -272,19 +272,53 @@ class AppointmentController extends BaseController
                 }
                 $this->appointmentService->createServiceAppointment($serviceData);
             }
+            // DB::commit();
+            // Send SMS
+            $result = $this->sendAppointmentSms(
+                $appointment->customer_phone,
+                $appointment->booking_time
+            );
+            dd($result);
             DB::commit();
             return response()->json($appointment->load('services'), 201);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['error' => 'Failed to create appointment'], 500);
-        }
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return response()->json(['error' => 'Failed to create appointment'], 500);
+        // }
     }
 
-    public function sendSms(Request $request)
+    private function sendAppointmentSms($phone,$booking_time){
+
+        // Send Booking Successfully SMS
+        $smsMassage = "Dear Customer, your appointment is confirmed on " . $booking_time . ". Thank you for choosing us!";
+
+
+        $smsResponse = $this->smsService->sendSms(
+            $smsMassage,
+    [$phone]
+        );
+
+
+        //Send reminder SMS if schedule time is today,
+        $today = Carbon::now()->format('Y-m-d');
+        $schedule_time = Carbon::createFromFormat('Y/m/d H:i', $booking_time);
+        if ($today == $schedule_time->format('Y-m-d')) {
+            $reminderMassage = "Dear Customer, this is a reminder for your appointment today at " . $booking_time . ". Thank you!";
+            $smsResponse = $this->smsService->sendSms(
+                $reminderMassage,
+                [$phone],
+                $schedule_time->format('Y-m-d H:i:s')
+            );
+        }
+
+        return $smsResponse;
+    }
+
+
+    public function sendSms($text, $phone_number,$schedule_time = null)
     {
-        $response = $this->smsService->sendSms("Hello, this is a test message",
-        "0491928668");
-        return response()->json($response);
+        $result = $this->smsService->sendSms($text, $phone_number,$schedule_time);
+        return $result;
     }
 
     public function update(Request $request, $id)

@@ -6,5 +6,5 @@ interface SmsContract
 {
     public function verifyToken();
 
-    public function sendSms(string $message,string $phone_number);
+    public function sendSms(string $message,array $phone_number,string $schedule_time = null);
 }

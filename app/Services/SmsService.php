@@ -18,8 +18,8 @@ class SmsService
         return $this->smsRepository->verifyToken();
     }
 
-    public function sendSms(string $message,string $phone_number)
+    public function sendSms(string $message,array $phone_number,string $schedule_time = null)
     {
-        return $this->smsRepository->sendSms($message, $phone_number);
+        return $this->smsRepository->sendSms($message, $phone_number,$schedule_time);
     }
 }

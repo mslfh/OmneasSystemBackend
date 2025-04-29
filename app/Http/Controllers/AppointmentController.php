@@ -241,7 +241,7 @@ class AppointmentController extends BaseController
 
         // Create the appointment
         DB::beginTransaction();
-        // try {
+        try {
             if($data['customer_service'][0]['staff_id'] == 0){
                 $appointmentData['status'] = 'unassigned';
             }
@@ -274,17 +274,17 @@ class AppointmentController extends BaseController
             }
             // DB::commit();
             // Send SMS
-            $result = $this->sendAppointmentSms(
-                $appointment->customer_phone,
-                $appointment->booking_time
-            );
-            dd($result);
+            // $result = $this->sendAppointmentSms(
+            //     $appointment->customer_phone,
+            //     $appointment->booking_time
+            // );
+            // dd($result);
             DB::commit();
             return response()->json($appointment->load('services'), 201);
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     return response()->json(['error' => 'Failed to create appointment'], 500);
-        // }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Failed to create appointment'], 500);
+        }
     }
 
     private function sendAppointmentSms($phone,$booking_time){

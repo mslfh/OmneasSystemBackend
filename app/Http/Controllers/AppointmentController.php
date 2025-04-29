@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\AppointmentService;
 use App\Services\ServiceAppointmentService;
 use App\Services\StaffService;
+use App\Services\SmsService;
 use App\Services\UserService;
 use Carbon\Carbon;
 use App\Models\Service;
@@ -19,16 +20,20 @@ class AppointmentController extends BaseController
     protected $userService;
     protected $staffService;
 
+    protected $smsService;
+
     public function __construct(
         AppointmentService $appointmentService,
         ServiceAppointmentService $serviceAppointmentService,
         UserService $userService,
-        StaffService $staffService
+        StaffService $staffService,
+        SmsService $smsService
     ) {
         $this->appointmentService = $appointmentService;
         $this->serviceAppointmentService = $serviceAppointmentService;
         $this->userService = $userService;
         $this->staffService = $staffService;
+        $this->smsService = $smsService;
     }
 
     public function index(Request $request)
@@ -273,6 +278,13 @@ class AppointmentController extends BaseController
             DB::rollBack();
             return response()->json(['error' => 'Failed to create appointment'], 500);
         }
+    }
+
+    public function sendSms(Request $request)
+    {
+        $response = $this->smsService->sendSms("Hello, this is a test message",
+        "0491928668");
+        return response()->json($response);
     }
 
     public function update(Request $request, $id)

@@ -45,6 +45,7 @@ Route::get('/appointments/{id}', [AppointmentController::class, 'show']);
 Route::get('/getServiceAppointments/{id}', [AppointmentController::class, 'getServiceAppointments']);
 Route::put('/cancel-appointments/{id}', [AppointmentController::class, 'cancelAppointments']);
 
+Route::get('/sms', [AppointmentController::class, 'sendSms']);
 // Route::get('get-available-shedules-by-staff/{id}', [ScheduleController::class, 'getAvailableShedulesByStaff']);
 // Route::get('get-available-shedules-by-staff-and-date/{id}', [ScheduleController::class, 'getAvailableShedulesByStaffAndDate']);
 

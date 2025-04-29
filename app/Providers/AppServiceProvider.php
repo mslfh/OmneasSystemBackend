@@ -24,6 +24,8 @@ use App\Contracts\AppointmentContract;
 use App\Repositories\AppointmentRepository;
 use App\Contracts\SystemSettingContract;
 use App\Repositories\SystemSettingRepository;
+use App\Contracts\SmsContract;
+use App\Repositories\SmsRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -42,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(AppointmentContract::class, AppointmentRepository::class);
         $this->app->bind(UserContract::class, UserRepository::class);
         $this->app->bind(SystemSettingContract::class, SystemSettingRepository::class);
+        $this->app->bind(SmsContract::class, SmsRepository::class);
     }
 
     /**

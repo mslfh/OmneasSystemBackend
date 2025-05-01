@@ -41,7 +41,7 @@ class SystemSettingController extends BaseController
     {
         $data = $request->validate([
             'key' => 'sometimes|string|unique:system_settings,key,' . $id,
-            'value' => 'nullable|string',
+            'value' => 'nullable',
             'description' => 'nullable|string',
             'status' => 'nullable|string',
         ]);

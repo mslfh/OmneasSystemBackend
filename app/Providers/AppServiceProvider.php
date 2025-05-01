@@ -26,7 +26,8 @@ use App\Contracts\SystemSettingContract;
 use App\Repositories\SystemSettingRepository;
 use App\Contracts\SmsContract;
 use App\Repositories\SmsRepository;
-
+use App\Contracts\NotificationContract;
+use App\Repositories\NotificationRepository;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -45,6 +46,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(UserContract::class, UserRepository::class);
         $this->app->bind(SystemSettingContract::class, SystemSettingRepository::class);
         $this->app->bind(SmsContract::class, SmsRepository::class);
+        $this->app->bind(NotificationContract::class, NotificationRepository::class);
     }
 
     /**

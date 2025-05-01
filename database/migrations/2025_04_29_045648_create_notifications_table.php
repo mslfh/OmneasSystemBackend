@@ -12,11 +12,12 @@ return new class extends Migration {
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->string('no')->unique()->comment('Unique identifier for the notification');
-            $table->string('type')->comment('Email, SMS, Push Notification');
-            $table->string('recipient_name')->comment('Recipient of the notification');
-            $table->string('recipient_email')->comment('Email of the recipient');
-            $table->string('recipient_phone')->comment('Phone number of the recipient');
+            $table->string('no')->comment('Third party Unique identifier for the notification')->nullable();
+            $table->foreignId('appointment_id')->constrained('appointments')->nullable();
+            $table->string('type')->nullable()->comment('Email, SMS, Push Notification');
+            $table->string('recipient_name')->nullable()->comment('Recipient of the notification');
+            $table->string('recipient_email')->nullable()->comment('Email of the recipient');
+            $table->string('recipient_phone')->nullable()->comment('Phone number of the recipient');
             $table->string('subject')->comment('Subject of the notification');
             $table->text('content')->comment('Message content of the notification');
             $table->string('status')->default('pending')->comment('Status of the notification (pending, sent, failed)');

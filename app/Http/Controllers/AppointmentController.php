@@ -7,6 +7,9 @@ use App\Services\ServiceAppointmentService;
 use App\Services\StaffService;
 use App\Services\SmsService;
 use App\Services\UserService;
+use App\Services\SystemSettingService;
+use App\Services\NotificationService;
+
 use Carbon\Carbon;
 use App\Models\Service;
 use Illuminate\Http\Request;
@@ -20,20 +23,28 @@ class AppointmentController extends BaseController
     protected $userService;
     protected $staffService;
 
+    protected $systemSettingService;
+
     protected $smsService;
+
+    protected $notificationService;
 
     public function __construct(
         AppointmentService $appointmentService,
         ServiceAppointmentService $serviceAppointmentService,
         UserService $userService,
         StaffService $staffService,
-        SmsService $smsService
+        SmsService $smsService,
+        SystemSettingService $systemSettingService,
+        NotificationService $notificationService
     ) {
         $this->appointmentService = $appointmentService;
         $this->serviceAppointmentService = $serviceAppointmentService;
         $this->userService = $userService;
         $this->staffService = $staffService;
         $this->smsService = $smsService;
+        $this->systemSettingService = $systemSettingService;
+        $this->notificationService = $notificationService;
     }
 
     public function index(Request $request)
@@ -100,7 +111,7 @@ class AppointmentController extends BaseController
                     'staff_name' => $service->staff_name,
                     'booking_time' => $service->booking_time,
                     'expected_end_time' => Carbon::createFromFormat('Y-m-d H:i:s', $service->booking_time)
-                    ->addMinutes($service->service_duration),
+                        ->addMinutes($service->service_duration),
                     'package_title' => $service->package_title,
                     'service_id' => $service->service_id,
                     'service_title' => $service->service_title,
@@ -147,7 +158,7 @@ class AppointmentController extends BaseController
         // Create the appointment
         DB::beginTransaction();
 
-        if($data['customer_service'][0]['staff']['id'] == 0){
+        if ($data['customer_service'][0]['staff']['id'] == 0) {
             $appointmentData['status'] = 'unassigned';
         }
         // try {
@@ -171,15 +182,14 @@ class AppointmentController extends BaseController
 
             $serviceData['appointment_id'] = $appointment->id;
             $serviceData['booking_time'] = $appointment->booking_time;
-            if($serviceData["staff"]['id'] == 0){
-                $recommendedstaff =  $this->staffService->getAvailableStaffFromScheduletime(
+            if ($serviceData["staff"]['id'] == 0) {
+                $recommendedstaff = $this->staffService->getAvailableStaffFromScheduletime(
                     $serviceData['booking_time'],
                     $serviceData['service_duration'],
                 )->first();
                 $serviceData['staff_id'] = $recommendedstaff->id ?? '0';
                 $serviceData['staff_name'] = $recommendedstaff->name ?? '';
-            }
-            else{
+            } else {
                 $serviceData['staff_id'] = $serviceData["staff"]['id'];
                 $serviceData['staff_name'] = $serviceData["staff"]['name'];
             }
@@ -242,7 +252,7 @@ class AppointmentController extends BaseController
         // Create the appointment
         DB::beginTransaction();
         try {
-            if($data['customer_service'][0]['staff_id'] == 0){
+            if ($data['customer_service'][0]['staff_id'] == 0) {
                 $appointmentData['status'] = 'unassigned';
             }
             $appointment = $this->appointmentService->createAppointment($appointmentData);
@@ -262,62 +272,101 @@ class AppointmentController extends BaseController
 
                 $serviceData['appointment_id'] = $appointment->id;
                 $serviceData['booking_time'] = $appointment->booking_time;
-                if($serviceData["staff_id"] == 0){
-                    $recommendedstaff =  $this->staffService->getAvailableStaffFromScheduletime(
+                if ($serviceData["staff_id"] == 0) {
+                    $recommendedstaff = $this->staffService->getAvailableStaffFromScheduletime(
                         $serviceData['booking_time'],
                         $serviceData['service_duration'],
                     )->first();
+                    $serviceData['any_therapist'] = true;
                     $serviceData['staff_id'] = $recommendedstaff->id ?? '0';
                     $serviceData['staff_name'] = $recommendedstaff->name ?? '';
                 }
                 $this->appointmentService->createServiceAppointment($serviceData);
             }
-            // DB::commit();
-            // Send SMS
-            // $result = $this->sendAppointmentSms(
-            //     $appointment->customer_phone,
-            //     $appointment->booking_time
-            // );
-            // dd($result);
             DB::commit();
+            // Send SMS
+            $this->sendAppointmentSms(
+                $appointment->customer_phone,
+                $appointment->booking_time,
+                $serviceData
+            );
+            // dd('ok');
             return response()->json($appointment->load('services'), 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Failed to create appointment'], 500);
+            return response()->json(['error' => 'Failed to create appointment','msg' => $e->getMessage()], 500);
         }
     }
 
-    private function sendAppointmentSms($phone,$booking_time){
-
-        // Send Booking Successfully SMS
-        $smsMassage = "Dear Customer, your appointment is confirmed on " . $booking_time . ". Thank you for choosing us!";
-
-
-        $smsResponse = $this->smsService->sendSms(
-            $smsMassage,
-    [$phone]
-        );
-
-
-        //Send reminder SMS if schedule time is today,
-        $today = Carbon::now()->format('Y-m-d');
-        $schedule_time = Carbon::createFromFormat('Y/m/d H:i', $booking_time);
-        if ($today == $schedule_time->format('Y-m-d')) {
-            $reminderMassage = "Dear Customer, this is a reminder for your appointment today at " . $booking_time . ". Thank you!";
-            $smsResponse = $this->smsService->sendSms(
-                $reminderMassage,
-                [$phone],
-                $schedule_time->format('Y-m-d H:i:s')
-            );
-        }
-
-        return $smsResponse;
-    }
-
-
-    public function sendSms($text, $phone_number,$schedule_time = null)
+    private function sendAppointmentSms($phone, $booking_time,$serviceData)
     {
-        $result = $this->smsService->sendSms($text, $phone_number,$schedule_time);
+        $booking_reminder_setting = $this->systemSettingService->getSettingByKey('booking_reminder')->value;
+        // Send Booking Successfully SMS
+        if ($booking_reminder_setting == "true") {
+            $smsMassage = $this->systemSettingService->getSettingByKey('booking_reminder_msg')->value;
+            $smsMassage = $this->formatMassage($smsMassage,$serviceData);
+            $smsResponse =  $this->smsService->sendSms(
+                $smsMassage,
+                [$phone],
+            );
+            if ($smsResponse) {
+                $this->notificationService->createBookingNotification($smsResponse,$serviceData);
+            }
+        }
+        //Send reminder SMS based on the reminder interval
+        $reminder_interval = (int) $this->systemSettingService->getSettingByKey('reminder_interval')->value;
+        if ($reminder_interval > 0) {
+            $schedule_time = Carbon::createFromFormat('Y/m/d H:i', $booking_time);
+            $today = Carbon::now()->format('Y-m-d');
+            //Skip reminder SMS if booking time is today
+            if ($today == $schedule_time->format('Y-m-d')) {
+                return;
+            }
+            // Send reminder SMS
+            else{
+                $reminder_time = Carbon::createFromFormat('Y/m/d H:i', $booking_time, 'Australia/Sydney')
+                    ->subHours($reminder_interval);
+                // Ensure the comparison is also in Australia/Sydney timezone
+                if ($reminder_time < Carbon::now('Australia/Sydney')) {
+                    return;
+                }
+                $reminderMassage = $this->systemSettingService->getSettingByKey('reminder_msg')->value;
+                $reminderMassage = $this->formatMassage($reminderMassage,$serviceData);
+                $smsResponse = $this->smsService->sendSms(
+                    $reminderMassage,
+                    [$phone],
+                    $reminder_time->format('Y-m-d H:i:s')
+                );
+                if ($smsResponse) {
+                    $this->notificationService->createBookingNotification($smsResponse,$serviceData,'Appintment Reminder');
+                }
+            }
+        }
+    }
+
+    private function formatMassage($smsMassage, $serviceData)
+    {
+        // Extract booking date and time
+        $bookingDateTime = Carbon::createFromFormat('Y/m/d H:i', $serviceData['booking_time']);
+        $formattedDate = $bookingDateTime->format('l, F j'); // e.g., Friday, May 22
+        $formattedTime = $bookingDateTime->format('g:i A'); // e.g., 10:00 AM
+        $names = explode(' ', $serviceData['customer_name'], 2); // Split into first and last name
+        $firstName = $names[0] ?? ''; // First part
+        $lastName = $names[1] ?? '';  // Second part (if exists)
+        // Replace placeholders in the message
+        $smsMassage = str_replace('{first_name}', $firstName, $smsMassage);
+        $smsMassage = str_replace('{last_name}', $lastName, $smsMassage);
+        $smsMassage = str_replace('{date}', $formattedDate, $smsMassage);
+        $smsMassage = str_replace('{time}', $formattedTime, $smsMassage);
+        $smsMassage = str_replace('{service}', $serviceData['service_title'] ?? '', $smsMassage);
+        $smsMassage = str_replace('{duration}', $serviceData['service_duration'] . ' minutes', $smsMassage);
+        $smsMassage = str_replace('{therapist}', $serviceData['any_therapist'] ? 'Any Therapist' : $serviceData['staff_name'], $smsMassage);
+        return $smsMassage;
+    }
+
+    public function sendSms($text, $phone_number, $schedule_time = null)
+    {
+        $result = $this->smsService->sendSms($text, $phone_number, $schedule_time);
         return $result;
     }
 
@@ -341,16 +390,16 @@ class AppointmentController extends BaseController
         ]);
         $serviceData = [];
         $appointment = $this->appointmentService->getAppointmentById($id);
-        if(isset($appointmentData['booking_date'] ) && isset($appointmentData['booking_time'])){
-            $booking_time = $appointmentData['booking_date'] . ' ' . $appointmentData['booking_time'].":00";
+        if (isset($appointmentData['booking_date']) && isset($appointmentData['booking_time'])) {
+            $booking_time = $appointmentData['booking_date'] . ' ' . $appointmentData['booking_time'] . ":00";
             unset($appointmentData['booking_time']);
             unset($appointmentData['booking_date']);
-            if($appointment->booking_time !=  $booking_time){
+            if ($appointment->booking_time != $booking_time) {
                 $appointmentData['booking_time'] = $booking_time;
                 $serviceData['booking_time'] = $booking_time;
             }
         }
-        if(isset($appointmentData['actual_start_time'])){
+        if (isset($appointmentData['actual_start_time'])) {
             $serviceData['booking_time'] = $appointmentData['actual_start_time'];
         }
         $serviceAppointment = $appointment->services->first();
@@ -359,7 +408,7 @@ class AppointmentController extends BaseController
         $staff = $request->input('staff') ?? [];
 
         if (isset($inputService['id'])) {
-            if($serviceAppointment->id != $inputService['id']){
+            if ($serviceAppointment->id != $inputService['id']) {
                 $service = Service::with('package')->findOrFail($inputService['id']);
                 $serviceData['service_id'] = $service->id;
                 $serviceData['package_id'] = $service->package_id;
@@ -375,12 +424,12 @@ class AppointmentController extends BaseController
         }
 
         if (isset($staff['id'])) {
-            if($serviceAppointment->staff_id != $staff['id']){
-            $serviceData['staff_id'] = $staff['id'];
-            $serviceData['staff_name'] = $staff['name'];
+            if ($serviceAppointment->staff_id != $staff['id']) {
+                $serviceData['staff_id'] = $staff['id'];
+                $serviceData['staff_name'] = $staff['name'];
             }
         }
-        if(isset($appointmentData['customer_name'])){
+        if (isset($appointmentData['customer_name'])) {
             $serviceData['customer_name'] = $appointmentData['customer_name'];
         }
         $this->serviceAppointmentService->updateServiceAppointment($serviceAppointment->id, $serviceData);

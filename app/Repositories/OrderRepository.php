@@ -14,7 +14,10 @@ class OrderRepository implements OrderContract
 
     public function getOrderById($id)
     {
-        return Order::findOrFail($id);
+        return Order::where('id','=',$id)
+        ->with('payment')
+        ->with('appointment.services')
+        ->first();
     }
 
     public function createOrder(array $data)

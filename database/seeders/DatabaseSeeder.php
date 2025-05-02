@@ -54,7 +54,7 @@ class DatabaseSeeder extends Seeder
         ]);
         SystemSetting::create([
             'key' => 'booking_reminder',
-            'value' => 'true',
+            'value' => 'false',
             'description' => 'If send reminder message that the appointment has been successfully made',
             'type' => 'boolean'
         ]);
@@ -66,7 +66,7 @@ class DatabaseSeeder extends Seeder
         ]);
         SystemSetting::create([
             'key' => 'reminder_interval',
-            'value' => '24',
+            'value' => '0',
             'description' => 'Number of hours before the appointment to automatically send a reminder. 0 - no reminder',
             'type' => 'number'
         ]);

@@ -54,7 +54,7 @@ class NotificationService
                 'subject' => $subject,
                 'content' => $smsResponse->data->messages[0]->body,
                 'status' => $smsResponse->meta->status === 'SUCCESS' ? 'sent' : 'failed',
-                'schedule_time' => $smsResponse->data->messages[0]->date,
+                'schedule_time' => $smsResponse->data->messages[0]->schedule_time??$smsResponse->data->messages[0]->date,
                 'error_message' => $smsResponse->meta->status !== 'SUCCESS' ? $smsResponse->msg : null,
             ];
         }

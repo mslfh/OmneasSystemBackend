@@ -294,23 +294,23 @@ class AppointmentController extends BaseController
             return response()->json($appointment->load('services'), 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Failed to create appointment','msg' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to create appointment', 'msg' => $e->getMessage()], 500);
         }
     }
 
-    private function sendAppointmentSms($phone, $booking_time,$serviceData)
+    private function sendAppointmentSms($phone, $booking_time, $serviceData)
     {
         $booking_reminder_setting = $this->systemSettingService->getSettingByKey('booking_reminder')->value;
         // Send Booking Successfully SMS
         if ($booking_reminder_setting == "true") {
             $smsMassage = $this->systemSettingService->getSettingByKey('booking_reminder_msg')->value;
-            $smsMassage = $this->formatMassage($smsMassage,$serviceData);
-            $smsResponse =  $this->smsService->sendSms(
+            $smsMassage = $this->formatMassage($smsMassage, $serviceData);
+            $smsResponse = $this->smsService->sendSms(
                 $smsMassage,
                 [$phone],
             );
             if ($smsResponse) {
-                $this->notificationService->createBookingNotification($smsResponse,$serviceData);
+                $this->notificationService->createBookingNotification($smsResponse, $serviceData);
             }
         }
         //Send reminder SMS based on the reminder interval
@@ -323,22 +323,26 @@ class AppointmentController extends BaseController
                 return;
             }
             // Send reminder SMS
-            else{
+            else {
                 $reminder_time = Carbon::createFromFormat('Y/m/d H:i', $booking_time, 'Australia/Sydney')
                     ->subHours($reminder_interval);
+                // if ($today == $reminder_time->format('Y-m-d')) {
+                //     return;
+                // }
                 // Ensure the comparison is also in Australia/Sydney timezone
                 if ($reminder_time < Carbon::now('Australia/Sydney')) {
                     return;
                 }
                 $reminderMassage = $this->systemSettingService->getSettingByKey('reminder_msg')->value;
-                $reminderMassage = $this->formatMassage($reminderMassage,$serviceData);
+                $reminderMassage = $this->formatMassage($reminderMassage, $serviceData);
                 $smsResponse = $this->smsService->sendSms(
                     $reminderMassage,
                     [$phone],
                     $reminder_time->format('Y-m-d H:i:s')
                 );
+                dd($smsResponse);
                 if ($smsResponse) {
-                    $this->notificationService->createBookingNotification($smsResponse,$serviceData,'Appintment Reminder');
+                    $this->notificationService->createBookingNotification($smsResponse, $serviceData, 'Appintment Reminder');
                 }
             }
         }

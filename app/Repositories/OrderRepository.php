@@ -12,6 +12,12 @@ class OrderRepository implements OrderContract
         return Order::all()->with('payment');
     }
 
+    public function getOrderByAppointment($appointmentId)
+    {
+        return Order::where('appointment_id', '=', $appointmentId)
+        ->first();
+    }
+
     public function getOrderById($id)
     {
         return Order::where('id','=',$id)

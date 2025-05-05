@@ -19,7 +19,6 @@ class AppointmentRepository implements AppointmentContract
             'cancelled'
         )->with('services')->orderBy('booking_time')->get();
     }
-
     public function getUserBookingHistory($data)
     {
         $name = $data['name'] ;

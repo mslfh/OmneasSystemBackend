@@ -24,6 +24,11 @@ class OrderService
         return $this->orderRepository->getOrderById($id);
     }
 
+    public function getOrderByAppointment($appointmentId)
+    {
+        return $this->orderRepository->getOrderByAppointment($appointmentId);
+    }
+
     public function createOrder(array $data)
     {
         return $this->orderRepository->createOrder($data);

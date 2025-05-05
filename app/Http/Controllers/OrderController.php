@@ -35,6 +35,11 @@ class OrderController extends BaseController
         ]);
     }
 
+    public function getOrderByAppointment($appointmentId)
+    {
+        return response()->json($this->orderService->getOrderByAppointment($appointmentId));
+    }
+
     public function show($id)
     {
         return response()->json($this->orderService->getOrderById($id));

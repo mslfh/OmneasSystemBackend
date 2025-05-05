@@ -297,7 +297,6 @@ class AppointmentController extends BaseController
             return response()->json(['error' => 'Failed to create appointment', 'msg' => $e->getMessage()], 500);
         }
     }
-
     private function sendAppointmentSms($phone, $booking_time, $serviceData)
     {
         $booking_reminder_setting = $this->systemSettingService->getSettingByKey('booking_reminder')->value;
@@ -326,9 +325,9 @@ class AppointmentController extends BaseController
             else {
                 $reminder_time = Carbon::createFromFormat('Y/m/d H:i', $booking_time, 'Australia/Sydney')
                     ->subHours($reminder_interval);
-                // if ($today == $reminder_time->format('Y-m-d')) {
-                //     return;
-                // }
+                if ($today == $reminder_time->format('Y-m-d')) {
+                    return;
+                }
                 // Ensure the comparison is also in Australia/Sydney timezone
                 if ($reminder_time < Carbon::now('Australia/Sydney')) {
                     return;
@@ -340,14 +339,12 @@ class AppointmentController extends BaseController
                     [$phone],
                     $reminder_time->format('Y-m-d H:i:s')
                 );
-                dd($smsResponse);
                 if ($smsResponse) {
                     $this->notificationService->createBookingNotification($smsResponse, $serviceData, 'Appintment Reminder');
                 }
             }
         }
     }
-
     private function formatMassage($smsMassage, $serviceData)
     {
         // Extract booking date and time
@@ -367,13 +364,49 @@ class AppointmentController extends BaseController
         $smsMassage = str_replace('{therapist}', $serviceData['any_therapist'] ? 'Any Therapist' : $serviceData['staff_name'], $smsMassage);
         return $smsMassage;
     }
-
-    public function sendSms($text, $phone_number, $schedule_time = null)
+    public function sendSms(Request $request)
     {
-        $result = $this->smsService->sendSms($text, $phone_number, $schedule_time);
-        return $result;
-    }
+        $data = $request->validate([
+            'customer_name' => 'nullable|string',
+            'appointment_id' => 'nullable|integer',
+            'phone_number' => 'required|string',
+            'message' => 'required|string',
+            'is_schedule_time' => 'nullable|boolean',
+            'schedule_time' => 'nullable|date_format:Y-m-d H:i:s',
+        ]);
+        $phone_number = [$data['phone_number']];
+        $text = $data['message'];
+        $schedule_time = $data['schedule_time'] ?? null;
+        if($data['is_schedule_time']) {
+            $smsResponse = $this->smsService->sendSms($text, $phone_number, $schedule_time);
+        }
+        else{
+            $smsResponse = $this->smsService->sendSms($text, $phone_number);
+        }
 
+        $serviceData = [
+            'appointment_id' => $data['appointment_id'] ?? null,
+            'customer_name' => $data['customer_name'],
+            'phone_number' => $data['phone_number'],
+            'message' => $data['message'],
+        ];
+        $this->notificationService->createBookingNotification(
+            $smsResponse,
+            $serviceData,
+            'Appintment Reminder'
+        );
+        if ($smsResponse->meta->status !== 'SUCCESS') {
+            return response()->json([
+                'status' => 'error',
+                'message' => $smsResponse->msg,
+            ], 500);
+        } else {
+            return response()->json([
+                'status' => 'success',
+                'message' => $smsResponse->msg,
+            ]);
+        }
+    }
     public function update(Request $request, $id)
     {
         $appointmentData = $request->validate([
@@ -439,7 +472,6 @@ class AppointmentController extends BaseController
         $this->serviceAppointmentService->updateServiceAppointment($serviceAppointment->id, $serviceData);
         return response()->json($this->appointmentService->updateAppointment($id, $appointmentData));
     }
-
     public function destroy($id)
     {
         $this->appointmentService->deleteAppointment($id);

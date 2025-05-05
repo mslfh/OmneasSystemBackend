@@ -70,8 +70,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('user', UserController::class);
     Route::apiResource('system-setting', SystemSettingController::class);
     Route::post('/importUser', [UserController::class, 'importUser']);
+    Route::get('/getSystemSettingByKey', [SystemSettingController::class, 'getSystemSettingByKey']);
     Route::get('/findUserByField', [UserController::class, 'findByField']);
     Route::post('/insertSchedule', [ScheduleController::class, 'insert']);
     Route::get('/getUserBookingHistory', [AppointmentController::class, 'getUserBookingHistory']);
+    Route::post('/sendSms', [AppointmentController::class, 'sendSms']);
 });
 

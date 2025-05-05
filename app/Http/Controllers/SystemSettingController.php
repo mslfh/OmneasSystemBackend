@@ -48,6 +48,13 @@ class SystemSettingController extends BaseController
 
         return response()->json($this->systemSettingService->updateSetting($id, $data));
     }
+
+    public function getSystemSettingByKey(Request $request)
+    {
+        $key = $request->input('key');
+        return response()->json($this->systemSettingService->getSettingByKey($key));
+    }
+
     public function destroy($id)
     {
         $this->systemSettingService->deleteSetting($id);

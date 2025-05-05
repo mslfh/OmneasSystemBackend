@@ -33,10 +33,10 @@ class NotificationService
         if($smsResponse->meta->status !== 'SUCCESS') {
             $data = [
                 'no' => null,
-                'appointment_id' => $serviceData['appointment_id'],
+                'appointment_id' => $serviceData['appointment_id']?? null,
                 'type' => 'SMS',
                 'recipient_name' => $serviceData['customer_name'],
-                'recipient_phone' => null,
+                'recipient_phone' => $serviceData['phone_number'],
                 'subject' => $subject,
                 'content' => $smsResponse->msg,
                 'status' => $smsResponse->meta->status === 'SUCCESS' ? 'sent' : 'failed',
@@ -47,10 +47,10 @@ class NotificationService
         else{
             $data = [
                 'no' => $smsResponse->data->messages[0]->message_id,
-                'appointment_id' => $serviceData['appointment_id'],
+                'appointment_id' => $serviceData['appointment_id']?? null,
                 'type' => 'SMS',
                 'recipient_name' => $serviceData['customer_name'],
-                'recipient_phone' => $smsResponse->data->messages[0]->to,
+                'recipient_phone' => $serviceData['phone_number'],
                 'subject' => $subject,
                 'content' => $smsResponse->data->messages[0]->body,
                 'status' => $smsResponse->meta->status === 'SUCCESS' ? 'sent' : 'failed',

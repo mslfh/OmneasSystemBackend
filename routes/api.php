@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PackageController;
@@ -14,66 +13,79 @@ use App\Http\Controllers\ScheduleHistoryController;
 use App\Http\Controllers\ServiceAppointmentController;
 use App\Http\Controllers\SystemSettingController;
 
+// Authentication routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 
-Route::get('/packages', [PackageController::class, 'index']); // Public route to fetch packages
-Route::get('/packages/{id}', [PackageController::class, 'show']); // Public route to fetch a single package
-Route::get('/packages-with-service', [PackageController::class, 'getPackageWithService']); // Public route to fetch packages
+// Package routes
+Route::get('/packages', [PackageController::class, 'index']);
+Route::get('/packages/{id}', [PackageController::class, 'show']);
+Route::get('/packages-with-service', [PackageController::class, 'getPackageWithService']);
 
-Route::get('/services', [ServiceController::class, 'index']); // Public route to fetch services
-Route::get('/services/{id}', [ServiceController::class, 'show']); // Public route to fetch a single service
-
+// Service routes
+Route::get('/services', [ServiceController::class, 'index']);
+Route::get('/services/{id}', [ServiceController::class, 'show']);
 Route::get('get-service-by-package/{id}', [ServiceController::class, 'getServiceByPackage']);
 
-Route::get('/staff', [StaffController::class, 'index']); // Public route to fetch staff
-Route::get('/staff/{id}', [StaffController::class, 'show']); // Public route to fetch a single staff
+// Staff routes
+Route::get('/staff', [StaffController::class, 'index']);
+Route::get('/staff/{id}', [StaffController::class, 'show']);
 Route::get('/get-available-staff-from-scheduletime', [StaffController::class, 'getAvailableStaffFromScheduledate']);
 Route::get('/get-staff-schedule-from-date', [StaffController::class, 'getStaffScheduleFromDate']);
 
-
+// Schedule routes
 Route::get('/schedules', [ScheduleController::class, 'index']);
 Route::get('/schedules/{id}', [ScheduleController::class, 'show']);
-
 Route::get('/get-available-shedules', [ScheduleController::class, 'getAvailableShedules']);
 Route::get('/get-unavailable-time-from-date', [ScheduleController::class, 'getUnavailableTimeFromDate']);
 Route::get('/get-unavailable-time-from-staff', [ScheduleController::class, 'getUnavailableTimeFromStaff']);
 
+// Appointment routes
 Route::post('/make-appointment', [AppointmentController::class, 'makeAppointment']);
 Route::get('/appointments', [AppointmentController::class, 'index']);
 Route::get('/appointments/{id}', [AppointmentController::class, 'show']);
 Route::get('/getServiceAppointments/{id}', [AppointmentController::class, 'getServiceAppointments']);
-Route::put('/cancel-appointments/{id}', [AppointmentController::class, 'cancelAppointments']);
-
 Route::get('/sms', [AppointmentController::class, 'sendSms']);
-// Route::get('get-available-shedules-by-staff/{id}', [ScheduleController::class, 'getAvailableShedulesByStaff']);
-// Route::get('get-available-shedules-by-staff-and-date/{id}', [ScheduleController::class, 'getAvailableShedulesByStaffAndDate']);
 
-
-// Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-//     return $request->user();
-// });
-
+// Protected routes
 Route::middleware(['auth:sanctum'])->group(function () {
-    // Protected routes
-    Route::apiResource('packages', PackageController::class)->except(['index','show']);
-    Route::apiResource('services', ServiceController::class)->except(['index','show']);
-    Route::apiResource('schedules', ScheduleController::class)->except(['index','show']);
-    Route::apiResource('appointments', AppointmentController::class)->except(['index','show']);
+    // Package management
+    Route::apiResource('packages', PackageController::class)->except(['index', 'show']);
+
+    // Service management
+    Route::apiResource('services', ServiceController::class)->except(['index', 'show']);
+
+    // Schedule management
+    Route::apiResource('schedules', ScheduleController::class)->except(['index', 'show']);
+    Route::post('/insertSchedule', [ScheduleController::class, 'insert']);
+
+    // Appointment management
+    Route::apiResource('appointments', AppointmentController::class)->except(['index', 'show']);
     Route::get('/getBookedServiceByDate', [AppointmentController::class, 'getBookedServiceByDate']);
     Route::post('/takeBreakAppointment', [AppointmentController::class, 'takeBreakAppointment']);
-    Route::apiResource('orders', OrderController::class);
-    Route::get('/getOrderByAppointment/{id}', [OrderController::class, 'getOrderByAppointment']);
-    Route::apiResource('schedule-histories', ScheduleHistoryController::class);
-    Route::apiResource('service-appointments', ServiceAppointmentController::class);
-    Route::apiResource('staff', StaffController::class)->except(['index','show']);
-    Route::apiResource('user', UserController::class);
-    Route::apiResource('system-setting', SystemSettingController::class);
-    Route::post('/importUser', [UserController::class, 'importUser']);
-    Route::get('/getSystemSettingByKey', [SystemSettingController::class, 'getSystemSettingByKey']);
-    Route::get('/findUserByField', [UserController::class, 'findByField']);
-    Route::post('/insertSchedule', [ScheduleController::class, 'insert']);
     Route::get('/getUserBookingHistory', [AppointmentController::class, 'getUserBookingHistory']);
     Route::post('/sendSms', [AppointmentController::class, 'sendSms']);
+
+    // Order management
+    Route::apiResource('orders', OrderController::class);
+    Route::get('/getOrderByAppointment/{id}', [OrderController::class, 'getOrderByAppointment']);
+
+    // Schedule history management
+    Route::apiResource('schedule-histories', ScheduleHistoryController::class);
+
+    // Service appointment management
+    Route::apiResource('service-appointments', ServiceAppointmentController::class);
+
+    // Staff management
+    Route::apiResource('staff', StaffController::class)->except(['index', 'show']);
+
+    // User management
+    Route::apiResource('user', UserController::class);
+    Route::post('/import-user', [UserController::class, 'import']);
+    Route::get('/search-user-by-field', [UserController::class, 'getByField']);
+
+    // System settings
+    Route::apiResource('system-setting', SystemSettingController::class);
+    Route::get('/getSystemSettingByKey', [SystemSettingController::class, 'getSystemSettingByKey']);
 });
 

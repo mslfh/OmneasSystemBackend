@@ -39,6 +39,19 @@ return new class extends Migration
             $table->integer('last_activity')->index();
         });
 
+         // Insert default users
+         \DB::table('users')->insert([
+            [
+                'name' => env('ADMIN_NAME'),
+                'email' => env('ADMIN_EMAIL'),
+                'password' => bcrypt(env('ADMIN_DEFAULT_PASSWORD')),
+            ],
+            [
+                'name' => env('DESK_NAME'),
+                'email' => env('DESK_EMAIL'),
+                'password' => bcrypt(env('DESK_DEFAULT_PASSWORD')),
+            ],
+        ]);
     }
 
     /**

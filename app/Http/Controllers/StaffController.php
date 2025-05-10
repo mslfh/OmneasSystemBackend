@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Services\StaffService;
 use App\Services\UserService;
-use DB;
 use Illuminate\Http\Request;
+use DB;
 
 class StaffController extends BaseController
 {
@@ -31,23 +31,13 @@ class StaffController extends BaseController
     public function getStaffScheduleFromDate(Request $request)
     {
         $date = $request->input('date');
-        $staffSchedules = $this->staffService->getStaffScheduleFromDate($date);
-        return response()->json($staffSchedules);
+        return response()->json($this->staffService->getStaffScheduleFromDate($date));
     }
 
     public function getAvailableStaffFromScheduledate(Request $request)
     {
         $date = $request->input('date');
-        $availableStaff = $this->staffService->getAvailableStaffFromScheduledate($date);
-        return response()->json($availableStaff);
-    }
-    public function getAvailableStaffFromScheduletime(Request $request)
-    {
-        $time = $request->input('time');
-        $date = $request->input('date');
-        $dateTimeString = $date . ' ' . $time;
-        $availableStaff = $this->staffService->getAvailableStaffFromScheduletime($dateTimeString);
-        return response()->json($availableStaff);
+        return response()->json($this->staffService->getAvailableStaffFromScheduledate($date));
     }
 
     public function store(Request $request)
@@ -64,35 +54,10 @@ class StaffController extends BaseController
             'sort' => 'nullable|integer',
             'email' => 'nullable|email|max:255',
             'password' => 'required|string|min:8',
-            'avatar' => 'nullable',
+            'avatar' => 'nullable|file',
         ]);
 
-        //Create a user for this staff
-        $userData = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:15',
-            'email' => 'nullable|email|max:255',
-            'password' => 'required',
-        ]);
-
-        DB::beginTransaction();
-        try {
-            $user = $this->userService->createUser($userData);
-            $data['user_id'] = $user->id;
-            if ($request->hasFile('avatar')) {
-                $avatarName = $data['name'] . '-' . time() . '.' . $request->file('avatar')->getClientOriginalExtension();
-                $profile_photo_path = $request->file('avatar')
-                    ->storeAs('staffAvatars', $avatarName, 'public');
-            }
-            unset($data['avatar']);
-            $data['profile_photo_path'] = $profile_photo_path ?? null;
-            $staff = $this->staffService->createStaff($data);
-            DB::commit();
-            return response()->json($staff, 201);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['error' => 'Failed to create staff'], 500);
-        }
+        return response()->json($this->staffService->createStaff($data, $request->file('avatar')), 201);
     }
 
     public function update(Request $request, $id)
@@ -109,44 +74,14 @@ class StaffController extends BaseController
             'sort' => 'nullable|integer',
             'email' => 'nullable|email|max:255',
             'password' => 'required|string|min:8',
-            'avatar' => 'nullable',
+            'avatar' => 'nullable|file',
         ]);
 
-        DB::beginTransaction();
-        try {
-            $staff = $this->staffService->getStaffById($id);
-
-            $userData = [
-                'name' => $data['name'] ?? $staff->user->name,
-                'email' => $data['email'] ?? $staff->user->email,
-                'phone' => $data['phone'] ?? $staff->user->phone,
-                'password' => $data['password'] ?? $staff->user->password,
-            ];
-            $this->userService->updateUser($staff->user_id, $userData);
-
-            if ($request->hasFile('avatar')) {
-                $avatarName = $data['name'] . '-' . time() . '.' . $request->file('avatar')->getClientOriginalExtension();
-                //delete old avatar
-                if ($staff->profile_photo_path) {
-                    \Storage::disk('public')->delete($staff->profile_photo_path);
-                }
-                $data['profile_photo_path'] = $request->file('avatar')
-                    ->storeAs('staffAvatars', $avatarName, 'public');
-            }
-            unset($data['email'], $data['avatar'], $data['phone'], $data['password']);
-            $updatedStaff = $this->staffService->updateStaff($id, $data);
-
-            DB::commit();
-            return response()->json($updatedStaff);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['error' => 'Failed to update staff'], 500);
-        }
+        return response()->json($this->staffService->updateStaff($id, $data, $request->file('avatar')));
     }
+
     public function destroy($id)
     {
-        $staff = $this->staffService->getStaffById($id);
-        $this->userService->deleteUser($staff->user_id);
         return response()->json($this->staffService->deleteStaff($id));
     }
 }

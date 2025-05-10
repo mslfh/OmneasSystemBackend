@@ -24,19 +24,29 @@ class UserService implements UserContract
         return $this->userRepository->findById($id);
     }
 
-    public function findByField($field)
+    public function findByField($data)
     {
-        return $this->userRepository->findByField($field);
+        $field = $data['search'];
+        return $this->userRepository->findByField(field: $field);
     }
 
     public function createUser(array $data)
     {
+        $data['password'] = bcrypt($data['password']??$data['phone']);
         return $this->userRepository->create($data);
     }
 
     public function updateUser($id, array $data)
     {
+        if (isset($data['password'])) {
+            $data['password'] = bcrypt($data['password']);
+        }
         return $this->userRepository->update($id, $data);
+    }
+
+    public function getPaginatedUsers($start, $count, $filter, $sortBy, $descending)
+    {
+        return $this->userRepository->getPaginatedUsers($start, $count, $filter, $sortBy, $descending);
     }
 
     public function deleteUser($id)

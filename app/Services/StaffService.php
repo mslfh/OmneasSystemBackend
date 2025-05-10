@@ -3,29 +3,28 @@
 namespace App\Services;
 
 use App\Contracts\StaffContract;
+use App\Services\UserService;
+use DB;
 
 class StaffService
 {
     protected $staffRepository;
+    protected $userService;
 
-    public function __construct(StaffContract $staffRepository)
+    public function __construct(StaffContract $staffRepository, UserService $userService)
     {
         $this->staffRepository = $staffRepository;
-    }
-
-
-    public function getAvailableStaffFromScheduletime($dateTime,$duration)
-    {
-        return $this->staffRepository->getAvailableStaffFromScheduletime($dateTime,$duration);
+        $this->userService = $userService;
     }
 
     public function getStaffScheduleFromDate($date)
     {
         return $this->staffRepository->getStaffScheduleFromDate($date);
     }
-    public function getAvailableStaffFromScheduledate($dateTime)
+
+    public function getAvailableStaffFromScheduledate($date)
     {
-        return $this->staffRepository->getAvailableStaffFromScheduledate($dateTime);
+        return $this->staffRepository->getAvailableStaffFromScheduledate($date);
     }
 
     public function getAllStaff()
@@ -38,18 +37,71 @@ class StaffService
         return $this->staffRepository->getById($id);
     }
 
-    public function createStaff(array $data)
+    public function createStaff(array $data, $avatar = null)
     {
-        return $this->staffRepository->create($data);
+        DB::beginTransaction();
+        try {
+            $user = $this->userService->createUser([
+                'name' => $data['name'],
+                'phone' => $data['phone'],
+                'email' => $data['email'] ?? null,
+                'password' => $data['password'],
+            ]);
+
+            $data['user_id'] = $user->id;
+
+            if ($avatar) {
+                $avatarName = $data['name'] . '-' . time() . '.' . $avatar->getClientOriginalExtension();
+                $data['profile_photo_path'] = $avatar->storeAs('staffAvatars', $avatarName, 'public');
+            }
+
+            unset($data['avatar']);
+            $staff = $this->staffRepository->create($data);
+
+            DB::commit();
+            return $staff;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
-    public function updateStaff($id, array $data)
+    public function updateStaff($id, array $data, $avatar = null)
     {
-        return $this->staffRepository->update($id, $data);
+        DB::beginTransaction();
+        try {
+            $staff = $this->staffRepository->getById($id);
+
+            $this->userService->updateUser($staff->user_id, [
+                'name' => $data['name'],
+                'email' => $data['email'] ?? $staff->user->email,
+                'phone' => $data['phone'],
+                'password' => $data['password'],
+            ]);
+
+            if ($avatar) {
+                $avatarName = $data['name'] . '-' . time() . '.' . $avatar->getClientOriginalExtension();
+                if ($staff->profile_photo_path) {
+                    \Storage::disk('public')->delete($staff->profile_photo_path);
+                }
+                $data['profile_photo_path'] = $avatar->storeAs('staffAvatars', $avatarName, 'public');
+            }
+
+            unset($data['email'], $data['avatar'], $data['phone'], $data['password']);
+            $updatedStaff = $this->staffRepository->update($id, $data);
+
+            DB::commit();
+            return $updatedStaff;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     public function deleteStaff($id)
     {
+        $staff = $this->staffRepository->getById($id);
+        $this->userService->deleteUser($staff->user_id);
         return $this->staffRepository->delete($id);
     }
 }

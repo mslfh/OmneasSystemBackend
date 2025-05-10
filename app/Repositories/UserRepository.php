@@ -15,12 +15,32 @@ class UserRepository
             ->limit(200)->get();
     }
 
+    public function getPaginatedUsers($start, $count, $filter, $sortBy, $descending)
+    {
+        $query = User::query();
+        $query->where('id', '!=', 1)
+            ->where('id', '!=', 2)
+            ->whereDoesntHave('staff')
+            ->when($filter, function ($query) use ($filter) {
+                return $query->where('name', 'like', '%' . $filter . '%')
+                    ->orWhere('phone', 'like', '%' . $filter . '%')
+                    ->orWhere('email', 'like', '%' . $filter . '%');
+            })
+            ->orderBy($sortBy, $descending ? 'desc' : 'asc');
+        $total = $query->count();
+        $data = $query->skip($start)->take($count) ->get();
+        return [
+            'data' => $data,
+            'total' => $total,
+        ];
+    }
+
     public function findByField($field)
     {
         return User::where('name', 'like', '%' . $field . '%')
             ->orWhere('phone', 'like', '%' . $field . '%')
             ->orWhere('email', 'like', '%' . $field . '%')
-            ->limit(50)
+            ->limit(20)
             ->get();
     }
 

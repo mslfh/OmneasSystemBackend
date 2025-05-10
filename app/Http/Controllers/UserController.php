@@ -16,15 +16,27 @@ class UserController extends BaseController
         $this->userService = $userService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json($this->userService->getAllUsers());
+        $start = $request->query('start', 0);
+        $count = $request->query('count', 10);
+        $filter = $request->query('filter', null);
+        $sortBy = $request->query('sortBy', 'id');
+        $descending = $request->query('descending', false);
+        $users = $this->userService->getPaginatedUsers($start, $count, $filter, $sortBy, $descending);
+        return response()->json([
+            'rows' => $users['data'],
+            'total' => $users['total'],
+        ]);
+
     }
 
-    public function findByField(Request $request)
+    public function getByField(Request $request)
     {
-        $search = $request->input('search');
-        return response()->json($this->userService->findByField($search));
+        $data = $request->validate([
+            'search' => 'required|string|max:255',
+        ]);
+        return response()->json($this->userService->findByField($data));
     }
 
     public function show($id)
@@ -36,16 +48,14 @@ class UserController extends BaseController
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8',
-            'phone' => 'nullable|string|max:15',
+            'password' => 'nullable|string|min:8',
+            'phone' => 'string|max:15|unique:users,phone',
+            'email' => 'nullable|email|unique:users,email',
         ]);
-
-        $data['password'] = bcrypt($data['password']);
         return response()->json($this->userService->createUser($data), 201);
     }
 
-    public function importUser(Request $request)
+    public function import(Request $request)
     {
         $request->validate([
             'file' => 'required|file|mimes:xlsx,csv|max:2048',
@@ -67,11 +77,6 @@ class UserController extends BaseController
             'password' => 'sometimes|string|min:8',
             'phone' => 'nullable|string|max:15',
         ]);
-
-        if (isset($data['password'])) {
-            $data['password'] = bcrypt($data['password']);
-        }
-
         return response()->json($this->userService->updateUser($id, $data));
     }
 

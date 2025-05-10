@@ -20,6 +20,28 @@ return new class extends Migration
             $table->softDeletes();
             $table->timestamps();
         });
+         // Insert default special roles
+         $adminId = \DB::table('users')->where('email', env('ADMIN_EMAIL'))->value('id');
+         $deskId = \DB::table('users')->where('email', env('DESK_EMAIL'))->value('id');
+
+         \DB::table('special_roles')->insert([
+             [
+                 'name' => 'Admin',
+                 'description' => 'Administrator Role',
+                 'is_active' => true,
+                 'user_id' => $adminId,
+                 'created_at' => now(),
+                 'updated_at' => now(),
+             ],
+             [
+                 'name' => 'Desk',
+                 'description' => 'Front Desk Role',
+                 'is_active' => true,
+                 'user_id' => $deskId,
+                 'created_at' => now(),
+                 'updated_at' => now(),
+             ],
+         ]);
     }
 
     /**

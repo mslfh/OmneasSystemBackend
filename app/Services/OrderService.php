@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Services;
-
 use App\Contracts\OrderContract;
 use App\Models\Order;
 
@@ -63,5 +62,16 @@ class OrderService
             'data' => $data,
             'total' => $total,
         ];
+    }
+
+    public function initAppointmentOrder ( $appointmentId,$total_amount)
+    {
+        $data = [
+            'status' => 'pending',
+            'appointment_id'  => $appointmentId,
+            'payment_method' => 'unpaid',
+            'total_amount' => $total_amount,
+        ];
+        $this->createOrder($data);
     }
 }

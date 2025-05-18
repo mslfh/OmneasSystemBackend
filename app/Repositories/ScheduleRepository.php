@@ -17,14 +17,15 @@ class ScheduleRepository implements ScheduleContract
     {
         $today = Carbon::today();
         return Schedule::whereDate('work_date', '>=', $today)
-            ->where('status', '!=','off')
+            ->where('status', 'active')
             ->get();
     }
 
     public function getAvailableScheduleByDate($date)
     {
         return Schedule::whereDate('work_date', $date)
-        ->where('status', '!=','off')->get();
+            ->where('status', 'active')
+            ->get();
     }
 
     public function getScheduleById($id)
@@ -49,5 +50,13 @@ class ScheduleRepository implements ScheduleContract
         $schedule = Schedule::findOrFail($id);
         $schedule->delete();
         return $schedule;
+    }
+
+    public function getSchedulesByDate($date)
+    {
+        return Schedule::whereDate('work_date', $date)
+            ->where('status', 'active')
+            ->with('staff')
+            ->get();
     }
 }

@@ -19,12 +19,31 @@ class StaffService
 
     public function getStaffScheduleFromDate($date)
     {
-        return $this->staffRepository->getStaffScheduleFromDate($date);
+        $formatDate = \Carbon\Carbon::createFromFormat('Y-m-d', $date);
+        return $this->staffRepository->getStaffScheduleFromDate($formatDate);
     }
 
     public function getAvailableStaffFromScheduledate($date)
     {
-        return $this->staffRepository->getAvailableStaffFromScheduledate($date);
+        $formatDate = \Carbon\Carbon::createFromFormat('Y-m-d', $date);
+        return $this->staffRepository->getAvailableStaffFromScheduledate($formatDate);
+    }
+
+    /**
+     * 获取指定时间段可用的员工（兼容原有业务调用）
+     */
+    public function getAvailableStaffFromScheduletime($datetime, $duration)
+    {
+        // $datetime 格式如 2025-05-16 10:00
+        $date = substr($datetime, 0, 10); // 取日期部分
+        // 这里可以扩展为根据时间段和 duration 进一步筛选员工
+        return $this->getAvailableStaffFromScheduledate($date);
+    }
+
+    public function getStaffScheduleAppointment($staffId, $date)
+    {
+        $formatDate = \Carbon\Carbon::createFromFormat('Y-m-d', $date);
+        return $this->staffRepository->getStaffScheduleAppointment($staffId, $formatDate);
     }
 
     public function getAllStaff()
@@ -104,4 +123,5 @@ class StaffService
         $this->userService->deleteUser($staff->user_id);
         return $this->staffRepository->delete($id);
     }
+
 }

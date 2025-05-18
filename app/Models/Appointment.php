@@ -16,4 +16,9 @@ class Appointment extends Model
     {
         return $this->hasMany(ServiceAppointment::class);
     }
+
+    public function getAmountAttribute()
+    {
+        return $this->services->sum('service_price');
+    }
 }

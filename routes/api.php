@@ -30,13 +30,12 @@ Route::get('get-service-by-package/{id}', [ServiceController::class, 'getService
 // Staff routes
 Route::get('/staff', [StaffController::class, 'index']);
 Route::get('/staff/{id}', [StaffController::class, 'show']);
-Route::get('/get-available-staff-from-scheduletime', [StaffController::class, 'getAvailableStaffFromScheduledate']);
-Route::get('/get-staff-schedule-from-date', [StaffController::class, 'getStaffScheduleFromDate']);
+Route::get('/get-available-staff-from-schedule-date', [StaffController::class, 'getAvailableStaffFromScheduleDate']);
 
 // Schedule routes
 Route::get('/schedules', [ScheduleController::class, 'index']);
 Route::get('/schedules/{id}', [ScheduleController::class, 'show']);
-Route::get('/get-available-shedules', [ScheduleController::class, 'getAvailableShedules']);
+Route::get('/get-available-schedules', [ScheduleController::class, 'getAvailableSchedules']);
 Route::get('/get-unavailable-time-from-date', [ScheduleController::class, 'getUnavailableTimeFromDate']);
 Route::get('/get-unavailable-time-from-staff', [ScheduleController::class, 'getUnavailableTimeFromStaff']);
 
@@ -57,7 +56,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Schedule management
     Route::apiResource('schedules', ScheduleController::class)->except(['index', 'show']);
-    Route::post('/insertSchedule', [ScheduleController::class, 'insert']);
+    Route::post('/insert-schedule', [ScheduleController::class, 'insert']);
 
     // Appointment management
     Route::apiResource('appointments', AppointmentController::class)->except(['index', 'show']);
@@ -78,6 +77,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Staff management
     Route::apiResource('staff', StaffController::class)->except(['index', 'show']);
+    Route::get('/get-staff-schedule-from-date', [StaffController::class, 'getStaffScheduleFromDate']);
 
     // User management
     Route::apiResource('user', UserController::class);

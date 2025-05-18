@@ -11,4 +11,5 @@ interface ScheduleContract
     public function createSchedule(array $data);
     public function updateSchedule($id, array $data);
     public function deleteSchedule($id);
+    public function getSchedulesByDate($date);
 }

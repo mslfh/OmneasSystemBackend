@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,6 +13,10 @@ return new class extends Migration
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
             $table->boolean('is_first')->default(false);
+            $table->string('status')->default('booked')
+                ->comment('pending, booked, cancelled, in_progress, finished');
+            $table->string('type')
+                ->comment('unassigned, assigned, break, no_show');
 
             $table->string('customer_id')->nullable();
             $table->string('customer_first_name')->nullable();
@@ -28,9 +31,6 @@ return new class extends Migration
 
             $table->dateTime('actual_start_time')->nullable();
             $table->dateTime('actual_end_time')->nullable();
-
-            $table->string('status')->default('pending')
-            ->comment('pending, confirmed, cancelled, in_progress, completed');
 
             $table->softDeletes();
             $table->timestamps();

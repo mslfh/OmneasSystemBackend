@@ -12,24 +12,47 @@ class StaffRepository implements StaffContract
         return Staff::all();
     }
 
-    public function getAvailableStaffFromScheduledate($date)
+    public function getStaffScheduleFromDate($date)
     {
-        $formatDate = \Carbon\Carbon::createFromFormat('Y/m/d', $date);
-        return Staff::where('status', 'active')
-            ->whereHas('schedules', function ($query) use ($formatDate) {
-                $query->where('work_date', '=', $formatDate->format('Y-m-d'));
+        return Staff::select('id', 'name', 'status')
+            ->where('status', 'active')
+            ->with('schedules', function ($query) use ($date) {
+                $query->select('id', 'staff_id', 'start_time', 'end_time', 'work_date', 'status')
+                    ->where('schedules.status', '=', 'active')
+                    ->where('schedules.work_date', '=', $date->format('Y-m-d'));
             })
             ->get();
     }
 
-    public function getStaffScheduleFromDate($date)
+    public function getAvailableStaffFromScheduledate($date)
     {
-        $formatDate = \Carbon\Carbon::createFromFormat('Y-m-d', $date);
         return Staff::where('status', 'active')
-            ->with('schedules', function ($query) use ($formatDate) {
-                $query->select('id', 'staff_id', 'work_date', 'start_time', 'end_time')
-                      ->where('work_date', '=', $formatDate->format('Y-m-d'));
+            ->whereHas('schedules', function ($query) use ($date) {
+                $query->where('schedules.status', '=', 'active')
+                    ->where('schedules.work_date', '=', $date->format('Y-m-d'));
             })
+            ->get();
+    }
+
+    public function getStaffScheduleAppointment($staffId, $formatDate)
+    {
+        return Staff::select('id', 'status')
+            ->where('id', $staffId)
+            ->whereHas('schedules', function ($query) use ($formatDate) {
+                $query->where('status', 'active')
+                    ->where('work_date', '=', $formatDate->format('Y-m-d'));
+            })
+            ->with('schedules', function ($query) use ($formatDate) {
+                $query->select('id', 'staff_id', 'start_time', 'end_time', 'work_date', 'status')
+                    ->where('status', 'active')
+                    ->where('work_date', '=', $formatDate->format('Y-m-d'));
+            })
+            ->with('bookingServices', function ($query) use ($formatDate) {
+                $query->select('id', 'staff_id', 'booking_time', 'service_duration')
+                    ->where('booking_time', '>=', $formatDate->format('Y-m-d 00:00:00'))
+                    ->where('booking_time', '<=', $formatDate->format('Y-m-d 23:59:59'));
+            })
+            ->where('status', 'active')
             ->get();
     }
 

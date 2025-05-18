@@ -28,12 +28,25 @@ class StaffController extends BaseController
         return response()->json($this->staffService->getStaffById($id));
     }
 
+
+    /**
+     * Get staff and schedule from date.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getStaffScheduleFromDate(Request $request)
     {
         $date = $request->input('date');
         return response()->json($this->staffService->getStaffScheduleFromDate($date));
     }
 
+    /**
+     * Get available staff from schedule date.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getAvailableStaffFromScheduledate(Request $request)
     {
         $date = $request->input('date');

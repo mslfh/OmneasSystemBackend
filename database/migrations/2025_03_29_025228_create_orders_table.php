@@ -16,19 +16,25 @@ return new class extends Migration
             $table->foreignId('appointment_id')->constrained('appointments');
 
             $table->string('order_status')->default('pending')
-                ->comment('pending, completed, paid, cancelled'); // Fixed missing semicolon
+                ->comment('created, pending_payment, paid, cancelled, refunded,failed');
 
             $table->string('payment_status')->default('pending')
-                ->comment('pending, success, failed, refunded'); // Fixed missing semicolon
+                ->comment('pending, success, failed, refunded');
 
             $table->string('payment_method')->default('credit_card')
-                ->comment('cash, credit_card, bank_transfer, voucher, other'); // Fixed missing semicolon
+                ->comment('cash, credit_card, bank_transfer, voucher, split_payment,unpaid');
 
             $table->double('total_amount')->default(0);
             $table->double('paid_amount')->default(0);
 
-            $table->foreignId('operator_id')->constrained('staff')->nullable();
-            $table->string('operator_name')->nullable();
+            $table->integer('used_id')->nullable();
+
+            $table->integer('confirmed_by')->nullable()->comment(
+                'id of the staff who confirmed the order'
+            );
+            $table->string('confirmed_staff_name')->nullable()->comment(
+                'name of the staff who confirmed the order'
+            );
             $table->string('payment_note')->nullable();
             $table->softDeletes();
             $table->timestamps();

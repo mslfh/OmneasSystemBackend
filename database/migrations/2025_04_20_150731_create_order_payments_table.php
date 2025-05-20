@@ -19,6 +19,7 @@ return new class extends Migration
             );
             $table->string('paid_by')
             ->comment('cash, credit_card, bank_transfer, voucher');
+
             $table->decimal('total_amount', 10, 2);
             $table->decimal('paid_amount', 10, 2);
             $table->string('remark')->nullable();

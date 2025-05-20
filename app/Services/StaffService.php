@@ -34,10 +34,7 @@ class StaffService
      */
     public function getAvailableStaffFromScheduletime($datetime, $duration)
     {
-        // $datetime 格式如 2025-05-16 10:00
-        $date = substr($datetime, 0, 10); // 取日期部分
-        // 这里可以扩展为根据时间段和 duration 进一步筛选员工
-        return $this->getAvailableStaffFromScheduledate($date);
+        return $this->staffRepository->getAvailableStaffFromScheduletime($datetime, $duration);
     }
 
     public function getStaffScheduleAppointment($staffId, $date)

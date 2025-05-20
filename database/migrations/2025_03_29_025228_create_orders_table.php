@@ -16,10 +16,10 @@ return new class extends Migration
             $table->foreignId('appointment_id')->constrained('appointments');
 
             $table->string('order_status')->default('pending')
-                ->comment('created, pending_payment, paid, cancelled, refunded,failed');
+                ->comment('created, pending(waiting payment), paid, cancelled, refunded,failed');
 
             $table->string('payment_status')->default('pending')
-                ->comment('pending, success, failed, refunded');
+                ->comment('pending, partially_paid, success, failed, refunded');
 
             $table->string('payment_method')->default('credit_card')
                 ->comment('cash, credit_card, bank_transfer, voucher, split_payment,unpaid');

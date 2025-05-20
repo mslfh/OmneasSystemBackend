@@ -14,8 +14,8 @@ return new class extends Migration {
             $table->id();
             $table->boolean('is_first')->default(false);
             $table->string('status')->default('booked')
-                ->comment('pending, booked, cancelled, in_progress, finished');
-            $table->string('type')
+                ->comment('pending(waitting list), booked, cancelled, in_progress, finished');
+            $table->string('type')->default('assigned')
                 ->comment('unassigned, assigned, break, no_show');
 
             $table->string('customer_id')->nullable();

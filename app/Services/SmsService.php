@@ -20,6 +20,7 @@ class SmsService
 
     public function sendSms(string $message,array $phone_number,string $schedule_time = null)
     {
+        //容错
         return $this->smsRepository->sendSms($message, $phone_number,$schedule_time);
     }
 }

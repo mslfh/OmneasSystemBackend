@@ -11,5 +11,6 @@ interface StaffContract
     public function delete($id);
     public function getStaffScheduleFromDate($date);
     public function getAvailableStaffFromScheduledate($date);
+    public function getAvailableStaffFromScheduletime($dateTime, $duration);
     public function getStaffScheduleAppointment($staffId, $formatDate);
 }

@@ -62,27 +62,32 @@ class OrderController extends BaseController
         ]);
         // get the appointment
         $appointment = $this->appointmentService->getAppointmentById($data['appointment_id']);
+
         if(!$appointment){
             return response()->json(['message' => 'Appointment not found'], 404);
         }
+
         // check if the appointment is already paid
         if($appointment->status == 'finished'){
             return response()->json(['message' => 'Appointment already done'], 400);
         }
+
         if($data['payment_method'] == 'unpaid'){
-            $data['payment_status'] = 'Unpaid';
+            $data['payment_status'] = 'pending';
         }
-        else if($data['payment_method'] == 'split_payment' && $data['order_status'] == 'Unsettled'){
-            $data['payment_status'] = 'Unsettled';
+        else if($data['payment_method'] == 'split_payment' && $data['order_status'] == 'pending'){
+            $data['payment_status'] = 'partially_paid';
         }
         else{
-            $data['payment_status'] = 'Paid';
+            $data['payment_status'] = 'paid';
         }
         DB::beginTransaction();
         $appointment->status = 'finished';
         $appointment->actual_start_time = $data['actual_start_time'];
         $appointment->actual_end_time = $data['actual_end_time'];
         $appointment->save();
+
+
         if($data['split_payment']){
             $payment = [];
             foreach($data['split_payment'] as $index=>$split_payment){
@@ -104,7 +109,8 @@ class OrderController extends BaseController
 
         unset($data['actual_start_time']);
         unset($data['actual_end_time']);
-        $order = $this->orderService->createOrder($data);
+
+        $order = $this->orderService->updateOrder($appointment->order->id, $data);
         DB::commit();
         return response()->json($order, 201);
     }

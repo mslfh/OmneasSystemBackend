@@ -34,6 +34,24 @@ class StaffRepository implements StaffContract
             ->get();
     }
 
+    public function getAvailableStaffFromScheduletime($dateTime, $duration)
+    {
+        $formatStartTime = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $dateTime);
+        $formatEndTime = $formatStartTime->copy()->addMinutes($duration);
+
+        return Staff::where('status', 'active')
+            ->whereHas('schedules', function ($query) use ($formatStartTime) {
+                $query->where('work_date', '=', $formatStartTime->format('Y-m-d'));
+            })
+            ->whereDoesntHave('bookingServices', function ($query) use ($formatStartTime, $formatEndTime) {
+                $query->where(function ($subQuery) use ($formatStartTime, $formatEndTime) {
+                    $subQuery->where('booking_time', '<', $formatEndTime)
+                             ->whereRaw('DATE_ADD(booking_time, INTERVAL service_duration MINUTE) > ?', [$formatStartTime]);
+                });
+            })
+            ->get();
+    }
+
     public function getStaffScheduleAppointment($staffId, $formatDate)
     {
         return Staff::select('id', 'status')

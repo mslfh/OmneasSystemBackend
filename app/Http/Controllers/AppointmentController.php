@@ -141,7 +141,7 @@ class AppointmentController extends BaseController
             'schedule_time' => 'nullable|date_format:Y-m-d H:i:s',
         ]);
         try {
-            $msg = $this->appointmentService->sendSms($data, $this->smsService, $this->notificationService);
+            $msg = $this->appointmentService->sendSms($data);
             return response()->json([
                 'status' => 'success',
                 'message' => $msg,
@@ -152,5 +152,10 @@ class AppointmentController extends BaseController
                 'message' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function destroy($id)
+    {
+          return response()->json($this->appointmentService->deleteAppointment($id));
     }
 }

@@ -37,7 +37,6 @@ class AppointmentRepository implements AppointmentContract
         )
         ->with('services')->orderBy('booking_time')->get();
     }
-
     public function getById($id)
     {
         return Appointment::findOrFail($id)->load('services');

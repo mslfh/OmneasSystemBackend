@@ -108,12 +108,12 @@ class ScheduleService
     public function getUnavailableTimeFromDate($date)
     {
         $allStaffSchedules = $this->staffService->getStaffScheduleFromDate($date);
-        if ($allStaffSchedules->isEmpty()) {
+        $formatDate = Carbon::createFromFormat('Y-m-d', $date);
+        $allSchedules = $allStaffSchedules->pluck('schedules')->flatten();
+        if ($allSchedules->isEmpty()) {
             return $this->noScheduleTimeResponse();
         }
 
-        $formatDate = Carbon::createFromFormat('Y-m-d', $date);
-        $allSchedules = $allStaffSchedules->pluck('schedules')->flatten();
         $minScheduleTime = $allSchedules->min('start_time');
         $maxScheduleTime = $allSchedules->max('end_time');
         $unavailableTime = [
@@ -249,15 +249,15 @@ class ScheduleService
     /**
      * Find intervals where there are no schedules
      *
-     * @param string $openingTime
-     * @param string $closingTime
+     * @param string $beginTime
+     * @param string $endTime
      * @param Collection $scheduleIntervals
      * @return array
      */
-    private function findNoScheduleIntervals($openingTime, $closingTime, Collection $scheduleIntervals)
+    private function findNoScheduleIntervals($beginTime, $endTime, Collection $scheduleIntervals)
     {
         $gaps = [];
-        $cursor = Carbon::createFromFormat('H:i', $openingTime);
+        $cursor = Carbon::createFromFormat('H:i', $beginTime);
         foreach ($scheduleIntervals as $interval) {
             if ($interval['start']->gt($cursor)) {
                 $gaps[] = [
@@ -269,10 +269,10 @@ class ScheduleService
                 $cursor = $interval['end']->copy();
             }
         }
-        if ($cursor->lt($closingTime)) {
+        if ($cursor->lt($endTime)) {
             $gaps[] = [
                 'start_time' => $cursor->format('H:i'),
-                'end_time' => $closingTime,
+                'end_time' => $endTime,
             ];
         }
         return $gaps;

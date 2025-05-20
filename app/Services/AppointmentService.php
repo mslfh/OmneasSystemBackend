@@ -25,8 +25,7 @@ class AppointmentService
         SystemSettingService $systemSettingService,
         NotificationService $notificationService,
         OrderService $orderService
-        )
-    {
+    ) {
         $this->appointmentRepository = $appointmentRepository;
         $this->serviceAppointmentService = $serviceAppointmentService;
         $this->userService = $userService;
@@ -47,7 +46,7 @@ class AppointmentService
 
         if ($filter) {
             $query->where('name', 'like', "%$filter%") // Example filter
-                  ->orWhere('status', 'like', "%$filter%");
+                ->orWhere('status', 'like', "%$filter%");
         }
         $sortDirection = $descending ? 'desc' : 'asc';
         $query->with('services')->orderBy($sortBy, $sortDirection);
@@ -68,8 +67,8 @@ class AppointmentService
 
     public function getUserBookingHistory($id)
     {
-        $user =  User::find($id);
-        $data=[
+        $user = User::find($id);
+        $data = [
             'name' => $user->name,
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
@@ -113,7 +112,7 @@ class AppointmentService
         return $this->appointmentRepository->getByDate($date);
     }
 
-    public function storeAppointment($data )
+    public function storeAppointment($data)
     {
         $data['booking_time'] = $data['booking_date'] . ' ' . $data['booking_time'];
         $appointmentData = $data;
@@ -133,11 +132,7 @@ class AppointmentService
         }
         \DB::beginTransaction();
         try {
-            if ($data['customer_service'][0]['staff']['id'] == 0) {
-                $appointmentData['status'] = 'unassigned';
-            }
             $appointment = $this->createAppointment($appointmentData);
-            $total_amount = 0;
             foreach ($data['customer_service'] as $serviceData) {
                 $service = \App\Models\Service::with('package')->findOrFail($serviceData['service']['id']);
                 $serviceData['service_id'] = $service->id;
@@ -157,9 +152,14 @@ class AppointmentService
                         $serviceData['booking_time'],
                         $serviceData['service_duration'],
                     )->first();
+                    $serviceData['any_therapist'] = true;
+                    if (!$recommendedstaff) {
+                        throw new \Exception('No available staff found for the selected time and duration.', 500);
+                    }
                     $serviceData['staff_id'] = $recommendedstaff->id ?? '0';
                     $serviceData['staff_name'] = $recommendedstaff->name ?? '';
                 } else {
+                    $serviceData['any_therapist'] = false;
                     $serviceData['staff_id'] = $serviceData["staff"]['id'];
                     $serviceData['staff_name'] = $serviceData["staff"]['name'];
                 }
@@ -169,7 +169,9 @@ class AppointmentService
                 $this->userService->createUser($userData);
             }
             $this->orderService->initAppointmentOrder($appointment->id, $appointment->amount);
-            \DB::commit();
+            // send notification sms
+            $this->sendAppointmentSms($appointment->customer_phone, $appointment->booking_time, $serviceData);
+             \DB::commit();
             return $appointment->load('services');
         } catch (\Exception $e) {
             \DB::rollBack();
@@ -187,7 +189,9 @@ class AppointmentService
         \DB::beginTransaction();
         try {
             if ($data['customer_service'][0]['staff_id'] == 0) {
-                $appointmentData['status'] = 'unassigned';
+                $appointmentData['type'] = 'unassigned';
+            } else {
+                $appointmentData['type'] = 'assigned';
             }
             $appointment = $this->createAppointment($appointmentData);
             foreach ($data['customer_service'] as $serviceData) {
@@ -202,20 +206,27 @@ class AppointmentService
                 $serviceData['service_price'] = $service->price;
                 $serviceData['appointment_id'] = $appointment->id;
                 $serviceData['booking_time'] = $appointment->booking_time;
+
                 if ($serviceData["staff_id"] == 0) {
                     $recommendedstaff = $this->staffService->getAvailableStaffFromScheduletime(
                         $serviceData['booking_time'],
                         $serviceData['service_duration'],
                     )->first();
+                    if (!$recommendedstaff) {
+                        throw new \Exception('No available staff found for the selected time and duration.', 500);
+                    }
                     $serviceData['any_therapist'] = true;
                     $serviceData['staff_id'] = $recommendedstaff->id ?? '0';
                     $serviceData['staff_name'] = $recommendedstaff->name ?? '';
                 }
+                 else {
+                    $serviceData['any_therapist'] = false;
+                }
                 $this->createServiceAppointment($serviceData);
             }
             // create following order
-
-            \DB::commit();
+            $this->orderService->initAppointmentOrder($appointment->id, $appointment->amount);
+             \DB::commit();
             // send notification sms
             $this->sendAppointmentSms($appointment->customer_phone, $appointment->booking_time, $serviceData);
             return $appointment->load('services');
@@ -228,7 +239,7 @@ class AppointmentService
     public function takeBreakAppointment($data)
     {
         $appointmentData = [
-            'status' => 'break',
+            'type' => 'break',
             'booking_time' => $data['date'] . ' ' . $data['time'],
         ];
         $appointmentServiceData = [
@@ -295,6 +306,7 @@ class AppointmentService
                     'customer_email' => $appointment->customer_email,
                     'tag' => $appointment->tag,
                     'status' => $appointment->status,
+                    'type' => $appointment->type,
                     'actual_start_time' => $appointment->actual_start_time,
                     'actual_end_time' => $appointment->actual_end_time,
                 ];
@@ -349,23 +361,24 @@ class AppointmentService
         return $this->updateAppointment($id, $appointmentData);
     }
 
-    public function sendSms($data, $smsService, $notificationService)
+    public function sendSms($data)
     {
         $phone_number = [$data['phone_number']];
         $text = $data['message'];
         $schedule_time = $data['schedule_time'] ?? null;
-        if($data['is_schedule_time']) {
-            $smsResponse = $smsService->sendSms($text, $phone_number, $schedule_time);
+        if ($data['is_schedule_time']) {
+            $smsResponse = $this->smsService->sendSms($text, $phone_number, $schedule_time);
         } else {
-            $smsResponse = $smsService->sendSms($text, $phone_number);
+            $smsResponse = $this->smsService->sendSms($text, $phone_number);
         }
+
         $serviceData = [
             'appointment_id' => $data['appointment_id'] ?? null,
             'customer_name' => $data['customer_name'],
             'phone_number' => $data['phone_number'],
             'message' => $data['message'],
         ];
-        $notificationService->createBookingNotification(
+        $this->notificationService->createBookingNotification(
             $smsResponse,
             $serviceData,
             'Appintment Reminder'
@@ -387,17 +400,19 @@ class AppointmentService
                 [$phone],
             );
             if ($smsResponse) {
+                $serviceData['phone_number'] = $phone;
                 $this->notificationService->createBookingNotification($smsResponse, $serviceData);
             }
         }
+
         $reminder_interval = (int) $this->systemSettingService->getSettingByKey('reminder_interval')->value;
         if ($reminder_interval > 0) {
-            $schedule_time = \Carbon\Carbon::createFromFormat('Y/m/d H:i', $booking_time);
+            $schedule_time = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $booking_time);
             $today = \Carbon\Carbon::now()->format('Y-m-d');
             if ($today == $schedule_time->format('Y-m-d')) {
                 return;
             } else {
-                $reminder_time = \Carbon\Carbon::createFromFormat('Y/m/d H:i', $booking_time, 'Australia/Sydney')
+                $reminder_time = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $booking_time, 'Australia/Sydney')
                     ->subHours($reminder_interval);
                 if ($today == $reminder_time->format('Y-m-d')) {
                     return;
@@ -413,6 +428,7 @@ class AppointmentService
                     $reminder_time->format('Y-m-d H:i:s')
                 );
                 if ($smsResponse) {
+                    $serviceData['phone_number'] = $phone;
                     $this->notificationService->createBookingNotification($smsResponse, $serviceData, 'Appintment Reminder');
                 }
             }
@@ -421,7 +437,7 @@ class AppointmentService
 
     public function formatMassage($smsMassage, $serviceData)
     {
-        $bookingDateTime = \Carbon\Carbon::createFromFormat('Y/m/d H:i', $serviceData['booking_time']);
+        $bookingDateTime = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $serviceData['booking_time']);
         $formattedDate = $bookingDateTime->format('l, F j');
         $formattedTime = $bookingDateTime->format('g:i A');
         $names = explode(' ', $serviceData['customer_name'], 2);

@@ -46,6 +46,8 @@ Route::get('/appointments/{id}', [AppointmentController::class, 'show']);
 Route::get('/getServiceAppointments/{id}', [AppointmentController::class, 'getServiceAppointments']);
 Route::get('/sms', [AppointmentController::class, 'sendSms']);
 
+
+
 // Protected routes
 Route::middleware(['auth:sanctum'])->group(function () {
     // Package management

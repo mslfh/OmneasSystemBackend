@@ -12,6 +12,7 @@ use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ScheduleHistoryController;
 use App\Http\Controllers\ServiceAppointmentController;
 use App\Http\Controllers\SystemSettingController;
+use App\Http\Controllers\UserProfileController;
 
 // Authentication routes
 Route::post('/login', [AuthController::class, 'login']);
@@ -44,8 +45,10 @@ Route::post('/make-appointment', [AppointmentController::class, 'makeAppointment
 Route::get('/appointments', [AppointmentController::class, 'index']);
 Route::get('/appointments/{id}', [AppointmentController::class, 'show']);
 Route::get('/getServiceAppointments/{id}', [AppointmentController::class, 'getServiceAppointments']);
-Route::get('/sms', [AppointmentController::class, 'sendSms']);
 
+
+Route::post('/user-profile', [UserProfileController::class, 'store']);
+Route::get('/find-user-by-field', [UserController::class, 'findByField']);
 
 
 // Protected routes
@@ -84,7 +87,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // User management
     Route::apiResource('user', UserController::class);
     Route::post('/import-user', [UserController::class, 'import']);
-    Route::get('/search-user-by-field', [UserController::class, 'getByField']);
+    Route::get('/search-user-by-field', [UserController::class, 'getByKeyword']);
+
+    // User profile management
+    // Route::apiResource('user-profile', UserProfileController::class);
 
     // System settings
     Route::apiResource('system-setting', SystemSettingController::class);

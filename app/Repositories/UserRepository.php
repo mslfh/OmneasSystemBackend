@@ -35,11 +35,21 @@ class UserRepository
         ];
     }
 
-    public function findByField($field)
+    public function fetchByKeyword($field)
     {
         return User::where('name', 'like', '%' . $field . '%')
             ->orWhere('phone', 'like', '%' . $field . '%')
             ->orWhere('email', 'like', '%' . $field . '%')
+            ->limit(20)
+            ->get();
+    }
+
+    public function findByField($search, $field = 'phone')
+    {
+        return User::where($field, 'like', '%' . $search . '%')
+            ->where('id', '!=', 1)
+            ->where('id', '!=', 2)
+            ->whereDoesntHave('staff')
             ->limit(20)
             ->get();
     }

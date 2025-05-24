@@ -31,10 +31,19 @@ class UserController extends BaseController
 
     }
 
-    public function getByField(Request $request)
+    public function getByKeyword(Request $request)
     {
         $data = $request->validate([
             'search' => 'required|string|max:255',
+        ]);
+        return response()->json($this->userService->fetchByKey($data));
+    }
+
+    public function findByField(Request $request)
+    {
+        $data = $request->validate([
+            'search' => 'required|string|max:255',
+            'field' => 'required|string|max:255',
         ]);
         return response()->json($this->userService->findByField($data));
     }

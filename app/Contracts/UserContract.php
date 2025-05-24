@@ -7,6 +7,7 @@ interface UserContract
     public function getAllUsers();
     public function getPaginatedUsers($start, $count, $filter, $sortBy, $descending);
     public function getUserById($id);
+    public function fetchByKey($field);
     public function findByField($field);
     public function createUser(array $data);
     public function updateUser($id, array $data);

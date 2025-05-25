@@ -67,7 +67,8 @@ class AppointmentService
 
     public function getUserBookingHistory($id)
     {
-        return $this->appointmentRepository->getUserBookingHistory($id);
+        $user = $this->userService->getUserById($id);
+        return $this->appointmentRepository->getUserBookingHistory($id,$user->phone);
     }
 
     public function getAppointmentById($id)

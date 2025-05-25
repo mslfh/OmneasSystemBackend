@@ -48,8 +48,12 @@ class OrderService
         $query = Order::query();
 
         if ($filter) {
-            $query->where('name', 'like', "%$filter%") // Example filter
-                  ->orWhere('status', 'like', "%$filter%");
+            $query->whereHas('appointment', function ($q) use ($filter) {
+                $q->where('customer_name', 'like', "%$filter%")
+                ->orWhere('customer_phone', 'like', "%$filter%")
+                ->orWhere('customer_email', 'like', "%$filter%")
+                ->orWhere('booking_time', 'like', "%$filter%");
+            });
         }
 
         $sortDirection = $descending ? 'desc' : 'asc';

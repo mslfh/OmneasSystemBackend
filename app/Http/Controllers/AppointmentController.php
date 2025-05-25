@@ -158,4 +158,12 @@ class AppointmentController extends BaseController
     {
           return response()->json($this->appointmentService->deleteAppointment($id));
     }
+
+    public function makeNoShow( Request $request)
+    {
+        $data = $request->validate([
+            'id' => 'required|integer|exists:appointments,id',
+        ]);
+        return response()->json($this->appointmentService->markAppointmentAsNoShow($data['id']));
+    }
 }

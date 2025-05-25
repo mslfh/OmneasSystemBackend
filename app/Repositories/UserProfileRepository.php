@@ -35,4 +35,21 @@ class UserProfileRepository implements UserProfileContract
         $profile->delete();
         return true;
     }
+
+     public function getPaginatedProfiles($start, $count, $filter, $sortBy, $descending)
+    {
+        $query = UserProfile::query();
+        $query->when($filter, function ($query) use ($filter) {
+                return $query->where('first_name', 'like', '%' . $filter . '%')
+                    ->orWhere('phone', 'like', '%' . $filter . '%')
+                    ->orWhere('last_name', 'like', '%' . $filter . '%');
+            })
+            ->orderBy($sortBy, $descending ? 'desc' : 'asc');
+        $total = $query->count();
+        $data = $query->skip($start)->take($count) ->get();
+        return [
+            'data' => $data,
+            'total' => $total,
+        ];
+    }
 }

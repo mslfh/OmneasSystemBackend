@@ -42,6 +42,13 @@ class OrderRepository implements OrderContract
     {
         $order = Order::findOrFail($id);
         $order->update($data);
+        if(isset($data['payment'])) {
+            foreach ($data['payment'] as $key => $value) {
+                $data['payment'][$key]['order_id'] = $order->id;
+            }
+            $order->payment()->delete();
+            $order->payment()->createMany($data['payment']);
+        }
         return $order;
     }
 

@@ -3,8 +3,9 @@
 namespace App\Repositories;
 
 use App\Models\User;
+use App\Contracts\UserContract;
 
-class UserRepository
+class UserRepository implements UserContract
 {
     public function getAll()
     {
@@ -44,13 +45,19 @@ class UserRepository
             ->get();
     }
 
-    public function findByField($search, $field = 'phone')
+    public function findByField($search, $field = 'phone', $fuzzy=true )
     {
-        return User::where($field, 'like', '%' . $search . '%')
+        if($fuzzy){
+            return User::where($field, 'like', '%' . $search . '%')
+                ->where('id', '!=', 1)
+                ->where('id', '!=', 2)
+                ->whereDoesntHave('staff')
+                ->get();
+        }
+        return User::where($field, $search)
             ->where('id', '!=', 1)
             ->where('id', '!=', 2)
             ->whereDoesntHave('staff')
-            ->limit(20)
             ->get();
     }
 

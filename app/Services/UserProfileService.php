@@ -27,8 +27,34 @@ class UserProfileService
         return $this->userProfileRepository->find($id);
     }
 
+    public function getPaginatedProfiles($start, $count, $filter, $sortBy, $descending)
+    {
+        return $this->userProfileRepository->getPaginatedProfiles($start, $count, $filter, $sortBy, $descending);
+    }
+
     public function create(array $data)
     {
+        $user = $this->userService->findByField(
+            [
+                'search' => $data['phone'],
+                'field' => 'phone',
+                'fuzzy' => false
+            ]
+        );
+        if ($user->isEmpty()) {
+            $user = $this->userService->createUser(
+                [
+                    'phone' => $data['phone'],
+                    'first_name' => $data['first_name'],
+                    'last_name' => $data['last_name'],
+                    'name' => $data['first_name'] . ' ' . $data['last_name'],
+                ]
+            );
+        } else {
+            $user = $user->first();
+        }
+        $data['user_id'] = $user->id;
+
         if(isset($data['medical_attachment_path'])){
             $data['medical_attachment_path'] = json_encode($data['medical_attachment_path']);
         }

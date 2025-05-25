@@ -67,14 +67,7 @@ class AppointmentService
 
     public function getUserBookingHistory($id)
     {
-        $user = User::find($id);
-        $data = [
-            'name' => $user->name,
-            'first_name' => $user->first_name,
-            'last_name' => $user->last_name,
-            'phone' => $user->phone,
-        ];
-        return $this->appointmentRepository->getUserBookingHistory($data);
+        return $this->appointmentRepository->getUserBookingHistory($id);
     }
 
     public function getAppointmentById($id)
@@ -114,22 +107,36 @@ class AppointmentService
 
     public function storeAppointment($data)
     {
+        $user = $this->userService->findByField(
+            [
+                'search' => $data['customer_phone'] ?? '',
+                'field' => 'phone',
+                'fuzzy' => false
+            ]
+        );
+        if ($user->isEmpty()) {
+            if ($data['is_first']) {
+                $user = $this->userService->createUser(
+                    [
+                        'name' => $data['customer_first_name'] . ' ' . $data['customer_last_name'],
+                        'first_name' => $data['customer_first_name'] ?? '',
+                        'last_name' => $data['customer_last_name'] ?? '',
+                        'phone' => $data['customer_phone'] ?? '',
+                        'email' => $data['customer_email'] ?? '',
+                    ]
+                );
+                $data['customer_id'] = $user->id;
+            }
+        } else {
+            $user = $user->first();
+            $data['customer_id'] = $user->id;
+        }
+
         $data['booking_time'] = $data['booking_date'] . ' ' . $data['booking_time'];
         $appointmentData = $data;
         $appointmentData['tag'] = implode(',', $data['tag']);
         unset($appointmentData['customer_service']);
         unset($appointmentData['booking_date']);
-        $userData = [];
-        if ($data['is_first']) {
-            $userData = [
-                'name' => $data['customer_service'][0]['customer_name'],
-                'first_name' => $data['customer_first_name'] ?? '',
-                'last_name' => $data['customer_last_name'] ?? '',
-                'phone' => $data['customer_phone'] ?? '',
-                'email' => $data['customer_email'] ?? '',
-                'password' => bcrypt($data['customer_phone']),
-            ];
-        }
         \DB::beginTransaction();
         try {
             $appointment = $this->createAppointment($appointmentData);
@@ -165,13 +172,10 @@ class AppointmentService
                 }
                 $this->createServiceAppointment($serviceData);
             }
-            if ($data['is_first']) {
-                $this->userService->createUser($userData);
-            }
             $this->orderService->initAppointmentOrder($appointment->id, $appointment->amount);
             // send notification sms
             $this->sendAppointmentSms($appointment->customer_phone, $appointment->booking_time, $serviceData);
-             \DB::commit();
+            \DB::commit();
             return $appointment->load('services');
         } catch (\Exception $e) {
             \DB::rollBack();
@@ -181,7 +185,29 @@ class AppointmentService
 
     public function makeAppointment($data)
     {
+        $user = $this->userService->findByField(
+            [
+                'search' => $data['customer_phone'],
+                'field' => 'phone',
+                'fuzzy' => false
+            ]
+        );
+        if ($user->isEmpty()) {
+            $user = $this->userService->createUser(
+                [
+                    'name' => $data['customer_first_name'] . ' ' . $data['customer_last_name'],
+                    'first_name' => $data['customer_first_name'],
+                    'last_name' => $data['customer_last_name'],
+                    'phone' => $data['customer_phone'],
+                    'email' => $data['customer_email'],
+                ]
+            );
+        } else {
+            $user = $user->first();
+        }
+        $data['customer_id'] = $user->id;
         $data['booking_time'] = $data['booking_date'] . ' ' . $data['booking_time'];
+
         $appointmentData = $data;
         unset($appointmentData['customer_service']);
         unset($appointmentData['booking_date']);
@@ -218,15 +244,14 @@ class AppointmentService
                     $serviceData['any_therapist'] = true;
                     $serviceData['staff_id'] = $recommendedstaff->id ?? '0';
                     $serviceData['staff_name'] = $recommendedstaff->name ?? '';
-                }
-                 else {
+                } else {
                     $serviceData['any_therapist'] = false;
                 }
                 $this->createServiceAppointment($serviceData);
             }
             // create following order
             $this->orderService->initAppointmentOrder($appointment->id, $appointment->amount);
-             \DB::commit();
+            \DB::commit();
             // send notification sms
             $this->sendAppointmentSms($appointment->customer_phone, $appointment->booking_time, $serviceData);
             return $appointment->load('services');
@@ -451,5 +476,22 @@ class AppointmentService
         $smsMassage = str_replace('{duration}', $serviceData['service_duration'] . ' minutes', $smsMassage);
         $smsMassage = str_replace('{therapist}', $serviceData['any_therapist'] ? 'Any Therapist' : $serviceData['staff_name'], $smsMassage);
         return $smsMassage;
+    }
+
+    public function markAppointmentAsNoShow($id)
+    {
+        $appointment = $this->getAppointmentById($id);
+        if (!$appointment) {
+            throw new \Exception('Appointment not found', 404);
+        }
+        $appointment->type = 'no_show';
+        $appointment->status = 'pending';
+        $appointment->services()->each(function ($service) {
+            $service->staff_id = 0;
+            $service->staff_name = '';
+            $service->save();
+        });
+        $appointment->save();
+        return $appointment;
     }
 }

@@ -74,4 +74,15 @@ class OrderService
         ];
         $this->createOrder($data);
     }
+
+     public function finishOrder ( $appointmentId, $total_amount)
+    {
+        $data = [
+            'status' => 'pending',
+            'appointment_id'  => $appointmentId,
+            'payment_method' => 'unpaid',
+            'total_amount' => $total_amount,
+        ];
+        $this->createOrder($data);
+    }
 }

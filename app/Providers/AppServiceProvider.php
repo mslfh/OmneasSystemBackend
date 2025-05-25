@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Contracts\ServiceContract;
+use App\Contracts\VoucherContract;
 use App\Repositories\ServiceRepository;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\ServiceProvider;
@@ -30,6 +31,8 @@ use App\Contracts\NotificationContract;
 use App\Repositories\NotificationRepository;
 use App\Contracts\UserProfileContract;
 use App\Repositories\UserProfileRepository;
+use App\Repositories\VoucherRepository;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -50,6 +53,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SmsContract::class, SmsRepository::class);
         $this->app->bind(NotificationContract::class, NotificationRepository::class);
         $this->app->bind(UserProfileContract::class, UserProfileRepository::class);
+        $this->app->bind(VoucherContract::class, VoucherRepository::class);
+
     }
 
     /**

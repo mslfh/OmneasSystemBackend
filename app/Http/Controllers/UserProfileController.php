@@ -19,10 +19,18 @@ class UserProfileController
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $profiles = $this->userProfileService->all();
-        return response()->json($profiles);
+        $start = $request->query('start', 0);
+        $count = $request->query('count', 10);
+        $filter = $request->query('filter', null);
+        $sortBy = $request->query('sortBy', 'id');
+        $descending = $request->query('descending', false);
+        $users = $this->userProfileService->getPaginatedProfiles($start, $count, $filter, $sortBy, $descending);
+        return response()->json([
+            'rows' => $users['data'],
+            'total' => $users['total'],
+        ]);
     }
 
     /**
@@ -41,7 +49,6 @@ class UserProfileController
         $files = $request->file('files');
 
         $data = $request->validate([
-            'user_id' => 'nullable',
             'first_name' => 'required|string',
             'last_name' => 'required|string',
             'phone' => 'required|string',

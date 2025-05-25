@@ -33,7 +33,7 @@ return new class extends Migration
 
             $table->string('private_health_fund_provider')->nullable();
 
-            $table->string('pain_points')->nullable();
+            $table->text('pain_points')->nullable();
             $table->string('areas_of_soreness')->nullable();
 
             $table->string('medical_history')->nullable();

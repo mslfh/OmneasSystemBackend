@@ -3,13 +3,12 @@
 namespace App\Services;
 
 use App\Contracts\UserContract;
-use App\Repositories\UserRepository;
 
-class UserService implements UserContract
+class UserService
 {
     protected $userRepository;
 
-    public function __construct(UserRepository $userRepository)
+    public function __construct(UserContract $userRepository)
     {
         $this->userRepository = $userRepository;
     }
@@ -34,7 +33,8 @@ class UserService implements UserContract
     {
         $search = $data['search'];
         $field = $data['field'] ?? 'phone';
-        return $this->userRepository->findByField($search,$field);
+        $fuzzy = $data['fuzzy'] ?? true;
+        return $this->userRepository->findByField($search,$field,$fuzzy);
     }
 
     public function createUser(array $data)

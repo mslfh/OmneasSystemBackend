@@ -13,6 +13,7 @@ use App\Http\Controllers\ScheduleHistoryController;
 use App\Http\Controllers\ServiceAppointmentController;
 use App\Http\Controllers\SystemSettingController;
 use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\VoucherController;
 
 // Authentication routes
 Route::post('/login', [AuthController::class, 'login']);
@@ -47,9 +48,8 @@ Route::get('/appointments/{id}', [AppointmentController::class, 'show']);
 Route::get('/getServiceAppointments/{id}', [AppointmentController::class, 'getServiceAppointments']);
 
 
-Route::post('/user-profile', [UserProfileController::class, 'store']);
+Route::apiResource('user-profile', UserProfileController::class);
 Route::get('/find-user-by-field', [UserController::class, 'findByField']);
-
 
 // Protected routes
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -69,10 +69,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/takeBreakAppointment', [AppointmentController::class, 'takeBreakAppointment']);
     Route::get('/getUserBookingHistory', [AppointmentController::class, 'getUserBookingHistory']);
     Route::post('/sendSms', [AppointmentController::class, 'sendSms']);
+    Route::post('/appointments/mark-no-show', [AppointmentController::class, 'makeNoShow']);
 
     // Order management
     Route::apiResource('orders', OrderController::class);
     Route::get('/getOrderByAppointment/{id}', [OrderController::class, 'getOrderByAppointment']);
+    Route::post('/orders/finishOrder', [OrderController::class, 'finishOrder']);
 
     // Schedule history management
     Route::apiResource('schedule-histories', ScheduleHistoryController::class);
@@ -91,6 +93,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // User profile management
     // Route::apiResource('user-profile', UserProfileController::class);
+
+    // Voucher management
+    Route::apiResource('vouchers', VoucherController::class);
+    Route::post('vouchers/bulk', [VoucherController::class, 'bulkStore']);
+    Route::post('vouchers/verify', [VoucherController::class, 'verify']);
+    Route::post('vouchers/verifyValidCode', [VoucherController::class, 'verifyValidCode']);
 
     // System settings
     Route::apiResource('system-setting', SystemSettingController::class);

@@ -49,7 +49,7 @@ class OrderService
 
         if ($filter) {
             $query->whereHas('appointment', function ($q) use ($filter) {
-                $q->where('customer_name', 'like', "%$filter%")
+                $q->where('customer_first_name', 'like', "%$filter%")
                 ->orWhere('customer_phone', 'like', "%$filter%")
                 ->orWhere('customer_email', 'like', "%$filter%")
                 ->orWhere('booking_time', 'like', "%$filter%");

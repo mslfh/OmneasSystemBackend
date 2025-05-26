@@ -194,7 +194,13 @@ class OrderController extends BaseController
 
         unset($data['actual_start_time']);
         unset($data['actual_end_time']);
-        $order = $this->orderService->updateOrder($appointment->order->id, $data);
+        if($appointment->order) {
+            $order = $this->orderService->updateOrder($appointment->order->id, $data);
+        }
+        else {
+            $data['appointment_id'] = $appointment->id;
+            $order = $this->orderService->createOrder($data);
+        }
         DB::commit();
         return response()->json($order, 201);
     }

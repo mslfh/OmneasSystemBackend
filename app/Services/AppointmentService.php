@@ -45,7 +45,8 @@ class AppointmentService
         $query = Appointment::query();
 
         if ($filter) {
-            $query->where('customer_name', 'like', "%$filter%")
+            $query->where('customer_first_name', 'like', "%$filter%")
+                ->orWhere('customer_phone', 'like', "%$filter%")
                 ->orWhere('customer_phone', 'like', "%$filter%")
                 ->orWhere('customer_email', 'like', "%$filter%")
                 ->orWhere('booking_time', 'like', "%$filter%");

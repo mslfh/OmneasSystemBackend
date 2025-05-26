@@ -49,6 +49,9 @@ class OrderRepository implements OrderContract
             $order->payment()->delete();
             $order->payment()->createMany($data['payment']);
         }
+        else{
+            $order->payment()->delete();
+        }
         return $order;
     }
 

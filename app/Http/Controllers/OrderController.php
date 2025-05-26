@@ -140,10 +140,10 @@ class OrderController extends BaseController
             return response()->json(['message' => 'Appointment not found'], 404);
         }
 
-        // check if the appointment is already paid
-        if ($appointment->status == 'finished') {
-            return response()->json(['message' => 'Appointment already done'], 400);
-        }
+        // // check if the appointment is already paid
+        // if ($appointment->status == 'finished') {
+        //     return response()->json(['message' => 'Appointment already done'], 400);
+        // }
 
         if ($data['payment_method'] == 'unpaid') {
             $data['payment_status'] = 'pending';

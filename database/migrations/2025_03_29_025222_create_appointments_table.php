@@ -23,7 +23,7 @@ return new class extends Migration {
             $table->string('customer_last_name')->nullable();
             $table->string('customer_phone')->nullable();
             $table->string('customer_email')->nullable();
-            $table->string('comments')->nullable();
+            $table->text('comments')->nullable();
 
             $table->string('tag')->nullable();
 

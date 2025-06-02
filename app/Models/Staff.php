@@ -33,11 +33,13 @@ class Staff extends Model
         $user = $this->user()->first();
         return  $user->email?? null;
     }
+
     public function getPhoneAttribute()
     {
         $user = $this->user()->first();
         return  $user->phone?? null;
     }
+
     public function schedules()
     {
         return $this->hasMany(Schedule::class);

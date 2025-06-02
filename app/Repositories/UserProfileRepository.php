@@ -36,7 +36,7 @@ class UserProfileRepository implements UserProfileContract
         return true;
     }
 
-     public function getPaginatedProfiles($start, $count, $filter, $sortBy, $descending)
+    public function getPaginatedProfiles($start, $count, $filter, $sortBy, $descending)
     {
         $query = UserProfile::query();
         $query->when($filter, function ($query) use ($filter) {
@@ -46,7 +46,7 @@ class UserProfileRepository implements UserProfileContract
             })
             ->orderBy($sortBy, $descending ? 'desc' : 'asc');
         $total = $query->count();
-        $data = $query->skip($start)->take($count) ->get();
+        $data = $query->skip($start)->take($count)->get();
         return [
             'data' => $data,
             'total' => $total,

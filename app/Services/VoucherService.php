@@ -28,11 +28,25 @@ class VoucherService
         return $this->voucherRepository->getVoucherById($id);
     }
 
+    public function generateVoucherCode($length = 9)
+    {
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $code = '';
+        for ($i = 0; $i < $length; $i++) {
+            $code .= $characters[rand(0, 25)];
+        }
+        if($this->voucherRepository->findByCode($code)) {
+            return $this->generateVoucherCode($length);
+        }
+        else{
+            return $code;
+        }
+    }
+
     public function createVoucher(array $data)
     {
         if (empty($data['code'])) {
-            // Generate a unique code if not provided
-            $data['code'] = strtoupper(uniqid());
+            $data['code'] = $this->generateVoucherCode();
         }
         if (empty($data['remaining_amount'])) {
             $data['remaining_amount'] = $data['amount'];
@@ -45,9 +59,8 @@ class VoucherService
     {
         $codes = [];
         if (empty($data['codes'])) {
-            // $data['count']
             for ($i = 0; $i < $data['count']; $i++) {
-                $codes[] = strtoupper(uniqid());
+                $codes[] = $this->generateVoucherCode();
             }
         } else {
             $codes = explode(',', $data['codes']);

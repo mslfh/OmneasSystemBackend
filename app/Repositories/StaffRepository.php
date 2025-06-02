@@ -16,6 +16,10 @@ class StaffRepository implements StaffContract
     {
         return Staff::select('id', 'name', 'status')
             ->where('status', 'active')
+            ->whereHas('schedules', function ($query) use ($date) {
+                $query->where('schedules.status', '=', 'active')
+                    ->where('schedules.work_date', '=', $date->format('Y-m-d'));
+            })
             ->with('schedules', function ($query) use ($date) {
                 $query->select('id', 'staff_id', 'start_time', 'end_time', 'work_date', 'status')
                     ->where('schedules.status', '=', 'active')

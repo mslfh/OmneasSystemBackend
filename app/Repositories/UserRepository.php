@@ -27,9 +27,10 @@ class UserRepository implements UserContract
                     ->orWhere('phone', 'like', '%' . $filter . '%')
                     ->orWhere('email', 'like', '%' . $filter . '%');
             })
+            ->with('userProfile')
             ->orderBy($sortBy, $descending ? 'desc' : 'asc');
         $total = $query->count();
-        $data = $query->skip($start)->take($count) ->get();
+        $data = $query->skip($start)->take($count)->get();
         return [
             'data' => $data,
             'total' => $total,

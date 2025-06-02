@@ -38,7 +38,8 @@ class StaffController extends BaseController
     public function getStaffScheduleFromDate(Request $request)
     {
         $date = $request->input('date');
-        return response()->json($this->staffService->getStaffScheduleFromDate($date));
+        $showAll = $request->input('showAll')? true : false;
+        return response()->json($this->staffService->getStaffScheduleFromDate($date, $showAll));
     }
 
     /**

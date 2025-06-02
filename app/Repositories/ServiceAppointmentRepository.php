@@ -18,6 +18,10 @@ class ServiceAppointmentRepository implements ServiceAppointmentContract
         if(isset($data['booking_time'])) {
             $data['expected_end_time'] = \Carbon\Carbon::parse($data['booking_time'])->addMinutes($serviceAppointment->service_duration);
         }
+        if(isset($data['status'])) {
+            $serviceAppointment->appointment->status = $data['status'];
+            $serviceAppointment->appointment->save();
+        }
         $serviceAppointment->update($data);
         return $serviceAppointment;
     }

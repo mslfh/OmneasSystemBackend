@@ -17,10 +17,10 @@ class StaffService
         $this->userService = $userService;
     }
 
-    public function getStaffScheduleFromDate($date)
+    public function getStaffScheduleFromDate($date, $showAll = false)
     {
         $formatDate = \Carbon\Carbon::createFromFormat('Y-m-d', $date);
-        return $this->staffRepository->getStaffScheduleFromDate($formatDate);
+        return $this->staffRepository->getStaffScheduleFromDate($formatDate, $showAll);
     }
 
     public function getAvailableStaffFromScheduledate($date)

@@ -28,7 +28,7 @@ class VoucherService
         return $this->voucherRepository->getVoucherById($id);
     }
 
-    public function generateVoucherCode($length = 9)
+    public function generateVoucherCode($length = 8)
     {
         $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $code = '';

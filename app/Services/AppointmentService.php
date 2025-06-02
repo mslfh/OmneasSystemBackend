@@ -435,14 +435,17 @@ class AppointmentService
         }
 
         $reminder_interval = (int) $this->systemSettingService->getSettingByKey('reminder_interval')->value;
+
         if ($reminder_interval > 0) {
             $schedule_time = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $booking_time);
             $today = \Carbon\Carbon::now()->format('Y-m-d');
+            // Skip today
             if ($today == $schedule_time->format('Y-m-d')) {
                 return;
             } else {
                 $reminder_time = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $booking_time, 'Australia/Sydney')
                     ->subHours($reminder_interval);
+                // Skip today's reminder
                 if ($today == $reminder_time->format('Y-m-d')) {
                     return;
                 }

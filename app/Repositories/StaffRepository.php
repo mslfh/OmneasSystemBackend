@@ -22,12 +22,15 @@ class StaffRepository implements StaffContract
                     ->where('schedules.work_date', '=', $date->format('Y-m-d'));
             });
         }
-        $query = $query->with('schedules', function ($query) use ($date) {
-            $query->select('id', 'staff_id', 'start_time', 'end_time', 'work_date', 'status')
-                ->where('schedules.status', '=', 'active')
-                ->where('schedules.work_date', '=', $date->format('Y-m-d'));
+        $query = $query->with('bookingServices', function ($query) use ($date) {
+            $query->select('id', 'staff_id')->whereDate('booking_time', '=', $date->format('Y-m-d'));
         })
-        ->get();
+            ->with('schedules', function ($query) use ($date) {
+                $query->select('id', 'staff_id', 'start_time', 'end_time', 'work_date', 'status')
+                    ->where('schedules.status', '=', 'active')
+                    ->where('schedules.work_date', '=', $date->format('Y-m-d'));
+            })
+            ->get();
         return $query;
     }
 

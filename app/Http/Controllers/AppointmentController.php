@@ -110,7 +110,7 @@ class AppointmentController extends BaseController
             'customer_last_name' => 'nullable|string',
             'is_first' => 'nullable|boolean',
             'customer_phone' => 'nullable|string',
-            'customer_email' => 'nullable|email',
+            'customer_email' => 'nullable|string',
             'customer_comments' => 'nullable|string',
             'tag' => 'nullable|string',
             'comments' => 'nullable|string',

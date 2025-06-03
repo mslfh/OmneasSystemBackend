@@ -27,10 +27,9 @@ return new class extends Migration {
             ['key' => 'booking_reminder', 'value' => 'false', 'description' => 'If send reminder message that the appointment has been successfully made', 'type' => 'boolean', 'created_at' => now(), 'updated_at' => now()],
             [
                 'key' => 'booking_reminder_msg',
-                'value' => "Hi {first_name} {last_name}, your massage therapy appointment has been successfully booked at Mia's Massage Therapy.
-Details: {service} ({duration}) with {therapist} on {date} at {time}.
-Location: Shop 2, 198 Charles Street, Launceston, TAS 7250.
-If you have any questions or need to make changes, please call us at +61 466 605 855.
+                'value' => "Hi {first_name} {last_name}, your appointment at Mia's Massage Therapy is confirmed.
+Details: {service} with {therapist} on {date} at {time}.
+For changes or cancellations, call +61 466 605 855.
 We look forward to seeing you!",
                 'description' => 'A reminder message that the appointment has been successfully made',
                 'type' => 'textarea',
@@ -40,10 +39,8 @@ We look forward to seeing you!",
             ['key' => 'reminder_interval', 'value' => '0', 'description' => 'Number of hours before the appointment to automatically send a reminder. 0 - no reminder', 'type' => 'number', 'created_at' => now(), 'updated_at' => now()],
             [
                 'key' => 'reminder_msg',
-                'value' => "Hi {first_name}, this is a friendly reminder of your upcoming massage appointment at Mia's Massage Therapy.
-Details: {service} ({duration}) with {therapist} on {date} at {time}.
-Location: Shop 2, 198 Charles Street, Launceston, TAS 7250.
-Please arrive 5-10 minutes early. For changes or cancellations, call +61 466 605 855.
+                'value' => "Hi {first_name} {last_name}, this is a kind reminder: your {service} with {therapist} is on {date} at {time}, Mia's Massage Therapy.
+Call +61 466 605 855 if needed.
 See you soon!",
                 'description' => 'Message for appointment reminder',
                 'type' => 'textarea',

@@ -360,7 +360,6 @@ class AppointmentService
         if (isset($appointmentData['actual_start_time'])) {
             $serviceData['booking_time'] = $appointmentData['actual_start_time'];
         }
-
         $serviceAppointment = $appointment->services->first();
         if (isset($inputService['id'])) {
             if ($serviceAppointment->id != $inputService['id']) {
@@ -374,7 +373,6 @@ class AppointmentService
                 $serviceData['service_description'] = $service->description;
                 $serviceData['service_duration'] = $service->duration;
                 $serviceData['service_price'] = $service->price;
-                $serviceData['comments'] = $appointmentData['comments'] ?? '';
             }
         }
         if (isset($staff['id'])) {

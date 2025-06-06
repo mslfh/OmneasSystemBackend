@@ -68,10 +68,9 @@ class AppointmentService
         return $this->appointmentRepository->getByDate($date);
     }
 
-    public function getUserBookingHistory($id)
+    public function getUserBookingHistory($id, $phone)
     {
-        $user = $this->userService->getUserById($id);
-        return $this->appointmentRepository->getUserBookingHistory($id,$user->phone);
+        return $this->appointmentRepository->getUserBookingHistory($id, $phone);
     }
 
     public function getAppointmentById($id)
@@ -326,9 +325,10 @@ class AppointmentService
                     'service_title' => $service->service_title,
                     'service_duration' => $service->service_duration,
                     'service_price' => $service->service_price,
-                    'customer_name' => $service->customer_name,
                     'comments' => $appointment->comments,
                     'appointment_id' => $appointment->id,
+                    'customer_id' => $appointment->customer_id,
+                    'customer_name' => $service->customer_name,
                     'customer_first_name' => $appointment->customer_first_name,
                     'customer_last_name' => $appointment->customer_last_name,
                     'customer_phone' => $appointment->customer_phone,

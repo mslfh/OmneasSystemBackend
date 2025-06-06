@@ -33,10 +33,11 @@ class AppointmentController extends BaseController
 
     public function getUserBookingHistory(Request $request)
     {
-        $data = $request->validate([
-            'id' => 'required|exists:users,id',
-        ]);
-        return response()->json($this->appointmentService->getUserBookingHistory($data['id']));
+        $userId = $request->query('id');
+        $phone = $request->query('phone');
+
+        return response()->json($this->appointmentService->getUserBookingHistory(
+            $userId, $phone));
     }
 
     public function show($id)

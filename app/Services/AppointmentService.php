@@ -49,7 +49,7 @@ class AppointmentService
                 ->orWhere('customer_phone', 'like', "%$filter%")
                 ->orWhere('customer_phone', 'like', "%$filter%")
                 ->orWhere('customer_email', 'like', "%$filter%")
-                ->orWhere('booking_time', 'like', "%$filter%");
+                ->orWhereDate('booking_time', $filter);
         }
         $sortDirection = $descending ? 'desc' : 'asc';
         $query->with('services')->orderBy($sortBy, $sortDirection);

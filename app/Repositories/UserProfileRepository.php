@@ -52,4 +52,5 @@ class UserProfileRepository implements UserProfileContract
             'total' => $total,
         ];
     }
+
 }

@@ -92,6 +92,17 @@ class UserProfileController
         //
     }
 
+
+    /**
+     * Get the profile by user ID.
+     */
+    public function getProfileByUser(Request $request)
+    {
+        $userId = $request->query('user_id');
+        $profile = $this->userProfileService->getProfileByUserId($userId);
+        return response()->json($profile);
+    }
+
     /**
      * Update the specified resource in storage.
      */

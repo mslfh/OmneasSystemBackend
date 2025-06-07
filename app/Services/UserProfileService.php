@@ -55,7 +55,7 @@ class UserProfileService
         }
         $data['user_id'] = $user->id;
 
-        if(isset($data['medical_attachment_path'])){
+        if (isset($data['medical_attachment_path'])) {
             $data['medical_attachment_path'] = json_encode($data['medical_attachment_path']);
         }
         $birthDate = $data['date_of_birth'] ?? null;
@@ -63,6 +63,17 @@ class UserProfileService
             $data['date_of_birth'] = Carbon::createFromFormat('d/m/Y', $birthDate);
         }
         return $this->userProfileRepository->create($data);
+    }
+
+    public function getProfileByUserId($userId)
+    {
+        $user = $this->userService->getUserById($userId);
+        if ($user && $user->userProfile) {
+            $profile = $user->userProfile;
+            return $this->userProfileRepository->find($profile->id);
+        } else {
+            return [];
+        }
     }
 
     public function update($id, array $data)

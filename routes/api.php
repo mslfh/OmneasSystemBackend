@@ -47,8 +47,11 @@ Route::get('/appointments', [AppointmentController::class, 'index']);
 Route::get('/appointments/{id}', [AppointmentController::class, 'show']);
 Route::get('/getServiceAppointments/{id}', [AppointmentController::class, 'getServiceAppointments']);
 
+// User profile routes
 Route::apiResource('user-profile', UserProfileController::class);
-
+Route::get('get-profile-by-userId', [UserProfileController::class, 'getProfileByUser']);
+Route::post('/user-profile/{id}', [UserProfileController::class, 'update']);
+// User routes
 Route::get('/find-user-by-field', [UserController::class, 'findByField']);
 
 // Protected routes
@@ -90,9 +93,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('user', UserController::class);
     Route::post('/import-user', [UserController::class, 'import']);
     Route::get('/search-user-by-field', [UserController::class, 'getByKeyword']);
-
-    // User profile management
-    Route::get('get-profile-by-userId', [UserProfileController::class, 'getProfileByUser']);
 
     // Voucher management
     Route::apiResource('vouchers', VoucherController::class);

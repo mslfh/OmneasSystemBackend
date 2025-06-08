@@ -22,12 +22,9 @@ class UserProfile extends Model
     }
 
 
-    public function getMedicalAttachmentPathAttribute()
+    public function getMedicalAttachmentPathAttribute($value)
     {
-        $paths = $this->attributes['medical_attachment_path'] ?? null;
-        if ( $paths) {
-            $paths = json_decode($paths, true);
-        }
+        $paths = is_string($value) ? json_decode($value, true) : $value;
         if (empty($paths) || !is_array($paths)) {
             return [];
         }

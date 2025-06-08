@@ -106,9 +106,36 @@ class UserProfileController
     /**
      * Update the specified resource in storage.
      */
-    public function update(UserProfileRequest $request, $id)
+    public function update(Request $request, $id)
     {
-        $profile = $this->userProfileService->update($id, $request->validated());
+        $files = $request->file('files');
+        $data = $request->validate([
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
+            'phone' => 'required|string',
+            'gender' => 'nullable|string',
+            'date_of_birth' => 'nullable|date',
+            'address' => 'nullable|string',
+            'visit_reason' => 'nullable|string',
+            'emergency_contact_name' => 'nullable|string',
+            'emergency_contact_phone' => 'nullable|string',
+            'private_health_fund_provider' => 'nullable|string',
+            'pain_points' => 'nullable|string',
+            'areas_of_soreness' => 'nullable|string',
+            'medical_history' => 'nullable|string',
+            'others' => 'nullable|string',
+            'notes' => 'nullable|string',
+        ]);
+        $profile = $this->userProfileService->update($id,  $data);
+        if ($files) {
+            $medical_attachment_path = $profile->medical_attachment_path ?? [];
+            foreach ($files as $file) {
+                $path = $file->store('profileAttachments', 'public');
+                $medical_attachment_path[] = $path;
+            }
+            $profile->medical_attachment_path = $medical_attachment_path;
+            $profile->save();
+        }
         return response()->json($profile);
     }
 

@@ -55,9 +55,6 @@ class UserProfileService
         }
         $data['user_id'] = $user->id;
 
-        if (isset($data['medical_attachment_path'])) {
-            $data['medical_attachment_path'] = json_encode($data['medical_attachment_path']);
-        }
         $birthDate = $data['date_of_birth'] ?? null;
         if ($birthDate) {
             $data['date_of_birth'] = Carbon::createFromFormat('d/m/Y', $birthDate);
@@ -78,10 +75,6 @@ class UserProfileService
 
     public function update($id, array $data)
     {
-        $birthDate = $data['date_of_birth'] ?? null;
-        if ($birthDate) {
-            $data['date_of_birth'] = Carbon::createFromFormat('d/m/Y', $birthDate);
-        }
         return $this->userProfileRepository->update($id, $data);
     }
 

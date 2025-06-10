@@ -128,15 +128,44 @@ class UserProfileController
         ]);
         $profile = $this->userProfileService->update($id,  $data);
         if ($files) {
-            $medical_attachment_path = $profile->medical_attachment_path ?? [];
+            $medical_attachment_path = $profile->getRawOriginal('medical_attachment_path') ?? [];
+            $medical_attachment_path = is_string($medical_attachment_path) ? json_decode($medical_attachment_path, true) : $medical_attachment_path;
+            if (empty($medical_attachment_path) || !is_array($medical_attachment_path)) {
+                $medical_attachment_path = [];
+            }
+            $paths = [];
             foreach ($files as $file) {
                 $path = $file->store('profileAttachments', 'public');
-                $medical_attachment_path[] = $path;
+                $paths[] = $path;
             }
+            $medical_attachment_path = array_merge($medical_attachment_path, $paths);
             $profile->medical_attachment_path = $medical_attachment_path;
             $profile->save();
         }
         return response()->json($profile);
+    }
+
+    /**
+     * Upload an attachment to the user profile.
+     */
+
+    public function uploadAttachment(Request $request, $id)
+    {
+        $file = $request->file('file');
+        if ($file) {
+            $path = $file->store('profileAttachments', 'public');
+            $profile = $this->userProfileService->find($id);
+            $medical_attachment_path = $profile->getRawOriginal('medical_attachment_path') ?? [];
+            $medical_attachment_path = is_string($medical_attachment_path) ? json_decode($medical_attachment_path, true) : $medical_attachment_path;
+            if (empty($medical_attachment_path) || !is_array($medical_attachment_path)) {
+                $medical_attachment_path = [];
+            }
+            $medical_attachment_path[] = $path;
+            $profile->medical_attachment_path = $medical_attachment_path;
+            $profile->save();
+            return response()->json($profile);
+        }
+        return response()->json(['error' => 'File not found'], 404);
     }
 
     /**

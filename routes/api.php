@@ -51,6 +51,7 @@ Route::get('/getServiceAppointments/{id}', [AppointmentController::class, 'getSe
 Route::apiResource('user-profile', UserProfileController::class);
 Route::get('get-profile-by-userId', [UserProfileController::class, 'getProfileByUser']);
 Route::post('/user-profile/{id}', [UserProfileController::class, 'update']);
+
 // User routes
 Route::get('/find-user-by-field', [UserController::class, 'findByField']);
 
@@ -93,6 +94,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('user', UserController::class);
     Route::post('/import-user', [UserController::class, 'import']);
     Route::get('/search-user-by-field', [UserController::class, 'getByKeyword']);
+
+
+    Route::post('/upload-attachment/{id}', [UserProfileController::class, 'uploadAttachment']);
+
 
     // Voucher management
     Route::apiResource('vouchers', VoucherController::class);

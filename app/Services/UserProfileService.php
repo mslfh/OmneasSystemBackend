@@ -9,8 +9,6 @@ class UserProfileService
 {
     protected $userProfileRepository;
     protected $userService;
-
-
     public function __construct(UserProfileContract $userProfileRepository, UserService $userService)
     {
         $this->userProfileRepository = $userProfileRepository;

@@ -105,3 +105,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/getSystemSettingByKey', [SystemSettingController::class, 'getSystemSettingByKey']);
 });
 
+Route::get('/phpinfo', function () {
+    phpinfo();
+});
+

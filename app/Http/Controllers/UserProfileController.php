@@ -169,6 +169,35 @@ class UserProfileController
     }
 
     /**
+     * Delete an attachment from the user profile.
+     */
+    public function deleteAttachment(Request $request, $id)
+    {
+        $filePath = $request->input('file_path');
+        if (!$filePath) {
+            return response()->json(['error' => 'File path is required'], 400);
+        }
+
+        $profile = $this->userProfileService->find($id);
+        $medical_attachment_path = $profile->getRawOriginal('medical_attachment_path') ?? [];
+        $medical_attachment_path = is_string($medical_attachment_path) ? json_decode($medical_attachment_path, true) : $medical_attachment_path;
+
+        if (($key = array_search($filePath, $medical_attachment_path)) !== false) {
+            unset($medical_attachment_path[$key]);
+            $profile->medical_attachment_path = array_values($medical_attachment_path);
+            $profile->save();
+            // Optionally delete the file from storage
+            if (\Storage::disk('public')->exists($filePath)) {
+                \Storage::disk('public')->delete($filePath);
+            }
+            // Return the updated profile
+            return response()->json($profile->medical_attachment_path);
+        }
+
+        return response()->json(['error' => 'File not found in profile'], 404);
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy($id)

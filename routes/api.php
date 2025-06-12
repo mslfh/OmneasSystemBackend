@@ -97,7 +97,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
     Route::post('/upload-attachment/{id}', [UserProfileController::class, 'uploadAttachment']);
-
+    Route::delete('/delete-attachment/{id}', [UserProfileController::class, 'deleteAttachment']);
 
     // Voucher management
     Route::apiResource('vouchers', VoucherController::class);

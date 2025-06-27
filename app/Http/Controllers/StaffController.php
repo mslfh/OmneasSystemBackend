@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Services\StaffService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
-use DB;
 
 class StaffController extends BaseController
 {
@@ -97,5 +96,12 @@ class StaffController extends BaseController
     public function destroy($id)
     {
         return response()->json($this->staffService->deleteStaff($id));
+    }
+
+    public function getStaffIncomeStatistics(Request $request)
+    {
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        return response()->json($this->staffService->getStaffIncomeStatistics($startDate, $endDate));
     }
 }

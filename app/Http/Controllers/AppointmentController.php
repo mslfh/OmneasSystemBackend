@@ -167,4 +167,10 @@ class AppointmentController extends BaseController
         ]);
         return response()->json($this->appointmentService->markAppointmentAsNoShow($data['id']));
     }
+
+    public function getTodayStatistics( )
+    {
+        return response()->json($this->appointmentService->getTodayStatistics());
+    }
+
 }

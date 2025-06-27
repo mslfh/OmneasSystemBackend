@@ -13,4 +13,6 @@ interface StaffContract
     public function getAvailableStaffFromScheduledate($date);
     public function getAvailableStaffFromScheduletime($dateTime, $duration);
     public function getStaffScheduleAppointment($staffId, $formatDate);
+    public function getStaffIncomeStatistics($startDate, $endDate, $staffId = null);
+
 }

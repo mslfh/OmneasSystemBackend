@@ -95,7 +95,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/import-user', [UserController::class, 'import']);
     Route::get('/search-user-by-field', [UserController::class, 'getByKeyword']);
 
-
     Route::post('/upload-attachment/{id}', [UserProfileController::class, 'uploadAttachment']);
     Route::delete('/delete-attachment/{id}', [UserProfileController::class, 'deleteAttachment']);
 
@@ -108,6 +107,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // System settings
     Route::apiResource('system-setting', SystemSettingController::class);
     Route::get('/getSystemSettingByKey', [SystemSettingController::class, 'getSystemSettingByKey']);
+
+    // Statistics routes
+    Route::get('/getTodayStatistics', [AppointmentController::class, 'getTodayStatistics']);
+    Route::get('/getStaffIncomeStatistics', [StaffController::class, 'getStaffIncomeStatistics']);
+    Route::get('/orders/getStatistics', [OrderController::class, 'getStatistics']);
+    Route::get('/staffs/getStatistics', [StaffController::class, 'getStatistics']);
 });
 
 Route::get('/phpinfo', function () {

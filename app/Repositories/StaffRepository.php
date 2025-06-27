@@ -110,4 +110,19 @@ class StaffRepository implements StaffContract
         $staff->delete();
         return $staff;
     }
+
+    public function getStaffIncomeStatistics($startDate, $endDate, $staffId = null)
+    {
+        $query = Staff::select('id', 'name')
+            ->where('status', 'active');
+
+        if ($staffId) {
+            $query->where('id', $staffId);
+        }
+
+        return $query->with(['bookingServices' => function ($query) use ($startDate, $endDate) {
+            $query->whereBetween('booking_time', [$startDate, $endDate])
+                ->select('id', 'staff_id', 'booking_time', 'service_price', 'service_duration');
+        }])->get();
+    }
 }

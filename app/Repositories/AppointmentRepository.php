@@ -19,6 +19,16 @@ class AppointmentRepository implements AppointmentContract
             'cancelled'
         )->with('services')->orderBy('booking_time')->get();
     }
+
+    public function getStatisticsByDate($beginDate, $endDate= null)
+    {
+        $query = Appointment::whereDate('booking_time', '>=', $beginDate);
+        if ($endDate) {
+            $query->whereDate('booking_time', '<=', $endDate);
+        }
+        return $query->with('order.payment')->orderBy('booking_time')->get();
+    }
+
     public function getUserBookingHistory($userId, $phone = null)
     {
         if ($phone) {

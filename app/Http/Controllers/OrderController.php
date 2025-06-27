@@ -177,7 +177,7 @@ class OrderController extends BaseController
         if ($data['split_payment']) {
             $payment = [];
             foreach ($data['split_payment'] as $index => $split_payment) {
-                $payment[$index]['paid_by'] = $split_payment['method']['label'];
+                $payment[$index]['paid_by'] = $split_payment['method']['value'];
                 if ($split_payment['method']['label'] != 'Unpaid') {
                     $payment[$index]['status'] = 'Paid';
                     $payment[$index]['paid_amount'] = $split_payment['amount'];

@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Contracts\AppointmentContract;
 use App\Models\Appointment;
-use App\Models\User;
 
 class AppointmentService
 {
@@ -498,5 +497,107 @@ class AppointmentService
         });
         $appointment->save();
         return $appointment;
+    }
+
+    public function getTodayStatistics()
+    {
+        // $today = \Carbon\Carbon::today();
+        //Test date 02/06/2025
+        $today = \Carbon\Carbon::createFromFormat('Y-m-d', '2025-06-03');
+
+        $appointments = $this->appointmentRepository->getStatisticsByDate($today, $today);
+
+        if ($appointments->isEmpty()) {
+            return [
+            ];
+        }
+        $totalAppointments = $appointments->count();
+        $appointmentGroupedByStatus = [];
+        foreach ($appointments as $appointment) {
+            $status = $appointment->status;
+            if (!isset($appointmentGroupedByStatus[$status])) {
+                $appointmentGroupedByStatus[$status] = 0;
+            }
+            $appointmentGroupedByStatus[$status]++;
+        }
+        // Get orders from appointments
+        $orders = $appointments->pluck('order');
+
+        $totalAmount = $orders->sum('total_amount');
+        $paidAmount = $orders->sum('paid_amount');
+
+        $amountGroupedByPaymentMethod = [];
+        foreach ($orders as $order) {
+            $paymentMethod = $order->payment_method;
+            if ($paymentMethod == 'split_payment') {
+                $splitPayments = $order->payment()->get();
+                foreach ($splitPayments as $splitPayment) {
+                    $paymentMethod = $splitPayment->paid_by;
+                    if (!isset($amountGroupedByPaymentMethod[$paymentMethod])) {
+                        if( $splitPayment->paid_by === 'unpaid') {
+                            $amountGroupedByPaymentMethod[$paymentMethod] = $splitPayment->total_amount;
+                        } else {
+                            $amountGroupedByPaymentMethod[$paymentMethod] = $splitPayment->paid_amount;
+                        }
+                    }
+                    else {
+                        if( $splitPayment->paid_by === 'unpaid') {
+                            $amountGroupedByPaymentMethod[$paymentMethod] += $splitPayment->total_amount;
+                        } else {
+                            $amountGroupedByPaymentMethod[$paymentMethod] += $splitPayment->paid_amount;
+                        }
+                    }
+                }
+            } else {
+                if (!isset($amountGroupedByPaymentMethod[$paymentMethod])) {
+                    if ($order->payment_method === 'unpaid') {
+                        $amountGroupedByPaymentMethod[$paymentMethod] = $order->total_amount;
+                    } else {
+                        $amountGroupedByPaymentMethod[$paymentMethod] = $order->paid_amount;
+                    }
+                } else {
+                    if ($order->payment_method === 'unpaid') {
+                        $amountGroupedByPaymentMethod[$paymentMethod] += $order->total_amount;
+                    } else {
+                        $amountGroupedByPaymentMethod[$paymentMethod] += $order->paid_amount;
+                    }
+                }
+            }
+        }
+
+        return [
+            'total_appointments' => $totalAppointments,
+            'total_revenue' => $totalAmount,
+            'total_paid' => $paidAmount,
+            'appointmentGroup' => $appointmentGroupedByStatus,
+            'orderGroup' => $amountGroupedByPaymentMethod,
+            'appointments' => $appointments,
+            'orders' => $orders,
+        ];
+    }
+
+    public function getStatistics($beginDate, $endDate)
+    {
+        $begin = \Carbon\Carbon::createFromFormat('Y-m-d', $beginDate);
+        $end = \Carbon\Carbon::createFromFormat('Y-m-d', $endDate);
+
+        $appointments = $this->appointmentRepository->getByDateRange($begin, $end);
+
+        if ($appointments->isEmpty()) {
+            return [
+                'total_appointments' => 0,
+                'total_revenue' => 0,
+                'appointments' => [],
+            ];
+        }
+        $totalAppointments = $appointments->count();
+        $orders = $appointments->order()->get();
+        $totalAmount = $orders->sum('total_amount');
+
+        return [
+            'total_appointments' => $totalAppointments,
+            'total_revenue' => $totalAmount,
+            'appointments' => $appointments,
+        ];
     }
 }

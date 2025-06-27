@@ -121,4 +121,9 @@ class StaffService
         return $this->staffRepository->delete($id);
     }
 
+    public function getStaffIncomeStatistics($startDate, $endDate)
+    {
+        return $this->staffRepository->getStaffIncomeStatistics($startDate, $endDate);
+    }
+
 }

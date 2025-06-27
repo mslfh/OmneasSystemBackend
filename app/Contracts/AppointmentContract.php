@@ -6,6 +6,7 @@ interface AppointmentContract
 {
     public function getAll();
     public function getByDate($date);
+    public function getStatisticsByDate($beginDate, $endDate= null);
     public function getById($id);
     public function getServiceAppointments($id);
     public function getUserBookingHistory($userId,$phone = null);

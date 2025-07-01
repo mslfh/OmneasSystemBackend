@@ -201,7 +201,7 @@ class AppointmentService
                     'first_name' => $data['customer_first_name'],
                     'last_name' => $data['customer_last_name'],
                     'phone' => $data['customer_phone'],
-                    'email' => $data['customer_email'],
+                    'email' => $data['customer_email'] ?? '',
                 ]
             );
         } else {

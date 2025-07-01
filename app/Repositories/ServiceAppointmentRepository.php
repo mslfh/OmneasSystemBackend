@@ -22,6 +22,10 @@ class ServiceAppointmentRepository implements ServiceAppointmentContract
             $serviceAppointment->appointment->status = $data['status'];
             $serviceAppointment->appointment->save();
         }
+        if(isset($data['type'])) {
+            $serviceAppointment->appointment->type = $data['type'];
+            $serviceAppointment->appointment->save();
+        }
         $serviceAppointment->update($data);
         return $serviceAppointment;
     }

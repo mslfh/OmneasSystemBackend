@@ -26,7 +26,11 @@ class AppointmentRepository implements AppointmentContract
         if ($endDate) {
             $query->whereDate('booking_time', '<=', $endDate);
         }
-        return $query->with('order.payment')->orderBy('booking_time')->get();
+        return $query->whereNotIn(
+            'type',
+            ['break','no_show']
+        )
+        ->with('order.payment')->orderBy('booking_time')->get();
     }
 
     public function getUserBookingHistory($userId, $phone = null)

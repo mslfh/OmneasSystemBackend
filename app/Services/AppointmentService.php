@@ -501,9 +501,9 @@ class AppointmentService
 
     public function getTodayStatistics()
     {
-        // $today = \Carbon\Carbon::today();
+        $today = \Carbon\Carbon::today()->format('Y-m-d');
         //Test date 02/06/2025
-        $today = \Carbon\Carbon::createFromFormat('Y-m-d', '2025-06-03');
+        // $today = \Carbon\Carbon::createFromFormat('Y-m-d', '2025-06-03');
 
         $appointments = $this->appointmentRepository->getStatisticsByDate($today, $today);
 
@@ -576,28 +576,27 @@ class AppointmentService
         ];
     }
 
-    public function getStatistics($beginDate, $endDate)
+    public function getTotalStatistics($beginDate, $endDate)
     {
         $begin = \Carbon\Carbon::createFromFormat('Y-m-d', $beginDate);
         $end = \Carbon\Carbon::createFromFormat('Y-m-d', $endDate);
 
-        $appointments = $this->appointmentRepository->getByDateRange($begin, $end);
-
+        $appointments = $this->appointmentRepository->getStatisticsByDate($begin, $end);
         if ($appointments->isEmpty()) {
             return [
-                'total_appointments' => 0,
-                'total_revenue' => 0,
-                'appointments' => [],
             ];
         }
         $totalAppointments = $appointments->count();
-        $orders = $appointments->order()->get();
+        $orders = $appointments->pluck('order');
         $totalAmount = $orders->sum('total_amount');
+        $paidAmount = $orders->sum('paid_amount');
+        $voucherAmount = $orders->sum('voucher_amount');
 
         return [
             'total_appointments' => $totalAppointments,
             'total_revenue' => $totalAmount,
-            'appointments' => $appointments,
+            'total_paid' => $paidAmount,
+            'total_voucher' => $voucherAmount,
         ];
     }
 }

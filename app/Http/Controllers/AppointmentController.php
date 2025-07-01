@@ -173,4 +173,9 @@ class AppointmentController extends BaseController
         return response()->json($this->appointmentService->getTodayStatistics());
     }
 
+    public function getTotalStatistics( )
+    {
+        return response()->json($this->appointmentService->getTotalStatistics());
+    }
+
 }

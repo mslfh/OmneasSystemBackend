@@ -121,8 +121,11 @@ class StaffRepository implements StaffContract
         }
 
         return $query->with(['bookingServices' => function ($query) use ($startDate, $endDate) {
-            $query->whereBetween('booking_time', [$startDate, $endDate])
-                ->select('id', 'staff_id', 'booking_time', 'service_price', 'service_duration');
+            $query->select('id', 'appointment_id', 'staff_id', 'booking_time', 'service_price', 'service_duration')
+            ->whereBetween('booking_time', [$startDate, $endDate])
+            ->with(['appointment' => function ($query) {
+                $query->select('id', 'status', 'type');
+            }]);
         }])->get();
     }
 }

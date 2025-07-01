@@ -111,8 +111,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Statistics routes
     Route::get('/getTodayStatistics', [AppointmentController::class, 'getTodayStatistics']);
     Route::get('/getStaffIncomeStatistics', [StaffController::class, 'getStaffIncomeStatistics']);
-    Route::get('/orders/getStatistics', [OrderController::class, 'getStatistics']);
-    Route::get('/staffs/getStatistics', [StaffController::class, 'getStatistics']);
+    Route::get('/getTotalStatistics', [AppointmentController::class, 'getTotalStatistics']);
 });
 
 Route::get('/phpinfo', function () {

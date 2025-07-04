@@ -19,6 +19,16 @@ class ScheduleController extends BaseController
         return response()->json($this->scheduleService->getAllSchedules());
     }
 
+    public function getStaffSchedule(Request $request)
+    {
+        $data = $request->validate([
+            'staff_id' => 'nullable|integer',
+            'start_date' => 'nullable|date_format:Y-m-d',
+            'end_date' => 'nullable|date_format:Y-m-d',
+        ]);
+        return response()->json($this->scheduleService->getSchedulesFromDateAndStaff($data));
+    }
+
     public function show($id)
     {
         return response()->json($this->scheduleService->getScheduleById($id));

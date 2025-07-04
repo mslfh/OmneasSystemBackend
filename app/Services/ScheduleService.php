@@ -34,6 +34,11 @@ class ScheduleService
         return $this->scheduleRepository->getAllSchedules();
     }
 
+    public function getSchedulesFromDateAndStaff($data)
+    {
+        return $this->scheduleRepository->getSchedulesFromDateAndStaff($data);
+    }
+
     public function getAllAvailableSchedules()
     {
         return $this->scheduleRepository->getAllAvailableSchedules();

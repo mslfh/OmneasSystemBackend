@@ -14,16 +14,32 @@ class AuthController extends BaseController
     {
         // 验证请求数据
         $request->validate([
-            'email' => 'required|email',
+            'userLogin' => 'required',
             'password' => 'required|string',
         ]);
 
         // 查找用户并验证密码
-        $user = User::where('email', $request->email)->first();
+        if (!$request->userLogin) {
+            throw ValidationException::withMessages([
+                'userLogin' => ['The email or phone is required.'],
+            ]);
+        }
+        if ($request->userLogin) {
+            $user = User::where('email', $request->userLogin)
+            ->orWhere('phone', $request->userLogin)
+            ->first();
+        }
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
+                'userLogin' => ['The provided credentials are incorrect.'],
+            ]);
+        }
+
+        // 检查用户role
+        if (!$user->role) {
+            throw ValidationException::withMessages([
+                'role' => ['The user does not have a valid role.'],
             ]);
         }
 

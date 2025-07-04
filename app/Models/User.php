@@ -39,6 +39,8 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+      protected $appends = ['role'];
+
     /**
      * Get the attributes that should be cast.
      *
@@ -52,6 +54,19 @@ class User extends Authenticatable
         ];
     }
 
+
+    public function getRoleAttribute()
+    {
+        // If the user has a role, return it; otherwise, check if the user is a staff member
+        // and return the staff role if available.
+        if ($this->specialRoles->isNotEmpty()) {
+            return $this->specialRoles->first()->name;
+        } elseif ($this->staff) {
+            return "Staff" ?? null;
+        }
+        return null;
+    }
+
     public function staff()
     {
         return $this->hasOne(Staff::class);
@@ -60,5 +75,10 @@ class User extends Authenticatable
     public function userProfile()
     {
         return $this->hasOne(UserProfile::class);
+    }
+
+    public function specialRoles()
+    {
+        return $this->hasMany(SpecialRole::class);
     }
 }

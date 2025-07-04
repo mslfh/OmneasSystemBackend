@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('end_time');
             $table->string('break_start_time')->nullable();
             $table->string('break_end_time')->nullable();
-            $table->string('status')->default('available')
-            ->comment('working, breaking, off');
+            $table->string('status')->default('active')
+            ->comment('active,inactive');
             $table->string('remark')->nullable();
             $table->timestamps();
         });

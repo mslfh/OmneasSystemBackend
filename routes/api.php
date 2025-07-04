@@ -66,6 +66,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Schedule management
     Route::apiResource('schedules', ScheduleController::class)->except(['index', 'show']);
     Route::post('/insert-schedule', [ScheduleController::class, 'insert']);
+    Route::get('/getStaffSchedule', [ScheduleController::class, 'getStaffSchedule']);
 
     // Appointment management
     Route::apiResource('appointments', AppointmentController::class)->except(['index', 'show']);

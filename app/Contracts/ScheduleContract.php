@@ -5,7 +5,6 @@ namespace App\Contracts;
 interface ScheduleContract
 {
     public function getAllSchedules();
-
     public function getSchedulesFromDateAndStaff($data);
     public function getAllAvailableSchedules();
     public function getAvailableScheduleByDate($date);

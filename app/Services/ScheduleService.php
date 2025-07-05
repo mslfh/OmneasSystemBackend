@@ -459,26 +459,37 @@ class ScheduleService
         return collect($availableSchedules)->values();
     }
 
-    public function getStaffScheduleStatistics()
+    public function getStaffScheduleStatistics($startDate = null, $endDate = null)
     {
-        $staffSchedules = $this->scheduleRepository->getStaffScheduleStatistics();
+        $staffSchedules = $this->scheduleRepository->getStaffScheduleStatistics($startDate, $endDate);
         $staffStatistics = [];
-
-        foreach ($staffSchedules as $schedule) {
-            $staffId = $schedule->staff_id;
+        if ($staffSchedules->isEmpty()) {
+            return collect($staffStatistics);
+        }
+        // Loop through each staffSchedule and calculate their total schedule time in hours and group by date
+        foreach ($staffSchedules as $staffSchedule) {
+            $staffId = $staffSchedule->staff_id;
             if (!isset($staffStatistics[$staffId])) {
                 $staffStatistics[$staffId] = [
-                    'total_schedules' => 0,
-                    'available_schedules' => 0,
-                    'unavailable_schedules' => 0,
+                    'id' => $staffId,
+                    'name' => $staffSchedule->staff->name,
+                    'total_hours' => 0,
+                    'schedules' => [],
                 ];
             }
-            $staffStatistics[$staffId]['total_schedules']++;
-            if ($schedule->status === 'active') {
-                $staffStatistics[$staffId]['available_schedules']++;
-            } else {
-                $staffStatistics[$staffId]['unavailable_schedules']++;
+            $scheduleDate = Carbon::parse($staffSchedule->work_date)->format('Y-m-d');
+            $startTime = Carbon::createFromFormat('H:i', $staffSchedule->start_time);
+            $endTime = Carbon::createFromFormat('H:i', $staffSchedule->end_time);
+            $hours = $startTime->diffInHours($endTime);
+
+            if (!isset($staffStatistics[$staffId]['schedules'][$scheduleDate])) {
+                $staffStatistics[$staffId]['schedules'][$scheduleDate] = [
+                    'date' => $scheduleDate,
+                    'hours' => 0,
+                ];
             }
+            $staffStatistics[$staffId]['schedules'][$scheduleDate]['hours'] += $hours;
+            $staffStatistics[$staffId]['total_hours'] += $hours;
         }
 
         return collect($staffStatistics)->values();

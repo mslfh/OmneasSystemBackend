@@ -73,11 +73,15 @@ class ScheduleRepository implements ScheduleContract
         return $query->with('staff')->get();
     }
 
-    public function getStaffScheduleStatistics()
+    public function getStaffScheduleStatistics( $startDate = null, $endDate = null)
     {
-        return Schedule::select('staff_id', \DB::raw('count(*) as total_schedules'))
-            ->groupBy('staff_id')
-            ->with('staff')
-            ->get();
+        $query = Schedule::query();
+        if ($startDate) {
+            $query->whereDate('work_date', '>=', $startDate);
+        }
+        if ($endDate) {
+            $query->whereDate('work_date', '<=', $endDate);
+        }
+        return $query->with('staff')->get();
     }
 }

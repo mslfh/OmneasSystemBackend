@@ -508,9 +508,9 @@ class AppointmentService
         $appointments = $this->appointmentRepository->getStatisticsByDate($today, $today);
 
         if ($appointments->isEmpty()) {
-            return [
-            ];
+            return [];
         }
+
         $totalAppointments = $appointments->count();
         $appointmentGroupedByStatus = [];
         foreach ($appointments as $appointment) {

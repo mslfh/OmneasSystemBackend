@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('services', function (Blueprint $table) {
+        Schema::create('staff', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('package_id')->constrained('packages')->onDelete('cascade');
-            $table->string('title');
+            $table->foreignId('user_id')->constrained('users');
+            $table->string('name')->nullable();
+            $table->string('position')->nullable();
             $table->string('description')->nullable();
-            $table->integer('duration')->nullable();
+            $table->string('tag')->nullable();
             $table->string('status')->default('active');
-            $table->double('price');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('services');
+        Schema::dropIfExists('staff');
     }
 };

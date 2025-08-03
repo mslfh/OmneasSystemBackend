@@ -466,6 +466,7 @@ class ScheduleService
         if ($staffSchedules->isEmpty()) {
             return collect($staffStatistics);
         }
+
         // Loop through each staffSchedule and calculate their total schedule time in hours and group by date
         foreach ($staffSchedules as $staffSchedule) {
             $staffId = $staffSchedule->staff_id;

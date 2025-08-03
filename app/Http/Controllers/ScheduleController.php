@@ -117,7 +117,7 @@ class ScheduleController extends BaseController
     {
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
-        
+
         $result = $this->scheduleService->getStaffScheduleStatistics($startDate, $endDate);
         return response()->json($result);
     }

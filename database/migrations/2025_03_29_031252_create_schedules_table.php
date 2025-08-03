@@ -11,14 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('schedule_histories', function (Blueprint $table) {
+        Schema::create('schedules', function (Blueprint $table) {
             $table->id();
             $table->foreignId('staff_id')->constrained('staff');
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->string('working_datetime');
-            $table->string('break_datetime');
-            $table->string('event_datetime');
+            $table->date('work_date');
+            $table->string('start_time');
+            $table->string('end_time');
+            $table->string('status')->default('active')
+            ->comment('active,inactive');
+            $table->string('type')->default('regular')
+            ->comment('regular,holiday,leave');
+            $table->string('remark')->nullable();
             $table->timestamps();
         });
     }
@@ -28,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('schedule_histories');
+        Schema::dropIfExists('schedules');
     }
 };

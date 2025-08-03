@@ -22,6 +22,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         //
     })
+    ->withCommands([
+        \App\Console\Commands\MakeCRSCommand::class,
+        \App\Console\Commands\AddCRSMethodCommand::class,
+        \App\Console\Commands\AddCRSMethodsCommand::class,
+    ])
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();

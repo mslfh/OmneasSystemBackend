@@ -32,6 +32,8 @@ use App\Repositories\NotificationRepository;
 use App\Contracts\UserProfileContract;
 use App\Repositories\UserProfileRepository;
 use App\Repositories\VoucherRepository;
+use App\Contracts\ProductContract;
+use App\Repositories\ProductRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -54,6 +56,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(NotificationContract::class, NotificationRepository::class);
         $this->app->bind(UserProfileContract::class, UserProfileRepository::class);
         $this->app->bind(VoucherContract::class, VoucherRepository::class);
+        $this->app->bind(ProductContract::class, ProductRepository::class);
 
     }
 

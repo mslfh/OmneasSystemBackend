@@ -75,4 +75,28 @@ class ProductRepository implements ProductContract
         // Example: return Product::where('field', $value)->get();
         throw new \Exception('Method findByPriceRange not implemented yet');
     }
+
+    /**
+     * Collection of records matching field value
+     */
+    public function findByField(string $field, mixed $value)
+    {
+        return Product::where($field, $value)->get();
+    }
+
+    /**
+     * bool
+     */
+    public function exists(int $id)
+    {
+        return Product::where('id', $id)->exists();
+    }
+
+    /**
+     * int
+     */
+    public function count()
+    {
+        return Product::count();
+    }
 }

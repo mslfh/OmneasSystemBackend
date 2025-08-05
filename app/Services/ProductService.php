@@ -68,4 +68,28 @@ class ProductService
     {
         return $this->productRepository->findByPriceRange($minPrice, $maxPrice);
     }
+
+    /**
+     * Collection of records matching field value
+     */
+    public function findByField(string $field, mixed $value)
+    {
+        return $this->productRepository->findByField($field, $value);
+    }
+
+    /**
+     * bool
+     */
+    public function exists(int $id)
+    {
+        return $this->productRepository->exists($id);
+    }
+
+    /**
+     * int
+     */
+    public function count()
+    {
+        return $this->productRepository->count();
+    }
 }

@@ -11,9 +11,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable,HasApiTokens ,SoftDeletes;
+    use HasFactory, Notifiable, HasApiTokens, SoftDeletes;
 
-    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
@@ -21,12 +20,12 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'email',
-        'password',
-        'phone',
-        'first_name',
         'last_name',
-        'phone'
+        'first_name',
+        'phone',
+        'email',
+        'email_verified_at',
+        'password',
     ];
 
     /**
@@ -70,11 +69,6 @@ class User extends Authenticatable
     public function staff()
     {
         return $this->hasOne(Staff::class);
-    }
-
-    public function userProfile()
-    {
-        return $this->hasOne(UserProfile::class);
     }
 
     public function specialRoles()

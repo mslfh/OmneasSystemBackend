@@ -11,4 +11,7 @@ interface ProductContract
     public function delete($id);
     public function findByCategory(string $category);
     public function findByPriceRange(float $minPrice, float $maxPrice);
+    public function findByField(string $field, mixed $value);
+    public function exists(int $id);
+    public function count();
 }

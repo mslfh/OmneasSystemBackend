@@ -23,16 +23,6 @@ class OrderService
         return $this->orderRepository->getOrderById($id);
     }
 
-    public function getOrderByDate($date)
-    {
-        return $this->orderRepository->getOrderByDate($date);
-    }
-
-    public function getOrderByAppointment($appointmentId)
-    {
-        return $this->orderRepository->getOrderByAppointment($appointmentId);
-    }
-
     public function createOrder(array $data)
     {
         return $this->orderRepository->createOrder($data);
@@ -48,23 +38,18 @@ class OrderService
         return $this->orderRepository->deleteOrder($id);
     }
 
-    public function getPaginatedOrders($start, $count, $filter, $sortBy, $descending)
+    public function getPaginatedOrders($start, $count, $filter = null, $sortBy = 'id', $descending = false)
     {
         $query = Order::query();
 
         if ($filter) {
-            $query->whereHas('appointment', function ($q) use ($filter) {
-                $q->where('customer_first_name', 'like', "%$filter%")
-                    ->orWhere('customer_phone', 'like', "%$filter%")
-                    ->orWhere('customer_email', 'like', "%$filter%")
-                    ->orWhereHas('services', function ($q) use ($filter) {
-                        $q->where('staff_name', 'like', "%$filter%");
-                    });
-            });
+            $query->where('payment_method', 'like', "%$filter%")
+                  ->orWhere('payment_status', 'like', "%$filter%")
+                  ->orWhere('operator_name', 'like', "%$filter%");
         }
 
         $sortDirection = $descending ? 'desc' : 'asc';
-        $query->with('appointment.services')->orderBy($sortBy, $sortDirection);
+        $query->orderBy($sortBy, $sortDirection);
 
         $total = $query->count();
         $data = $query->skip($start)->take($count)->with('payment')->get();
@@ -73,27 +58,5 @@ class OrderService
             'data' => $data,
             'total' => $total,
         ];
-    }
-
-    public function initAppointmentOrder($appointmentId, $total_amount)
-    {
-        $data = [
-            'status' => 'pending',
-            'appointment_id' => $appointmentId,
-            'payment_method' => 'unpaid',
-            'total_amount' => $total_amount,
-        ];
-        $this->createOrder($data);
-    }
-
-    public function finishOrder($appointmentId, $total_amount)
-    {
-        $data = [
-            'status' => 'pending',
-            'appointment_id' => $appointmentId,
-            'payment_method' => 'unpaid',
-            'total_amount' => $total_amount,
-        ];
-        $this->createOrder($data);
     }
 }

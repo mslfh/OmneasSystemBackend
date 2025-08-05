@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('type')->default('regular')
             ->comment('regular,holiday,leave');
             $table->string('remark')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

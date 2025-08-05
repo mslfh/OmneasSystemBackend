@@ -64,28 +64,6 @@ class StaffRepository implements StaffContract
             ->get();
     }
 
-    public function getStaffScheduleAppointment($staffId, $formatDate)
-    {
-        return Staff::select('id', 'status')
-            ->where('id', $staffId)
-            ->whereHas('schedules', function ($query) use ($formatDate) {
-                $query->where('status', 'active')
-                    ->where('work_date', '=', $formatDate->format('Y-m-d'));
-            })
-            ->with('schedules', function ($query) use ($formatDate) {
-                $query->select('id', 'staff_id', 'start_time', 'end_time', 'work_date', 'status')
-                    ->where('status', 'active')
-                    ->where('work_date', '=', $formatDate->format('Y-m-d'));
-            })
-            ->with('bookingServices', function ($query) use ($formatDate) {
-                $query->select('id', 'staff_id', 'booking_time', 'service_duration')
-                    ->where('booking_time', '>=', $formatDate->format('Y-m-d 00:00:00'))
-                    ->where('booking_time', '<=', $formatDate->format('Y-m-d 23:59:59'));
-            })
-            ->where('status', 'active')
-            ->get();
-    }
-
     public function getById($id)
     {
         $staff = Staff::findOrFail($id);
@@ -119,13 +97,6 @@ class StaffRepository implements StaffContract
         if ($staffId) {
             $query->where('id', $staffId);
         }
-
-        return $query->with(['bookingServices' => function ($query) use ($startDate, $endDate) {
-            $query->select('id', 'appointment_id', 'staff_id', 'booking_time', 'service_price', 'service_duration')
-            ->whereBetween('booking_time', [$startDate, $endDate])
-            ->with(['appointment' => function ($query) {
-                $query->select('id', 'status', 'type');
-            }]);
-        }])->get();
+        return $query->get();
     }
 }

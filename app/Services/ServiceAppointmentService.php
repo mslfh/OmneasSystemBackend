@@ -6,40 +6,35 @@ use App\Contracts\ServiceAppointmentContract;
 
 class ServiceAppointmentService
 {
-    protected $repository;
+    protected $serviceAppointmentRepository;
 
-    public function __construct(ServiceAppointmentContract $repository)
+    public function __construct(ServiceAppointmentContract $serviceAppointmentRepository)
     {
-        $this->repository = $repository;
-    }
-
-    public function createServiceAppointment(array $data)
-    {
-        return $this->repository->create($data);
-    }
-
-    public function updateServiceAppointment(int $id, array $data)
-    {
-        return $this->repository->update($id, $data);
-    }
-
-    public function deleteServiceAppointment(int $id)
-    {
-        return $this->repository->delete($id);
-    }
-
-    public function getServiceAppointmentById(int $id)
-    {
-        return $this->repository->findById($id);
+        $this->serviceAppointmentRepository = $serviceAppointmentRepository;
     }
 
     public function getAllServiceAppointments()
     {
-        return $this->repository->getAll();
+        return $this->serviceAppointmentRepository->getAll();
     }
 
-    public function getAppointmentsFromDate($date)
+    public function getServiceAppointmentById($id)
     {
-        return $this->repository->getAppointmentsFromDate($date);
+        return $this->serviceAppointmentRepository->findById($id);
+    }
+
+    public function createServiceAppointment(array $data)
+    {
+        return $this->serviceAppointmentRepository->create($data);
+    }
+
+    public function updateServiceAppointment($id, array $data)
+    {
+        return $this->serviceAppointmentRepository->update($id, $data);
+    }
+
+    public function deleteServiceAppointment($id)
+    {
+        return $this->serviceAppointmentRepository->delete($id);
     }
 }

@@ -34,23 +34,6 @@ class ScheduleController extends BaseController
         return response()->json($this->scheduleService->getScheduleById($id));
     }
 
-    public function getUnavailableTimeFromDate(Request $request)
-    {
-        $data = $request->validate(['date' => 'required|date_format:Y-m-d']);
-        $result = $this->scheduleService->getUnavailableTimeFromDate($data['date']);
-        return response()->json($result);
-    }
-
-    public function getUnavailableTimeFromStaff(Request $request)
-    {
-        $data = $request->validate([
-            'date' => 'required|date_format:Y-m-d',
-            'staff_id' => 'required|integer',
-        ]);
-        $result = $this->scheduleService->getUnavailableTimeFromStaff($data['date'], $data['staff_id']);
-        return response()->json($result);
-    }
-
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -117,7 +100,6 @@ class ScheduleController extends BaseController
     {
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
-
         $result = $this->scheduleService->getStaffScheduleStatistics($startDate, $endDate);
         return response()->json($result);
     }

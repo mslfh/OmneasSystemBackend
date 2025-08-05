@@ -12,9 +12,20 @@ class Staff extends Model
     use HasFactory;
     use SoftDeletes;
 
-    protected $guarded = ['id'];
+    protected $fillable = [
+        'user_id',
+        'name',
+        'position',
+        'description',
+        'tag',
+        'status',
+    ];
 
-    protected $appends = ['profile_photo_url','email','phone'];
+    protected $casts = [
+        'user_id' => 'integer',
+    ];
+
+    protected $appends = ['email','phone'];
 
     protected $hidden = [
         'deleted_at',
@@ -22,11 +33,11 @@ class Staff extends Model
         'updated_at',
     ];
 
-    public function getProfilePhotoUrlAttribute()
-    {
-        return $this->profile_photo_path ? asset('storage/' . $this->profile_photo_path	) :
-         null;
-    }
+    // public function getProfilePhotoUrlAttribute()
+    // {
+    //     return $this->profile_photo_path ? asset('storage/' . $this->profile_photo_path	) :
+    //      null;
+    // }
 
     public function getEmailAttribute()
     {
@@ -45,24 +56,6 @@ class Staff extends Model
         return $this->hasMany(Schedule::class);
     }
 
-    public function bookingServices()
-    {
-        return $this->hasMany(
-            ServiceAppointment::class,
-            'staff_id',
-            'id'
-        );
-    }
-
-    public function appointments()
-    {
-        return $this->belongsToMany(
-            Appointment::class,
-            'service_appointments',
-            'staff_id',
-            'appointment_id'
-        );
-    }
 
     public function user()
     {

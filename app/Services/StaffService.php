@@ -37,12 +37,6 @@ class StaffService
         return $this->staffRepository->getAvailableStaffFromScheduletime($datetime, $duration);
     }
 
-    public function getStaffScheduleAppointment($staffId, $date)
-    {
-        $formatDate = \Carbon\Carbon::createFromFormat('Y-m-d', $date);
-        return $this->staffRepository->getStaffScheduleAppointment($staffId, $formatDate);
-    }
-
     public function getAllStaff()
     {
         return $this->staffRepository->getAll();

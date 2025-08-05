@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Services\OrderService;
-use App\Services\AppointmentService;
 use App\Services\VoucherService;
 use DB;
 use Illuminate\Http\Request;
@@ -11,15 +10,12 @@ use Illuminate\Http\Request;
 class OrderController extends BaseController
 {
     protected $orderService;
-    protected $appointmentService;
     protected $voucherService;
 
     public function __construct(
         OrderService $orderService,
-        AppointmentService $appointmentService,
         VoucherService $voucherService
     ) {
-        $this->appointmentService = $appointmentService;
         $this->orderService = $orderService;
         $this->voucherService = $voucherService;
     }
@@ -41,11 +37,6 @@ class OrderController extends BaseController
         ]);
     }
 
-    public function getOrderByAppointment($appointmentId)
-    {
-        return response()->json($this->orderService->getOrderByAppointment($appointmentId));
-    }
-
     public function show($id)
     {
         return response()->json($this->orderService->getOrderById($id));
@@ -53,74 +44,18 @@ class OrderController extends BaseController
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'appointment_id' => 'required|exists:appointments,id',
-            'order_status' => 'required|string',
-            'payment_method' => 'required|string',
-            'total_amount' => 'required|numeric',
-            'paid_amount' => 'required|numeric',
-            'operator_id' => 'nullable|exists:staff,id',
-            'operator_name' => 'nullable|string',
-            'payment_note' => 'nullable|string',
-            'actual_end_time' => 'nullable',
-            'actual_start_time' => 'nullable',
-            'split_payment' => 'nullable',
-        ]);
-        // get the appointment
-        $appointment = $this->appointmentService->getAppointmentById($data['appointment_id']);
-
-        if (!$appointment) {
-            return response()->json(['message' => 'Appointment not found'], 404);
+        try {
+            $order = $this->orderService->createOrder($request->all());
+            return response()->json($order, 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to create order', 'message' => $e->getMessage()], 500);
         }
-
-        // check if the appointment is already paid
-        if ($appointment->status == 'finished') {
-            return response()->json(['message' => 'Appointment already done'], 400);
-        }
-
-        if ($data['payment_method'] == 'unpaid') {
-            $data['payment_status'] = 'pending';
-        } else if ($data['payment_method'] == 'split_payment' && $data['order_status'] == 'pending') {
-            $data['payment_status'] = 'partially_paid';
-        } else {
-            $data['payment_status'] = 'paid';
-        }
-        DB::beginTransaction();
-        $appointment->status = 'finished';
-        $appointment->actual_start_time = $data['actual_start_time'];
-        $appointment->actual_end_time = $data['actual_end_time'];
-        $appointment->save();
-
-        if ($data['split_payment']) {
-            $payment = [];
-            foreach ($data['split_payment'] as $index => $split_payment) {
-                $payment[$index]['paid_by'] = $split_payment['method']['label'];
-                if ($split_payment['method']['label'] != 'Unpaid') {
-                    $payment[$index]['payment_status'] = 'Paid';
-                    $payment[$index]['paid_amount'] = $split_payment['amount'];
-                } else {
-                    $payment[$index]['payment_status'] = 'Unpaid';
-                    $payment[$index]['paid_amount'] = 0;
-                }
-                $payment[$index]['total_amount'] = $split_payment['amount'];
-                $payment[$index]['remark'] = $data['payment_note'];
-            }
-            $data['payment'] = $payment;
-            unset($data['split_payment']);
-        }
-
-        unset($data['actual_start_time']);
-        unset($data['actual_end_time']);
-
-        $order = $this->orderService->updateOrder($appointment->order->id, $data);
-        DB::commit();
-        return response()->json($order, 201);
     }
 
     public function finishOrder(Request $request)
     {
         $data = $request->validate([
-            'appointment_id' => 'required|exists:appointments,id',
+            'order_id' => 'required|exists:orders,id',
             'order_status' => 'required|string',
             'payment_method' => 'required|string',
             'total_amount' => 'required|numeric',
@@ -128,81 +63,65 @@ class OrderController extends BaseController
             'operator_id' => 'nullable|exists:staff,id',
             'operator_name' => 'nullable|string',
             'payment_note' => 'nullable|string',
-            'actual_end_time' => 'nullable',
-            'actual_start_time' => 'nullable',
             'split_payment' => 'nullable',
             'voucher_code' => 'nullable|string',
         ]);
-        // get the appointment
-        $appointment = $this->appointmentService->getAppointmentById($data['appointment_id']);
 
-        if (!$appointment) {
-            return response()->json(['message' => 'Appointment not found'], 404);
-        }
+        try {
+            DB::beginTransaction();
 
-        // // check if the appointment is already paid
-        // if ($appointment->status == 'finished') {
-        //     return response()->json(['message' => 'Appointment already done'], 400);
-        // }
-
-        if ($data['payment_method'] == 'unpaid') {
-            $data['payment_status'] = 'pending';
-        } else if ($data['payment_method'] == 'split_payment' && $data['order_status'] == 'pending') {
-            $data['payment_status'] = 'partially_paid';
-        } else {
-            $data['payment_status'] = 'paid';
-        }
-        DB::beginTransaction();
-        $appointment->status = 'finished';
-        $appointment->actual_start_time = $data['actual_start_time'];
-        $appointment->actual_end_time = $data['actual_end_time'];
-        $appointment->save();
-
-         if (isset($data['voucher_code'])) {
-            $voucherData = $this->voucherService->verifyVoucher($data['voucher_code']);
-            if ($voucherData['status'] == 'error') {
-                return response()->json(['message' => $voucherData['message']], 400);
+            // Set payment status based on payment method
+            if ($data['payment_method'] == 'unpaid') {
+                $data['payment_status'] = 'pending';
+            } else if ($data['payment_method'] == 'split_payment' && $data['order_status'] == 'pending') {
+                $data['payment_status'] = 'partially_paid';
+            } else {
+                $data['payment_status'] = 'paid';
             }
-            $voucher = $voucherData['data'];
-            if ($voucher->remaining_amount < $data['total_amount']) {
-                $voucher->remaining_amount = 0;
-            }
-            else{
-                $voucher->remaining_amount -= $data['total_amount'];
-            }
-            $voucher->save();
-            $data['payment_note'] = $data['payment_note'] . '  Voucher Code: ' . $voucher->code;
-        }
 
-        if ($data['split_payment']) {
-            $payment = [];
-            foreach ($data['split_payment'] as $index => $split_payment) {
-                $payment[$index]['paid_by'] = $split_payment['method']['value'];
-                if ($split_payment['method']['label'] != 'Unpaid') {
-                    $payment[$index]['status'] = 'Paid';
-                    $payment[$index]['paid_amount'] = $split_payment['amount'];
-                } else {
-                    $payment[$index]['status'] = 'Unpaid';
-                    $payment[$index]['paid_amount'] = 0;
+            // Handle voucher if provided
+            if (isset($data['voucher_code'])) {
+                $voucherData = $this->voucherService->verifyVoucher($data['voucher_code']);
+                if ($voucherData['status'] == 'error') {
+                    DB::rollBack();
+                    return response()->json(['message' => $voucherData['message']], 400);
                 }
-                $payment[$index]['total_amount'] = $split_payment['amount'];
-                $payment[$index]['remark'] = $data['payment_note'];
+                $voucher = $voucherData['data'];
+                if ($voucher->remaining_amount < $data['total_amount']) {
+                    $voucher->remaining_amount = 0;
+                } else {
+                    $voucher->remaining_amount -= $data['total_amount'];
+                }
+                $voucher->save();
+                $data['payment_note'] = ($data['payment_note'] ?? '') . ' Voucher Code: ' . $voucher->code;
             }
-            $data['payment'] = $payment;
-            unset($data['split_payment']);
-        }
 
-        unset($data['actual_start_time']);
-        unset($data['actual_end_time']);
-        if($appointment->order) {
-            $order = $this->orderService->updateOrder($appointment->order->id, $data);
+            // Handle split payment
+            if ($data['split_payment']) {
+                $payment = [];
+                foreach ($data['split_payment'] as $index => $split_payment) {
+                    $payment[$index]['paid_by'] = $split_payment['method']['value'];
+                    if ($split_payment['method']['label'] != 'Unpaid') {
+                        $payment[$index]['status'] = 'Paid';
+                        $payment[$index]['paid_amount'] = $split_payment['amount'];
+                    } else {
+                        $payment[$index]['status'] = 'Unpaid';
+                        $payment[$index]['paid_amount'] = 0;
+                    }
+                    $payment[$index]['total_amount'] = $split_payment['amount'];
+                    $payment[$index]['remark'] = $data['payment_note'] ?? '';
+                }
+                $data['payment'] = $payment;
+                unset($data['split_payment']);
+            }
+
+            $order = $this->orderService->updateOrder($data['order_id'], $data);
+            DB::commit();
+            return response()->json($order, 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Failed to finish order', 'message' => $e->getMessage()], 500);
         }
-        else {
-            $data['appointment_id'] = $appointment->id;
-            $order = $this->orderService->createOrder($data);
-        }
-        DB::commit();
-        return response()->json($order, 201);
     }
 
     public function update(Request $request, $id)

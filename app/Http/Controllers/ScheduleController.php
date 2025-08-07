@@ -34,6 +34,7 @@ class ScheduleController extends BaseController
         return response()->json($this->scheduleService->getScheduleById($id));
     }
 
+
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -90,17 +91,9 @@ class ScheduleController extends BaseController
         return response()->json(null, 204);
     }
 
-    public function getAvailableSchedules()
+    public function getStaffScheduleStatistics()
     {
-        $result = $this->scheduleService->getAvailableSchedules();
-        return response()->json($result);
-    }
-
-    public function getStaffScheduleStatistics(Request $request)
-    {
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
-        $result = $this->scheduleService->getStaffScheduleStatistics($startDate, $endDate);
+        $result = $this->scheduleService->getStaffScheduleStatistics();
         return response()->json($result);
     }
 }

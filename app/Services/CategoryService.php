@@ -14,29 +14,54 @@ class CategoryService
         $this->categoryRepository = $categoryRepository;
     }
 
-    public function findAll()
+    public function getAll()
     {
-        return $this->categoryRepository->findAll();
+        return $this->categoryRepository->getAll();
     }
 
-    public function findById($id)
+    public function getAllCategories()
+    {
+        return $this->getAll();
+    }
+
+    public function getCategoryById($id)
     {
         return $this->categoryRepository->findById($id);
     }
 
-    public function create(array $data)
+    public function findById($id)
+    {
+        return $this->getCategoryById($id);
+    }
+
+    public function createCategory(array $data)
     {
         return $this->categoryRepository->create($data);
     }
 
-    public function update($id, array $data)
+    public function create(array $data)
+    {
+        return $this->createCategory($data);
+    }
+
+    public function updateCategory($id, array $data)
     {
         return $this->categoryRepository->update($id, $data);
     }
 
-    public function delete($id)
+    public function update($id, array $data)
+    {
+        return $this->updateCategory($id, $data);
+    }
+
+    public function deleteCategory($id)
     {
         return $this->categoryRepository->delete($id);
+    }
+
+    public function delete($id)
+    {
+        return $this->deleteCategory($id);
     }
 
     public function findByParentId($parentId)

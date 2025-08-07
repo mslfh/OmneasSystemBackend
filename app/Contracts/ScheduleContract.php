@@ -13,5 +13,5 @@ interface ScheduleContract
     public function updateSchedule($id, array $data);
     public function deleteSchedule($id);
     public function getSchedulesByDate($date);
-    public function getStaffScheduleStatistics( $startDate = null, $endDate = null);
+    public function getStaffScheduleStatistics();
 }

@@ -14,7 +14,7 @@ class ComboRepository implements ComboContract
         $this->model = $combo;
     }
 
-    public function findAll()
+    public function getAll()
     {
         return $this->model->all();
     }

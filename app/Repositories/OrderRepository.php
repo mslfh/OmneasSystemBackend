@@ -7,21 +7,27 @@ use App\Models\Order;
 
 class OrderRepository implements OrderContract
 {
-    public function getAllOrders()
+    protected $model;
+
+    public function __construct(Order $order)
     {
-        return Order::with('payment')->get();
+        $this->model = $order;
     }
 
-    public function getOrderById($id)
+    // Standard CRUD methods
+    public function getAll()
     {
-        return Order::where('id','=',$id)
-        ->with('payment')
-        ->first();
+        return $this->model->with('payment')->get();
     }
 
-    public function createOrder(array $data)
+    public function findById($id)
     {
-        $order = Order::create($data);
+        return $this->model->where('id', $id)->with('payment')->first();
+    }
+
+    public function create(array $data)
+    {
+        $order = $this->model->create($data);
         if(isset($data['payment'])) {
             foreach ($data['payment'] as $key => $value) {
                 $data['payment'][$key]['order_id'] = $order->id;
@@ -31,9 +37,9 @@ class OrderRepository implements OrderContract
         return $order;
     }
 
-    public function updateOrder($id, array $data)
+    public function update($id, array $data)
     {
-        $order = Order::findOrFail($id);
+        $order = $this->model->findOrFail($id);
         $order->update($data);
         if(isset($data['payment'])) {
             foreach ($data['payment'] as $key => $value) {
@@ -48,10 +54,38 @@ class OrderRepository implements OrderContract
         return $order;
     }
 
+    public function delete($id)
+    {
+        $order = $this->findById($id);
+        if ($order) {
+            return $order->delete();
+        }
+        return false;
+    }
+
+    // Legacy methods for backward compatibility
+    public function getAllOrders()
+    {
+        return $this->getAll();
+    }
+
+    public function getOrderById($id)
+    {
+        return $this->findById($id);
+    }
+
+    public function createOrder(array $data)
+    {
+        return $this->create($data);
+    }
+
+    public function updateOrder($id, array $data)
+    {
+        return $this->update($id, $data);
+    }
+
     public function deleteOrder($id)
     {
-        $order = Order::findOrFail($id);
-        $order->delete();
-        return $order;
+        return $this->delete($id);
     }
 }

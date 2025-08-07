@@ -41,17 +41,6 @@ class StaffController extends BaseController
         return response()->json($this->staffService->getStaffScheduleFromDate($date, $showAll));
     }
 
-    /**
-     * Get available staff from schedule date.
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function getAvailableStaffFromScheduledate(Request $request)
-    {
-        $date = $request->input('date');
-        return response()->json($this->staffService->getAvailableStaffFromScheduledate($date));
-    }
 
     public function store(Request $request)
     {
@@ -96,12 +85,5 @@ class StaffController extends BaseController
     public function destroy($id)
     {
         return response()->json($this->staffService->deleteStaff($id));
-    }
-
-    public function getStaffIncomeStatistics(Request $request)
-    {
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
-        return response()->json($this->staffService->getStaffIncomeStatistics($startDate, $endDate));
     }
 }

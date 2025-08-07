@@ -21,13 +21,10 @@ use App\Http\Controllers\ProductAttributeController;
 use App\Http\Controllers\ProductItemController;
 use App\Http\Controllers\ProductProfileController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SpecialRoleController;
 
 // Authentication routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
-
-// Public routes that don't require authentication
 
 // Protected routes
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -40,8 +37,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('orders', OrderController::class);
     Route::post('/orders/finishOrder', [OrderController::class, 'finishOrder']);
 
+    // Schedule management
+    Route::apiResource('schedules', ScheduleController::class);
+    Route::post('/insert-schedule', [ScheduleController::class, 'insert']);
+    Route::get('/getStaffSchedule', [ScheduleController::class, 'getStaffSchedule']);
+
     // Staff management
-    Route::apiResource('staff', StaffController::class)->except(['index', 'show']);
+    Route::apiResource('staff', StaffController::class);
 
     // User management
     Route::apiResource('user', UserController::class);

@@ -7,12 +7,19 @@ use App\Contracts\ProductContract;
 
 class ProductRepository implements ProductContract
 {
+    protected $model;
+
+    public function __construct(Product $product)
+    {
+        $this->model = $product;
+    }
+
     /**
      * Get all products
      */
     public function getAll()
     {
-        return Product::all();
+        return $this->model->all();
     }
 
     /**
@@ -20,7 +27,7 @@ class ProductRepository implements ProductContract
      */
     public function findById($id)
     {
-        return Product::find($id);
+        return $this->model->find($id);
     }
 
     /**
@@ -28,7 +35,7 @@ class ProductRepository implements ProductContract
      */
     public function create(array $data)
     {
-        return Product::create($data);
+        return $this->model->create($data);
     }
 
     /**
@@ -36,7 +43,7 @@ class ProductRepository implements ProductContract
      */
     public function update($id, array $data)
     {
-        $product = Product::find($id);
+        $product = $this->findById($id);
         if ($product) {
             $product->update($data);
             return $product;
@@ -49,7 +56,7 @@ class ProductRepository implements ProductContract
      */
     public function delete($id)
     {
-        $product = Product::find($id);
+        $product = $this->findById($id);
         if ($product) {
             return $product->delete();
         }
@@ -62,7 +69,7 @@ class ProductRepository implements ProductContract
     public function findByCategory(string $category)
     {
         // TODO: Implement findByCategory logic
-        // Example: return Product::where('field', $value)->get();
+        // Example: return $this->model->where('category', $category)->get();
         throw new \Exception('Method findByCategory not implemented yet');
     }
 
@@ -72,7 +79,7 @@ class ProductRepository implements ProductContract
     public function findByPriceRange(float $minPrice, float $maxPrice)
     {
         // TODO: Implement findByPriceRange logic
-        // Example: return Product::where('field', $value)->get();
+        // Example: return $this->model->whereBetween('price', [$minPrice, $maxPrice])->get();
         throw new \Exception('Method findByPriceRange not implemented yet');
     }
 
@@ -81,7 +88,7 @@ class ProductRepository implements ProductContract
      */
     public function findByField(string $field, mixed $value)
     {
-        return Product::where($field, $value)->get();
+        return $this->model->where($field, $value)->get();
     }
 
     /**
@@ -89,7 +96,7 @@ class ProductRepository implements ProductContract
      */
     public function exists(int $id)
     {
-        return Product::where('id', $id)->exists();
+        return $this->model->where('id', $id)->exists();
     }
 
     /**
@@ -97,6 +104,6 @@ class ProductRepository implements ProductContract
      */
     public function count()
     {
-        return Product::count();
+        return $this->model->count();
     }
 }

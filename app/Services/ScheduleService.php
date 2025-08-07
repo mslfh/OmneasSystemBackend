@@ -3,14 +3,21 @@ namespace App\Services;
 
 use App\Contracts\ScheduleContract;
 use Carbon\Carbon;
+use App\Services\ServiceAppointmentService;
+use App\Services\StaffService;
 
 class ScheduleService
 {
     protected $scheduleRepository;
+    protected $staffService;
 
-    public function __construct(ScheduleContract $scheduleRepository)
-    {
+    public function __construct(
+        ScheduleContract $scheduleRepository,
+        StaffService $staffService
+
+    ) {
         $this->scheduleRepository = $scheduleRepository;
+        $this->staffService = $staffService;
     }
 
     public function getAllSchedules()
@@ -43,6 +50,41 @@ class ScheduleService
         return $this->scheduleRepository->createSchedule($data);
     }
 
+    public function insertSchedules(array $data)
+    {
+        $startDate = Carbon::createFromFormat('Y-m-d', $data['start_date']);
+        $endDate = Carbon::createFromFormat('Y-m-d', $data['end_date']);
+        $weekDays = collect($data['week_days']);
+
+        for ($currentDate = $startDate; $currentDate->lte($endDate); $currentDate->addDay()) {
+            $dayName = $currentDate->format('l');
+
+            $matchingDay = $weekDays->firstWhere('day', $dayName);
+            if ($matchingDay) {
+                $this->createSchedule([
+                    'staff_id' => $data['staff_id'],
+                    'work_date' => $currentDate->format('Y-m-d'),
+                    'start_time' => $matchingDay['start_time'],
+                    'end_time' => $matchingDay['end_time'],
+                    'status' => 'active',
+                ]);
+
+                if (!empty($matchingDay['additional_times'])) {
+                    foreach ($matchingDay['additional_times'] as $additionalTime) {
+                        $this->createSchedule([
+                            'staff_id' => $data['staff_id'],
+                            'work_date' => $currentDate->format('Y-m-d'),
+                            'start_time' => $additionalTime['start'],
+                            'end_time' => $additionalTime['end'],
+                            'status' => 'active',
+                        ]);
+                    }
+                }
+            }
+        }
+
+    }
+
     public function updateSchedule($id, array $data)
     {
         return $this->scheduleRepository->updateSchedule($id, $data);
@@ -53,54 +95,29 @@ class ScheduleService
         return $this->scheduleRepository->deleteSchedule($id);
     }
 
-    public function getSchedulesByDate($date)
+
+    public function getStaffScheduleStatistics()
     {
-        return $this->scheduleRepository->getSchedulesByDate($date);
-    }
+        $staffSchedules = $this->scheduleRepository->getStaffScheduleStatistics();
+        $staffStatistics = [];
 
-    public function getStaffScheduleStatistics($startDate = null, $endDate = null)
-    {
-        return $this->scheduleRepository->getStaffScheduleStatistics($startDate, $endDate);
-    }
-
-    public function getAvailableSchedules()
-    {
-        $availableSchedules = [];
-
-        // Group schedules by Date
-        $groupedSchedules = $this->getAllAvailableSchedules()->groupBy(function ($schedule) {
-            return Carbon::parse($schedule->work_date)->format('Y-m-d');
-        });
-
-        // Loop through each date and format response
-        foreach ($groupedSchedules as $date => $schedules) {
-            $availableSchedules[$date] = [
-                'schedules_id' => $schedules->pluck('id')->toArray(),
-                'date' => Carbon::parse($date)->format('Y/m/d'),
-            ];
+        foreach ($staffSchedules as $schedule) {
+            $staffId = $schedule->staff_id;
+            if (!isset($staffStatistics[$staffId])) {
+                $staffStatistics[$staffId] = [
+                    'total_schedules' => 0,
+                    'available_schedules' => 0,
+                    'unavailable_schedules' => 0,
+                ];
+            }
+            $staffStatistics[$staffId]['total_schedules']++;
+            if ($schedule->status === 'active') {
+                $staffStatistics[$staffId]['available_schedules']++;
+            } else {
+                $staffStatistics[$staffId]['unavailable_schedules']++;
+            }
         }
 
-        return collect($availableSchedules)->values();
-    }
-
-    public function getAvailableSchedulesAndStatus()
-    {
-        $availableSchedules = [];
-
-        // Group schedules by Date
-        $groupedSchedules = $this->getAllAvailableSchedules()->groupBy(function ($schedule) {
-            return Carbon::parse($schedule->work_date)->format('Y-m-d');
-        });
-
-        // Loop through each date and add basic status
-        foreach ($groupedSchedules as $date => $schedules) {
-            $availableSchedules[$date] = [
-                'schedules_id' => $schedules->pluck('id')->toArray(),
-                'date' => Carbon::parse($date)->format('Y/m/d'),
-                'booking_state' => 'available', // Simplified - no appointment checking
-            ];
-        }
-
-        return collect($availableSchedules)->values();
+        return collect($staffStatistics)->values();
     }
 }

@@ -15,7 +15,7 @@ class ComboService
 
     public function getAllCombos()
     {
-        return $this->comboRepository->findAll();
+        return $this->comboRepository->getAll();
     }
 
     public function getComboById($id)

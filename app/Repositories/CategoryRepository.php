@@ -14,7 +14,7 @@ class CategoryRepository implements CategoryContract
         $this->model = $category;
     }
 
-    public function findAll()
+    public function getAll()
     {
         return $this->model->all();
     }

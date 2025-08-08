@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\ServiceProvider;
+use App\Contracts\AttributeContract;
+use App\Repositories\AttributeRepository;
 use App\Contracts\CategoryContract;
 use App\Repositories\CategoryRepository;
 use App\Contracts\ComboContract;
@@ -12,6 +14,8 @@ use App\Contracts\ComboItemContract;
 use App\Repositories\ComboItemRepository;
 use App\Contracts\ComboProductContract;
 use App\Repositories\ComboProductRepository;
+use App\Contracts\ItemContract;
+use App\Repositories\ItemRepository;
 use App\Contracts\OrderContract;
 use App\Repositories\OrderRepository;
 use App\Contracts\OrderItemContract;
@@ -53,10 +57,12 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         // Core bindings
+        $this->app->bind(AttributeContract::class, AttributeRepository::class);
         $this->app->bind(CategoryContract::class, CategoryRepository::class);
         $this->app->bind(ComboContract::class, ComboRepository::class);
         $this->app->bind(ComboItemContract::class, ComboItemRepository::class);
         $this->app->bind(ComboProductContract::class, ComboProductRepository::class);
+        $this->app->bind(ItemContract::class, ItemRepository::class);
         $this->app->bind(OrderContract::class, OrderRepository::class);
         $this->app->bind(OrderItemContract::class, OrderItemRepository::class);
         $this->app->bind(OrderPaymentContract::class, OrderPaymentRepository::class);

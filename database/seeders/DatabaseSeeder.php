@@ -12,10 +12,19 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            PackageSeeder::class,
-            ServiceSeeder::class,
             UserSeeder::class,
             StaffSeeder::class,
+            ProfileSeeder::class,
+            CategorySeeder::class,
+            AttributeSeeder::class,
+            ItemSeeder::class,
+            ProductSeeder::class,
+            ComboSeeder::class,
+            OrderSeeder::class,
+            // Note: OrderItemSeeder and OrderPaymentSeeder are included in OrderSeeder
+            // Uncomment below if you want to run them separately
+            // OrderItemSeeder::class,
+            // OrderPaymentSeeder::class,
         ]);
     }
 }

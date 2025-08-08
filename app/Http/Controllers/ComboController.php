@@ -17,14 +17,24 @@ class ComboController extends BaseController
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        try {
-            $combos = $this->comboService->getAllCombos();
-            return $this->sendResponse($combos, 'Combos retrieved successfully');
-        } catch (\Exception $e) {
-            return $this->sendError('Error retrieving combos', [$e->getMessage()]);
-        }
+        $start = $request->query('start', 0);
+        $count = $request->query('count', 10);
+        $filter = $request->query('filter', null);
+        $selected = $request->query('selected', null);
+        $sortBy = $request->query('sortBy', 'id');
+        $descending = $request->query('descending', false);
+
+        $filter = $filter ? json_decode($filter, true) : null;
+        $selected = $selected ? json_decode($selected, true) : null;
+
+        $combos = $this->comboService->getPaginatedCombos($start, $count, $filter, $sortBy, $descending, $selected);
+
+        return response()->json([
+            'rows' => $combos['data'],
+            'total' => $combos['total'],
+        ]);
     }
 
     /**

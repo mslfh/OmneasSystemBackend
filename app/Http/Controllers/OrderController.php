@@ -26,10 +26,14 @@ class OrderController extends BaseController
         $start = $request->query('start', 0);
         $count = $request->query('count', 10);
         $filter = $request->query('filter', null);
+        $selected = $request->query('selected', null);
         $sortBy = $request->query('sortBy', 'id');
         $descending = $request->query('descending', false);
 
-        $orders = $this->orderService->getPaginatedOrders($start, $count, $filter, $sortBy, $descending);
+        $filter = $filter ? json_decode($filter, true) : null;
+        $selected = $selected ? json_decode($selected, true) : null;
+
+        $orders = $this->orderService->getPaginatedOrders($start, $count, $filter, $sortBy, $descending, $selected);
 
         return response()->json([
             'rows' => $orders['data'],

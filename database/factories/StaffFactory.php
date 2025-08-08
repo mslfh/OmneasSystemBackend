@@ -15,7 +15,6 @@ class StaffFactory extends Factory
             'position' => $this->faker->word,
             'description' => $this->faker->sentence,
             'tag' => $this->faker->word,
-            'has_certificate' => $this->faker->boolean,
             'status' => 'active',
         ];
     }

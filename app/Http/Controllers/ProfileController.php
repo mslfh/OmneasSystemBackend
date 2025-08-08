@@ -17,14 +17,24 @@ class ProfileController extends BaseController
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        try {
-            $profiles = $this->profileService->getAll();
-            return $this->sendResponse($profiles, 'Profiles retrieved successfully');
-        } catch (\Exception $e) {
-            return $this->sendError('Error retrieving profiles', [$e->getMessage()]);
-        }
+        $start = $request->query('start', 0);
+        $count = $request->query('count', 10);
+        $filter = $request->query('filter', null);
+        $selected = $request->query('selected', null);
+        $sortBy = $request->query('sortBy', 'id');
+        $descending = $request->query('descending', false);
+
+        $filter = $filter ? json_decode($filter, true) : null;
+        $selected = $selected ? json_decode($selected, true) : null;
+
+        $profiles = $this->profileService->getPaginatedProfiles($start, $count, $filter, $sortBy, $descending, $selected);
+
+        return response()->json([
+            'rows' => $profiles['data'],
+            'total' => $profiles['total'],
+        ]);
     }
 
     /**

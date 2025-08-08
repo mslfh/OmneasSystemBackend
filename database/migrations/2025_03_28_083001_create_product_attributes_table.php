@@ -13,12 +13,8 @@ return new class extends Migration
     {
         Schema::create('product_attributes', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->comment('Name of the product attribute, e.g., only meats, extra source, etc.');
-            $table->string('type')->nullable()
-            ->comment('Type of the product attribute, e.g., extra, only, etc.');
-             $table->decimal('extra_cost', 10, 2)->default(0)
-            ->comment('Additional cost for the product attribute');
-            $table->softDeletes();
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->foreignId('attribute_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -2,7 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AttributesController;
+use App\Http\Controllers\ItemController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ScheduleController;
@@ -60,9 +63,25 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/getSystemSettingByKey', [SystemSettingController::class, 'getSystemSettingByKey']);
 
     // Category management
-    Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
+    Route::apiResource('categories', CategoryController::class);
     Route::get('/categories/active', [CategoryController::class, 'getActiveCategories']);
     Route::get('/categories/parent/{parentId}', [CategoryController::class, 'getByParentId']);
+    Route::get('/categories/field', [CategoryController::class, 'getByField']);
+    Route::get('/categories/{id}/exists', [CategoryController::class, 'exists']);
+    Route::get('/categories/count', [CategoryController::class, 'count']);
+
+    // Attribute management
+    Route::apiResource('attributes', AttributesController::class);
+    Route::get('/attributes/field', [AttributesController::class, 'getByField']);
+    Route::get('/attributes/{id}/exists', [AttributesController::class, 'exists']);
+    Route::get('/attributes/count', [AttributesController::class, 'count']);
+
+    // Item management
+    Route::apiResource('items', ItemController::class);
+    Route::get('/items/field', [ItemController::class, 'getByField']);
+    Route::get('/items/price-range', [ItemController::class, 'getByPriceRange']);
+    Route::get('/items/{id}/exists', [ItemController::class, 'exists']);
+    Route::get('/items/count', [ItemController::class, 'count']);
 
     // Combo management
     Route::apiResource('combos', ComboController::class);
@@ -96,6 +115,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('print-templates', PrintTemplateController::class);
     Route::get('/print-templates/active', [PrintTemplateController::class, 'getActiveTemplates']);
 
+    // Product management
+    Route::apiResource('products', ProductController::class);
+
     // Product Attribute management
     Route::apiResource('product-attributes', ProductAttributeController::class);
     Route::get('/product-attributes/product/{productId}', [ProductAttributeController::class, 'getByProductId']);
@@ -109,6 +131,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Profile management
     Route::apiResource('profiles', ProfileController::class);
+
+    // Order management
+    Route::apiResource('orders', OrderController::class);
 
     // Statistics routes
     Route::get('/getStaffScheduleStatistics', [ScheduleController::class, 'getStaffScheduleStatistics']);

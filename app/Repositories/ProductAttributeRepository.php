@@ -2,16 +2,16 @@
 
 namespace App\Repositories;
 
-use App\Models\ProductAttribute;
+use App\Models\Attribute;
 use App\Contracts\ProductAttributeContract;
 
 class ProductAttributeRepository implements ProductAttributeContract
 {
     protected $model;
 
-    public function __construct(ProductAttribute $productAttribute)
+    public function __construct(Attribute $attribute)
     {
-        $this->model = $productAttribute;
+        $this->model = $attribute;
     }
 
     public function getAll()

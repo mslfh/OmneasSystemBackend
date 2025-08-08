@@ -92,4 +92,47 @@ class ProductService
     {
         return $this->productRepository->count();
     }
+
+    /**
+     * Get paginated products
+     */
+    public function getPaginatedProducts($start, $count, $filter, $sortBy, $descending, $selected)
+    {
+        $query = \App\Models\Product::query();
+
+        if ($filter) {
+            if ($filter['field'] == "title") {
+                $query->where('title', 'like', "%{$filter['value']}%");
+            } else if ($filter['field'] == "code") {
+                $query->where('code', 'like', "%{$filter['value']}%");
+            } else if ($filter['field'] == "description") {
+                $query->where('description', 'like', "%{$filter['value']}%");
+            } else if ($filter['field'] == "price") {
+                $query->where('price', '=', $filter['value']);
+            } else if ($filter['field'] == "status") {
+                $query->where('status', '=', $filter['value']);
+            }
+        }
+
+        if ($selected) {
+            if ($selected['field'] == "deleted") {
+                $query->where('deleted_at', '!=', null);
+            } else if ($selected['field'] == "featured") {
+                $query->where('is_featured', true);
+            } else if ($selected['field'] == "out_of_stock") {
+                $query->where('stock', '<=', 0);
+            }
+        }
+
+        $sortDirection = $descending ? 'desc' : 'asc';
+        $query->with(['categories'])->withTrashed()->orderBy($sortBy, $sortDirection);
+
+        $total = $query->count();
+        $data = $query->skip($start)->take($count)->get();
+
+        return [
+            'data' => $data,
+            'total' => $total,
+        ];
+    }
 }

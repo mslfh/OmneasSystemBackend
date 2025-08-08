@@ -42,4 +42,43 @@ class ComboService
     {
         return $this->comboRepository->getActiveItems();
     }
+
+    /**
+     * Get paginated combos
+     */
+    public function getPaginatedCombos($start, $count, $filter, $sortBy, $descending, $selected)
+    {
+        $query = \App\Models\Combo::query();
+
+        if ($filter) {
+            if ($filter['field'] == "name") {
+                $query->where('name', 'like', "%{$filter['value']}%");
+            } else if ($filter['field'] == "description") {
+                $query->where('description', 'like', "%{$filter['value']}%");
+            } else if ($filter['field'] == "price") {
+                $query->where('price', '=', $filter['value']);
+            }
+        }
+
+        if ($selected) {
+            if ($selected['field'] == "deleted") {
+                $query->where('deleted_at', '!=', null);
+            } else if ($selected['field'] == "active") {
+                $query->where('is_active', true);
+            } else if ($selected['field'] == "featured") {
+                $query->where('is_featured', true);
+            }
+        }
+
+        $sortDirection = $descending ? 'desc' : 'asc';
+        $query->with(['items', 'products'])->withTrashed()->orderBy($sortBy, $sortDirection);
+
+        $total = $query->count();
+        $data = $query->skip($start)->take($count)->get();
+
+        return [
+            'data' => $data,
+            'total' => $total,
+        ];
+    }
 }

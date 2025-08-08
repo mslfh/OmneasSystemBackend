@@ -2,16 +2,16 @@
 
 namespace App\Repositories;
 
-use App\Models\ProductItem;
+use App\Models\Item;
 use App\Contracts\ProductItemContract;
 
 class ProductItemRepository implements ProductItemContract
 {
     protected $model;
 
-    public function __construct(ProductItem $productItem)
+    public function __construct(Item $Item)
     {
-        $this->model = $productItem;
+        $this->model = $Item;
     }
 
     public function getAll()
@@ -31,19 +31,19 @@ class ProductItemRepository implements ProductItemContract
 
     public function update($id, array $data)
     {
-        $productItem = $this->findById($id);
-        if ($productItem) {
-            $productItem->update($data);
-            return $productItem;
+        $Item = $this->findById($id);
+        if ($Item) {
+            $Item->update($data);
+            return $Item;
         }
         return null;
     }
 
     public function delete($id)
     {
-        $productItem = $this->findById($id);
-        if ($productItem) {
-            return $productItem->delete();
+        $Item = $this->findById($id);
+        if ($Item) {
+            return $Item->delete();
         }
         return false;
     }

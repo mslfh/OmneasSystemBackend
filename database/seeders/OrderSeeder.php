@@ -21,14 +21,14 @@ class OrderSeeder extends Seeder
             User::factory()->count(10)->create();
         }
 
-        // Create products first if they don't exist
-        if (Product::count() === 0) {
-            Product::factory()->count(20)->create();
-        }
-
-        // Create orders with different statuses
+        // Use existing products (created by ProductSeeder)
         $users = User::all();
         $products = Product::all();
+
+        if ($products->count() === 0) {
+            $this->command->warn('No products found. Please run ProductSeeder first.');
+            return;
+        }
 
         // Create completed orders
         Order::factory()

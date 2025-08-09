@@ -13,66 +13,58 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        // Create main categories using factory
-        $mealCategory = Category::factory()->active()->create([
-            'title' => 'Meal',
-            'hint' => 'Traditional flavors perfect for everyone',
-        ]);
+        // Define the exact category structure
+        $categories = [
+            'Meal' => [
+                'hint' => 'Traditional flavors perfect for everyone',
+                'subcategories' => [
+                    'Noodle' => 'Delicious noodle dishes with rich flavors',
+                    'Fry Rice' => 'Perfectly seasoned fried rice variations'
+                ]
+            ],
+            'Drink' => [
+                'hint' => 'Light and refreshing, perfect for health-conscious diners',
+                'subcategories' => [
+                    '200ml Tin' => 'Convenient single-serving beverages',
+                    '600ml bottle' => 'Large sharing size beverages'
+                ]
+            ],
+            'Soup' => [
+                'hint' => 'Healthy and nutritious ingredients sourced fresh daily',
+                'subcategories' => []
+            ],
+            'Snack' => [
+                'hint' => 'Sweet and delightful, loved by all ages',
+                'subcategories' => []
+            ]
+        ];
 
-        $drinkCategory = Category::factory()->active()->create([
-            'title' => 'Drink',
-            'hint' => 'Light and refreshing, perfect for health-conscious diners',
-        ]);
+        foreach ($categories as $title => $data) {
+            // Create main category
+            $mainCategory = Category::updateOrCreate(
+                ['parent_id' => null, 'title' => $title],
+                [
+                    'hint' => $data['hint'],
+                    'status' => 'active'
+                ]
+            );
 
-        $soupCategory = Category::factory()->active()->create([
-            'title' => 'Soup',
-            'hint' => 'Healthy and nutritious ingredients sourced fresh daily',
-        ]);
-
-        $snackCategory = Category::factory()->active()->create([
-            'title' => 'Snack',
-            'hint' => 'Sweet and delightful, loved by all ages',
-        ]);
-
-        // Create subcategories using factory with proper parent relationships
-        // Meal subcategories
-        Category::factory()->subcategory($mealCategory->id)->active()->create([
-            'title' => 'Noodle',
-            'hint' => 'Delicious noodle dishes with rich flavors',
-        ]);
-
-        Category::factory()->subcategory($mealCategory->id)->active()->create([
-            'title' => 'Fry Rice',
-            'hint' => 'Perfectly seasoned fried rice variations',
-        ]);
-
-        // Drink subcategories
-        Category::factory()->subcategory($drinkCategory->id)->active()->create([
-            'title' => '200ml Tin',
-            'hint' => 'Convenient single-serving beverages',
-        ]);
-
-        Category::factory()->subcategory($drinkCategory->id)->active()->create([
-            'title' => '600ml bottle',
-            'hint' => 'Large sharing size beverages',
-        ]);
-
-        // Create some additional random main categories
-        Category::factory(2)->active()->create();
-
-        // Create some additional subcategories
-        $parentCategories = Category::whereNull('parent_id')->pluck('id')->toArray();
-        foreach ($parentCategories as $parentId) {
-            if (rand(1, 3) == 1) { // 33% chance to create additional subcategory
-                Category::factory()->subcategory($parentId)->create();
+            // Create subcategories if any
+            foreach ($data['subcategories'] as $subTitle => $subHint) {
+                Category::updateOrCreate(
+                    ['parent_id' => $mainCategory->id, 'title' => $subTitle],
+                    [
+                        'hint' => $subHint,
+                        'status' => 'active'
+                    ]
+                );
             }
         }
 
-        // Create some inactive categories for testing
-        Category::factory(2)->inactive()->create();
-
-        $this->command->info('Created ' . Category::count() . ' categories successfully.');
-        $this->command->info('Main categories: ' . Category::whereNull('parent_id')->count());
-        $this->command->info('Sub categories: ' . Category::whereNotNull('parent_id')->count());
+        if (property_exists($this, 'command') && $this->command) {
+            $this->command->info('Seeded Categories: ' . Category::count());
+            $this->command->info('Main categories: ' . Category::whereNull('parent_id')->count());
+            $this->command->info('Sub categories: ' . Category::whereNotNull('parent_id')->count());
+        }
     }
 }

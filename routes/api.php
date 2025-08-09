@@ -141,3 +141,7 @@ Route::apiResource('orders', OrderController::class);
 Route::get('/phpinfo', function () {
     phpinfo();
 });
+
+Route::get('/health', function () {
+    return response()->json(['status' => 'healthy']);
+});

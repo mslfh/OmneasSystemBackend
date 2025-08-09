@@ -19,61 +19,37 @@ class ItemFactory extends Factory
      */
     public function definition(): array
     {
-        $itemTypes = [
-            'meat', 'source', 'soup', 'staple', 'vegetable'
-        ];
+        $itemTypes = ['MAIN', 'VEGETABLE', 'SOURCE', 'MEAT', 'SEAFOOD'];
 
         $itemsByType = [
-            'meat' => [
-                'Chicken Breast', 'Beef Strips', 'Pork Belly', 'Salmon Fillet', 'Shrimp',
-                'Duck Breast', 'Lamb Chops', 'Turkey Slices', 'Cod Fillet', 'Tuna Steak',
-                'Crab Meat', 'Lobster Tail', 'Scallops', 'Mussels', 'Chicken Thigh'
+            'MAIN' => [
+                'Thick Egg Noodle', 'Thin Egg Noodle', 'Thin Rice Noodle', 'Udon Noodle',
+                'Flat Rice Noodle', 'Spinach Noodle', 'Rice', 'Fresh Egg Noodle(Soup Only)'
             ],
-            'source' => [
-                'Soy Sauce', 'Oyster Sauce', 'Teriyaki Sauce', 'Sweet & Sour Sauce', 'Black Bean Sauce',
-                'Garlic Sauce', 'Chili Sauce', 'Sesame Oil', 'Fish Sauce', 'Hoisin Sauce',
-                'XO Sauce', 'Plum Sauce', 'Satay Sauce', 'Thai Curry Paste', 'Miso Paste'
+            'VEGETABLE' => [
+                'Pineapple', 'Cabbage', 'Mushroom', 'Capsicum', 'Tofu', 'Tomato', 'Onion', 'Bokchoy', 'Carrot'
             ],
-            'soup' => [
-                'Chicken Broth', 'Beef Bone Broth', 'Vegetable Stock', 'Miso Soup', 'Tom Yum Soup',
-                'Hot & Sour Soup', 'Wonton Soup', 'Corn Soup', 'Mushroom Soup', 'Seafood Bisque',
-                'Pho Broth', 'Ramen Broth', 'Clear Broth', 'Coconut Soup', 'Lentil Soup'
+            'MEAT' => [
+                'BBQ Pork', 'Beef', 'Chicken', 'Egg'
             ],
-            'staple' => [
-                'Steamed Rice', 'Fried Rice', 'Brown Rice', 'Jasmine Rice', 'Glutinous Rice',
-                'Fat Noodles (Udon)', 'Fat Rice Noodles', 'Thick Wheat Noodles', 'Hand-pulled Noodles',
-                'Thin Egg Noodles', 'Angel Hair Noodles', 'Ramen Noodles', 'Soba Noodles', 'Vermicelli',
-                'Glass Noodles'
+            'SEAFOOD' => [
+                'Prawn', 'Shrimp', 'FishCake', 'Squid', 'SeafoodEXT'
             ],
-            'vegetable' => [
-                'Bok Choy', 'Chinese Broccoli', 'Snow Peas', 'Bell Peppers', 'Mushrooms',
-                'Bean Sprouts', 'Cabbage', 'Carrots', 'Onions', 'Garlic', 'Ginger',
-                'Tomatoes', 'Lettuce', 'Spinach', 'Broccoli', 'Cauliflower', 'Eggplant',
-                'Zucchini', 'Green Beans', 'Corn Kernels'
+            'SOURCE' => [
+                'Asia Source', 'Yaki Source', 'Satay Source', 'Gluten Free( Singapore)', 'HotBox Source',
+                'HokkieMEE Source', 'Sambal Source', 'MaMaMEE Source', 'SweetBox Source', 'BlackBean Source',
+                'Garlic Source', 'SweetHoney Source', 'Oyster Source'
             ]
         ];
 
         $type = $this->faker->randomElement($itemTypes);
         $name = $this->faker->randomElement($itemsByType[$type]);
 
-        $descriptions = [
-            'Fresh and high-quality ingredient',
-            'Premium grade item with excellent taste',
-            'Locally sourced and organic when possible',
-            'Carefully selected for optimal flavor',
-            'Traditional preparation method',
-            'Modern twist on classic ingredient',
-            'Sustainably sourced product',
-            'Artisanal quality item',
-            'Restaurant grade ingredient',
-            'Specialty imported item'
-        ];
-
         return [
             'name' => $name,
             'type' => $type,
-            'description' => $this->faker->randomElement($descriptions),
-            'price' => $this->faker->randomFloat(2, 0.50, 15.00),
+            'description' => 'Premium quality ingredient',
+            'price' => $this->faker->randomFloat(2, 1.00, 8.00),
         ];
     }
 
@@ -98,70 +74,19 @@ class ItemFactory extends Factory
     }
 
     /**
-     * Create meat type item.
+     * Create main type item.
      */
-    public function meat(): static
+    public function main(): static
     {
-        $meats = [
-            'Chicken Breast', 'Beef Strips', 'Pork Belly', 'Salmon Fillet', 'Shrimp',
-            'Duck Breast', 'Lamb Chops', 'Turkey Slices', 'Cod Fillet', 'Tuna Steak'
+        $items = [
+            'Thick Egg Noodle', 'Thin Egg Noodle', 'Thin Rice Noodle', 'Udon Noodle',
+            'Flat Rice Noodle', 'Spinach Noodle', 'Rice', 'Fresh Egg Noodle(Soup Only)'
         ];
 
         return $this->state(fn (array $attributes) => [
-            'name' => $this->faker->randomElement($meats),
-            'type' => 'meat',
-            'price' => $this->faker->randomFloat(2, 5.00, 25.00),
-        ]);
-    }
-
-    /**
-     * Create source type item.
-     */
-    public function source(): static
-    {
-        $sources = [
-            'Soy Sauce', 'Oyster Sauce', 'Teriyaki Sauce', 'Sweet & Sour Sauce',
-            'Black Bean Sauce', 'Garlic Sauce', 'Chili Sauce', 'XO Sauce'
-        ];
-
-        return $this->state(fn (array $attributes) => [
-            'name' => $this->faker->randomElement($sources),
-            'type' => 'source',
-            'price' => $this->faker->randomFloat(2, 0.50, 3.00),
-        ]);
-    }
-
-    /**
-     * Create soup type item.
-     */
-    public function soup(): static
-    {
-        $soups = [
-            'Chicken Broth', 'Beef Bone Broth', 'Vegetable Stock', 'Miso Soup',
-            'Tom Yum Soup', 'Hot & Sour Soup', 'Wonton Soup', 'Mushroom Soup'
-        ];
-
-        return $this->state(fn (array $attributes) => [
-            'name' => $this->faker->randomElement($soups),
-            'type' => 'soup',
-            'price' => $this->faker->randomFloat(2, 2.00, 8.00),
-        ]);
-    }
-
-    /**
-     * Create staple type item.
-     */
-    public function staple(): static
-    {
-        $staples = [
-            'Steamed Rice', 'Fried Rice', 'Fat Noodles (Udon)', 'Fat Rice Noodles',
-            'Thin Egg Noodles', 'Angel Hair Noodles', 'Ramen Noodles', 'Soba Noodles'
-        ];
-
-        return $this->state(fn (array $attributes) => [
-            'name' => $this->faker->randomElement($staples),
-            'type' => 'staple',
-            'price' => $this->faker->randomFloat(2, 1.50, 6.00),
+            'name' => $this->faker->randomElement($items),
+            'type' => 'MAIN',
+            'price' => $this->faker->randomFloat(2, 3.00, 8.00),
         ]);
     }
 
@@ -170,15 +95,60 @@ class ItemFactory extends Factory
      */
     public function vegetable(): static
     {
-        $vegetables = [
-            'Bok Choy', 'Chinese Broccoli', 'Snow Peas', 'Bell Peppers', 'Mushrooms',
-            'Bean Sprouts', 'Cabbage', 'Carrots', 'Onions', 'Broccoli'
+        $items = [
+            'Pineapple', 'Cabbage', 'Mushroom', 'Capsicum', 'Tofu', 'Tomato', 'Onion', 'Bokchoy', 'Carrot'
         ];
 
         return $this->state(fn (array $attributes) => [
-            'name' => $this->faker->randomElement($vegetables),
-            'type' => 'vegetable',
+            'name' => $this->faker->randomElement($items),
+            'type' => 'VEGETABLE',
             'price' => $this->faker->randomFloat(2, 1.00, 4.00),
+        ]);
+    }
+
+    /**
+     * Create meat type item.
+     */
+    public function meat(): static
+    {
+        $items = ['BBQ Pork', 'Beef', 'Chicken', 'Egg'];
+
+        return $this->state(fn (array $attributes) => [
+            'name' => $this->faker->randomElement($items),
+            'type' => 'MEAT',
+            'price' => $this->faker->randomFloat(2, 5.00, 12.00),
+        ]);
+    }
+
+    /**
+     * Create seafood type item.
+     */
+    public function seafood(): static
+    {
+        $items = ['Prawn', 'Shrimp', 'FishCake', 'Squid', 'SeafoodEXT'];
+
+        return $this->state(fn (array $attributes) => [
+            'name' => $this->faker->randomElement($items),
+            'type' => 'SEAFOOD',
+            'price' => $this->faker->randomFloat(2, 6.00, 15.00),
+        ]);
+    }
+
+    /**
+     * Create source type item.
+     */
+    public function source(): static
+    {
+        $items = [
+            'Asia Source', 'Yaki Source', 'Satay Source', 'Gluten Free( Singapore)', 'HotBox Source',
+            'HokkieMEE Source', 'Sambal Source', 'MaMaMEE Source', 'SweetBox Source', 'BlackBean Source',
+            'Garlic Source', 'SweetHoney Source', 'Oyster Source'
+        ];
+
+        return $this->state(fn (array $attributes) => [
+            'name' => $this->faker->randomElement($items),
+            'type' => 'SOURCE',
+            'price' => $this->faker->randomFloat(2, 0.50, 3.00),
         ]);
     }
 }

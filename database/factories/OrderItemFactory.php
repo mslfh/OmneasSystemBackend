@@ -29,8 +29,30 @@ class OrderItemFactory extends Factory
     {
         $quantity = $this->faker->numberBetween(1, 5);
 
-        // Create a product for this order item
-        $product = Product::factory()->create();
+        // Use existing product instead of creating new one
+        $product = Product::inRandomOrder()->first();
+
+        // If no products exist, create a simple product
+        if (!$product) {
+            $product = Product::create([
+                'code' => 'TEMP' . $this->faker->unique()->numberBetween(1000, 9999),
+                'title' => 'Temporary Product',
+                'second_title' => '临时产品',
+                'acronym' => 'TP',
+                'description' => 'Temporary product for testing',
+                'tip' => 'This is a temporary product',
+                'price' => 25.00,
+                'discount' => 0,
+                'selling_price' => 25.00,
+                'stock' => 10,
+                'status' => 'active',
+                'image' => 'https://picsum.photos/400/300?random=999',
+                'image_list' => ['https://picsum.photos/400/300?random=999'],
+                'tag' => 'Temporary',
+                'sort' => 999,
+                'is_featured' => false,
+            ]);
+        }
 
         // Use actual product information
         $productPrice = $product->price;

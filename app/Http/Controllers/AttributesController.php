@@ -146,6 +146,19 @@ class AttributesController extends BaseController
     }
 
     /**
+     * Get active attributes.
+     */
+    public function getGroupAttributes()
+    {
+        try {
+            $attributes = $this->attributeService->getGroupAttributes();
+            return $this->sendResponse($attributes, 'Group attributes retrieved successfully');
+        } catch (\Exception $e) {
+            return $this->sendError('Error retrieving group attributes', [$e->getMessage()]);
+        }
+    }
+
+    /**
      * Check if attribute exists.
      */
     public function exists($id)

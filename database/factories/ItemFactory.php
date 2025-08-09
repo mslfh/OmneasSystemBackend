@@ -20,51 +20,36 @@ class ItemFactory extends Factory
     public function definition(): array
     {
         $itemTypes = [
-            'ingredient', 'sauce', 'condiment', 'garnish', 'seasoning',
-            'side_dish', 'beverage', 'addon', 'base', 'topping'
+            'meat', 'source', 'soup', 'staple', 'vegetable'
         ];
 
         $itemsByType = [
-            'ingredient' => [
+            'meat' => [
                 'Chicken Breast', 'Beef Strips', 'Pork Belly', 'Salmon Fillet', 'Shrimp',
-                'Mushrooms', 'Bell Peppers', 'Onions', 'Garlic', 'Ginger',
-                'Tomatoes', 'Lettuce', 'Spinach', 'Broccoli', 'Carrots'
+                'Duck Breast', 'Lamb Chops', 'Turkey Slices', 'Cod Fillet', 'Tuna Steak',
+                'Crab Meat', 'Lobster Tail', 'Scallops', 'Mussels', 'Chicken Thigh'
             ],
-            'sauce' => [
+            'source' => [
                 'Soy Sauce', 'Oyster Sauce', 'Teriyaki Sauce', 'Sweet & Sour Sauce', 'Black Bean Sauce',
-                'Garlic Sauce', 'Chili Sauce', 'Sesame Oil', 'Fish Sauce', 'Hoisin Sauce'
+                'Garlic Sauce', 'Chili Sauce', 'Sesame Oil', 'Fish Sauce', 'Hoisin Sauce',
+                'XO Sauce', 'Plum Sauce', 'Satay Sauce', 'Thai Curry Paste', 'Miso Paste'
             ],
-            'condiment' => [
-                'Salt', 'Black Pepper', 'White Pepper', 'Sugar', 'Vinegar',
-                'Sesame Seeds', 'Chili Flakes', 'Green Onions', 'Cilantro', 'Lime'
+            'soup' => [
+                'Chicken Broth', 'Beef Bone Broth', 'Vegetable Stock', 'Miso Soup', 'Tom Yum Soup',
+                'Hot & Sour Soup', 'Wonton Soup', 'Corn Soup', 'Mushroom Soup', 'Seafood Bisque',
+                'Pho Broth', 'Ramen Broth', 'Clear Broth', 'Coconut Soup', 'Lentil Soup'
             ],
-            'garnish' => [
-                'Parsley', 'Mint Leaves', 'Basil', 'Cherry Tomatoes', 'Cucumber Slices',
-                'Lemon Wedges', 'Orange Zest', 'Microgreens', 'Edible Flowers', 'Pickled Vegetables'
+            'staple' => [
+                'Steamed Rice', 'Fried Rice', 'Brown Rice', 'Jasmine Rice', 'Glutinous Rice',
+                'Fat Noodles (Udon)', 'Fat Rice Noodles', 'Thick Wheat Noodles', 'Hand-pulled Noodles',
+                'Thin Egg Noodles', 'Angel Hair Noodles', 'Ramen Noodles', 'Soba Noodles', 'Vermicelli',
+                'Glass Noodles'
             ],
-            'seasoning' => [
-                'Five Spice', 'Curry Powder', 'Paprika', 'Cumin', 'Coriander',
-                'Star Anise', 'Bay Leaves', 'Thyme', 'Rosemary', 'Oregano'
-            ],
-            'side_dish' => [
-                'Steamed Rice', 'Fried Rice', 'Noodles', 'French Fries', 'Mashed Potatoes',
-                'Coleslaw', 'Salad', 'Soup', 'Bread Roll', 'Garlic Bread'
-            ],
-            'beverage' => [
-                'Green Tea', 'Jasmine Tea', 'Coffee', 'Fresh Orange Juice', 'Apple Juice',
-                'Soft Drinks', 'Sparkling Water', 'Hot Chocolate', 'Milk Tea', 'Smoothie'
-            ],
-            'addon' => [
-                'Extra Cheese', 'Bacon Bits', 'Fried Egg', 'Avocado', 'Extra Meat',
-                'Extra Vegetables', 'Nuts', 'Croutons', 'Olives', 'Pickles'
-            ],
-            'base' => [
-                'Pizza Base', 'Burger Bun', 'Tortilla', 'Flatbread', 'Rice Paper',
-                'Pasta', 'Noodle Base', 'Salad Base', 'Soup Base', 'Sauce Base'
-            ],
-            'topping' => [
-                'Cheese', 'Pepperoni', 'Ham', 'Pineapple', 'Olives',
-                'Jalapeños', 'Mushrooms', 'Onions', 'Bell Peppers', 'Anchovies'
+            'vegetable' => [
+                'Bok Choy', 'Chinese Broccoli', 'Snow Peas', 'Bell Peppers', 'Mushrooms',
+                'Bean Sprouts', 'Cabbage', 'Carrots', 'Onions', 'Garlic', 'Ginger',
+                'Tomatoes', 'Lettuce', 'Spinach', 'Broccoli', 'Cauliflower', 'Eggplant',
+                'Zucchini', 'Green Beans', 'Corn Kernels'
             ]
         ];
 
@@ -113,53 +98,87 @@ class ItemFactory extends Factory
     }
 
     /**
-     * Create ingredient type item.
+     * Create meat type item.
      */
-    public function ingredient(): static
+    public function meat(): static
     {
-        $ingredients = [
+        $meats = [
             'Chicken Breast', 'Beef Strips', 'Pork Belly', 'Salmon Fillet', 'Shrimp',
-            'Mushrooms', 'Bell Peppers', 'Onions', 'Garlic', 'Ginger'
+            'Duck Breast', 'Lamb Chops', 'Turkey Slices', 'Cod Fillet', 'Tuna Steak'
         ];
 
         return $this->state(fn (array $attributes) => [
-            'name' => $this->faker->randomElement($ingredients),
-            'type' => 'ingredient',
-            'price' => $this->faker->randomFloat(2, 2.00, 12.00),
+            'name' => $this->faker->randomElement($meats),
+            'type' => 'meat',
+            'price' => $this->faker->randomFloat(2, 5.00, 25.00),
         ]);
     }
 
     /**
-     * Create sauce type item.
+     * Create source type item.
      */
-    public function sauce(): static
+    public function source(): static
     {
-        $sauces = [
+        $sources = [
             'Soy Sauce', 'Oyster Sauce', 'Teriyaki Sauce', 'Sweet & Sour Sauce',
-            'Black Bean Sauce', 'Garlic Sauce', 'Chili Sauce'
+            'Black Bean Sauce', 'Garlic Sauce', 'Chili Sauce', 'XO Sauce'
         ];
 
         return $this->state(fn (array $attributes) => [
-            'name' => $this->faker->randomElement($sauces),
-            'type' => 'sauce',
+            'name' => $this->faker->randomElement($sources),
+            'type' => 'source',
             'price' => $this->faker->randomFloat(2, 0.50, 3.00),
         ]);
     }
 
     /**
-     * Create addon type item.
+     * Create soup type item.
      */
-    public function addon(): static
+    public function soup(): static
     {
-        $addons = [
-            'Extra Cheese', 'Bacon Bits', 'Fried Egg', 'Avocado', 'Extra Meat',
-            'Extra Vegetables', 'Nuts', 'Croutons'
+        $soups = [
+            'Chicken Broth', 'Beef Bone Broth', 'Vegetable Stock', 'Miso Soup',
+            'Tom Yum Soup', 'Hot & Sour Soup', 'Wonton Soup', 'Mushroom Soup'
         ];
 
         return $this->state(fn (array $attributes) => [
-            'name' => $this->faker->randomElement($addons),
-            'type' => 'addon',
-            'price' => $this->faker->randomFloat(2, 1.00, 5.00),
+            'name' => $this->faker->randomElement($soups),
+            'type' => 'soup',
+            'price' => $this->faker->randomFloat(2, 2.00, 8.00),
+        ]);
+    }
+
+    /**
+     * Create staple type item.
+     */
+    public function staple(): static
+    {
+        $staples = [
+            'Steamed Rice', 'Fried Rice', 'Fat Noodles (Udon)', 'Fat Rice Noodles',
+            'Thin Egg Noodles', 'Angel Hair Noodles', 'Ramen Noodles', 'Soba Noodles'
+        ];
+
+        return $this->state(fn (array $attributes) => [
+            'name' => $this->faker->randomElement($staples),
+            'type' => 'staple',
+            'price' => $this->faker->randomFloat(2, 1.50, 6.00),
+        ]);
+    }
+
+    /**
+     * Create vegetable type item.
+     */
+    public function vegetable(): static
+    {
+        $vegetables = [
+            'Bok Choy', 'Chinese Broccoli', 'Snow Peas', 'Bell Peppers', 'Mushrooms',
+            'Bean Sprouts', 'Cabbage', 'Carrots', 'Onions', 'Broccoli'
+        ];
+
+        return $this->state(fn (array $attributes) => [
+            'name' => $this->faker->randomElement($vegetables),
+            'type' => 'vegetable',
+            'price' => $this->faker->randomFloat(2, 1.00, 4.00),
         ]);
     }
 }

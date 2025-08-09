@@ -38,6 +38,19 @@ class ProductController extends BaseController
     }
 
     /**
+     * Get active products.
+     */
+    public function getActiveProducts()
+    {
+        try {
+            $products = $this->productService->getAllProducts();
+            return $this->sendResponse($products, 'Active products retrieved successfully');
+        } catch (\Exception $e) {
+            return $this->sendError('Error retrieving active products', [$e->getMessage()]);
+        }
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)

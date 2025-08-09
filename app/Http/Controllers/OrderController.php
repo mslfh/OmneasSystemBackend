@@ -56,8 +56,10 @@ class OrderController extends BaseController
         }
     }
 
-    public function finishOrder(Request $request)
+    public function placeOrder(Request $request)
     {
+        return response()->json(['message' => 'Order placed successfully'], 200);
+
         $data = $request->validate([
             'order_id' => 'required|exists:orders,id',
             'order_status' => 'required|string',

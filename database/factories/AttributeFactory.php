@@ -20,21 +20,25 @@ class AttributeFactory extends Factory
     public function definition(): array
     {
         $attributeTypes = [
-            'size', 'color', 'material', 'texture', 'temperature', 'spice_level',
-            'cooking_method', 'dietary', 'portion', 'sweetness'
+            'spice_level',
+            'no_spicy',
+            'no_veg',
+            'no_meats',
+            'only',
+            'chili',
+            'extra',
+            'sauce'
         ];
 
         $attributesByType = [
-            'size' => ['Small', 'Medium', 'Large', 'Extra Large', 'Mini'],
-            'color' => ['Red', 'Blue', 'Green', 'Yellow', 'Black', 'White', 'Orange', 'Purple'],
-            'material' => ['Cotton', 'Silk', 'Leather', 'Plastic', 'Metal', 'Wood', 'Glass'],
-            'texture' => ['Smooth', 'Rough', 'Soft', 'Hard', 'Crispy', 'Creamy', 'Chewy'],
-            'temperature' => ['Hot', 'Cold', 'Warm', 'Frozen', 'Room Temperature'],
-            'spice_level' => ['Mild', 'Medium', 'Spicy', 'Extra Spicy', 'No Spice'],
-            'cooking_method' => ['Grilled', 'Fried', 'Steamed', 'Boiled', 'Roasted', 'Baked'],
-            'dietary' => ['Vegetarian', 'Vegan', 'Gluten-Free', 'Sugar-Free', 'Low-Fat', 'High-Protein'],
-            'portion' => ['Single', 'Double', 'Family Size', 'Sharing', 'Individual'],
-            'sweetness' => ['No Sugar', 'Low Sugar', 'Medium Sweet', 'Sweet', 'Extra Sweet']
+            'spice_level' => ['chilli 3', 'chilli 5', 'chilli 7', 'chilli 10'],
+            'no_spicy' => ['No Spicy', 'No Hot', 'No Chili', 'Mild Only'],
+            'no_veg' => ['No Vegetables', 'No Greens', 'No Onions', 'No Herbs'],
+            'no_meats' => ['No Meat', 'No Beef', 'No Pork', 'No Chicken', 'No Seafood'],
+            'only' => ['Cheese Only', 'Sauce Only', 'Bread Only', 'Rice Only', 'Noodles Only'],
+            'chili' => ['Green Chili', 'Red Chili', 'Bird Eye Chili', 'Bell Pepper', 'Jalapeno'],
+            'extra' => ['Extra Cheese', 'Extra Sauce', 'Extra Meat', 'Extra Vegetables', 'Extra Portion'],
+            'sauce' => ['Tomato Sauce', 'BBQ Sauce', 'Mayo', 'Chili Sauce', 'Garlic Sauce', 'Sweet & Sour']
         ];
 
         $type = $this->faker->randomElement($attributeTypes);
@@ -52,7 +56,7 @@ class AttributeFactory extends Factory
      */
     public function free(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'extra_cost' => 0.00,
         ]);
     }
@@ -62,7 +66,7 @@ class AttributeFactory extends Factory
      */
     public function withCost(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'extra_cost' => $this->faker->randomFloat(2, 1, 25),
         ]);
     }
@@ -72,7 +76,7 @@ class AttributeFactory extends Factory
      */
     public function size(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'name' => $this->faker->randomElement(['Small', 'Medium', 'Large', 'Extra Large']),
             'type' => 'size',
         ]);
@@ -83,8 +87,8 @@ class AttributeFactory extends Factory
      */
     public function spiceLevel(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'name' => $this->faker->randomElement(['Mild', 'Medium', 'Spicy', 'Extra Spicy']),
+        return $this->state(fn(array $attributes) => [
+            'name' => $this->faker->randomElement(['chilli 3', 'chilli 5', 'chilli 7', 'chilli 10']),
             'type' => 'spice_level',
         ]);
     }
@@ -94,10 +98,94 @@ class AttributeFactory extends Factory
      */
     public function dietary(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'name' => $this->faker->randomElement(['Vegetarian', 'Vegan', 'Gluten-Free', 'Sugar-Free']),
             'type' => 'dietary',
             'extra_cost' => 0.00,
+        ]);
+    }
+
+    /**
+     * Create no spicy attribute.
+     */
+    public function noSpicy(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'name' => $this->faker->randomElement(['No Spicy', 'No Hot', 'No Chili', 'Mild Only']),
+            'type' => 'no_spicy',
+            'extra_cost' => 0.00,
+        ]);
+    }
+
+    /**
+     * Create no vegetables attribute.
+     */
+    public function noVeg(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'name' => $this->faker->randomElement(['No Vegetables', 'No Greens', 'No Onions', 'No Herbs']),
+            'type' => 'no_veg',
+            'extra_cost' => 0.00,
+        ]);
+    }
+
+    /**
+     * Create no meats attribute.
+     */
+    public function noMeats(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'name' => $this->faker->randomElement(['No Meat', 'No Beef', 'No Pork', 'No Chicken', 'No Seafood']),
+            'type' => 'no_meats',
+            'extra_cost' => 0.00,
+        ]);
+    }
+
+    /**
+     * Create only attribute.
+     */
+    public function only(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'name' => $this->faker->randomElement(['Cheese Only', 'Sauce Only', 'Bread Only', 'Rice Only', 'Noodles Only']),
+            'type' => 'only',
+            'extra_cost' => $this->faker->randomFloat(2, 0, 10),
+        ]);
+    }
+
+    /**
+     * Create chili attribute.
+     */
+    public function chili(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'name' => $this->faker->randomElement(['Green Chili', 'Red Chili', 'Bird Eye Chili', 'Bell Pepper', 'Jalapeno']),
+            'type' => 'chili',
+            'extra_cost' => $this->faker->randomFloat(2, 0, 5),
+        ]);
+    }
+
+    /**
+     * Create extra attribute.
+     */
+    public function extra(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'name' => $this->faker->randomElement(['Extra Cheese', 'Extra Sauce', 'Extra Meat', 'Extra Vegetables', 'Extra Portion']),
+            'type' => 'extra',
+            'extra_cost' => $this->faker->randomFloat(2, 2, 15),
+        ]);
+    }
+
+    /**
+     * Create sauce attribute.
+     */
+    public function sauce(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'name' => $this->faker->randomElement(['Tomato Sauce', 'BBQ Sauce', 'Mayo', 'Chili Sauce', 'Garlic Sauce', 'Sweet & Sour']),
+            'type' => 'sauce',
+            'extra_cost' => $this->faker->randomFloat(2, 0, 8),
         ]);
     }
 }

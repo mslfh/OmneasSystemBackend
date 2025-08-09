@@ -19,22 +19,20 @@ class CategoryFactory extends Factory
      */
     public function definition(): array
     {
+        // Only allow these main categories
         $mainCategories = [
-            'Main Dishes',
-            'Soups',
-            'Appetizers',
-            'Desserts',
-            'Beverages',
-            'Specialty Items'
+            'Meal',
+            'Drink',
+            'Soup',
+            'Snack',
         ];
 
+        // Mapping shown for reference (not used directly in default state)
         $subCategories = [
-            'Main Dishes' => ['Rice Dishes', 'Noodles', 'Meat', 'Seafood', 'Vegetarian'],
-            'Soups' => ['Clear Soup', 'Thick Soup', 'Hot Pot', 'Broth'],
-            'Appetizers' => ['Cold Dishes', 'Salads', 'Finger Foods', 'Sharing Plates'],
-            'Desserts' => ['Cakes', 'Ice Cream', 'Traditional Sweets', 'Puddings'],
-            'Beverages' => ['Juices', 'Tea', 'Coffee', 'Soft Drinks'],
-            'Specialty Items' => ['Seasonal', 'Chef Special', 'Limited Edition', 'Signature']
+            'Meal' => ['Noodle', 'Fry Rice'],
+            'Drink' => ['200ml Tin', '600ml bottle'],
+            'Soup' => [],
+            'Snack' => [],
         ];
 
         $hints = [
@@ -59,19 +57,35 @@ class CategoryFactory extends Factory
      */
     public function subcategory(?int $parentId = null): static
     {
-        $subCategories = [
-            'Rice Dishes', 'Noodles', 'Meat', 'Seafood', 'Vegetarian',
-            'Clear Soup', 'Thick Soup', 'Hot Pot', 'Broth',
-            'Cold Dishes', 'Salads', 'Finger Foods', 'Sharing Plates',
-            'Cakes', 'Ice Cream', 'Traditional Sweets', 'Puddings',
-            'Juices', 'Tea', 'Coffee', 'Soft Drinks',
-            'Seasonal', 'Chef Special', 'Limited Edition', 'Signature'
+        // Map each subcategory to its correct parent category
+        $subToParent = [
+            'Noodle' => 'Meal',
+            'Fry Rice' => 'Meal',
+            '200ml Tin' => 'Drink',
+            '600ml bottle' => 'Drink',
         ];
+        $subCategories = array_keys($subToParent);
 
-        return $this->state(fn (array $attributes) => [
-            'parent_id' => $parentId ?? $this->faker->numberBetween(1, 6),
-            'title' => $this->faker->randomElement($subCategories),
-        ]);
+        return $this->state(function (array $attributes) use ($parentId, $subToParent, $subCategories) {
+            $title = $this->faker->randomElement($subCategories);
+
+            // Determine or create the correct parent category
+            if ($parentId === null) {
+                $parentTitle = $subToParent[$title];
+                $parent = Category::firstOrCreate([
+                    'parent_id' => null,
+                    'title' => $parentTitle,
+                ]);
+                $resolvedParentId = $parent->id;
+            } else {
+                $resolvedParentId = $parentId;
+            }
+
+            return [
+                'parent_id' => $resolvedParentId,
+                'title' => $title,
+            ];
+        });
     }
 
     /**

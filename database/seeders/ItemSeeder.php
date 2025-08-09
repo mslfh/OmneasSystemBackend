@@ -13,233 +13,245 @@ class ItemSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create main ingredients
-        Item::factory()->ingredient()->create([
+        // Create specific meat items
+        Item::factory()->meat()->create([
             'name' => 'Chicken Breast',
-            'type' => 'ingredient',
             'description' => 'Premium quality chicken breast, tender and juicy',
             'price' => 8.50
         ]);
 
-        Item::factory()->ingredient()->create([
+        Item::factory()->meat()->create([
             'name' => 'Beef Strips',
-            'type' => 'ingredient',
             'description' => 'Fresh beef strips, perfect for stir-fry dishes',
             'price' => 12.00
         ]);
 
-        Item::factory()->ingredient()->create([
-            'name' => 'Salmon Fillet',
-            'type' => 'ingredient',
-            'description' => 'Atlantic salmon fillet, rich in omega-3',
-            'price' => 15.00
-        ]);
-
-        Item::factory()->ingredient()->create([
-            'name' => 'Shrimp',
-            'type' => 'ingredient',
-            'description' => 'Fresh jumbo shrimp, sweet and succulent',
-            'price' => 10.00
-        ]);
-
-        Item::factory()->ingredient()->create([
+        Item::factory()->meat()->create([
             'name' => 'Pork Belly',
-            'type' => 'ingredient',
             'description' => 'Marbled pork belly with perfect fat ratio',
             'price' => 9.50
         ]);
 
-        // Create vegetables
-        Item::factory()->ingredient()->create([
-            'name' => 'Mixed Vegetables',
-            'type' => 'ingredient',
-            'description' => 'Fresh seasonal vegetables mix',
-            'price' => 4.50
+        Item::factory()->meat()->create([
+            'name' => 'Salmon Fillet',
+            'description' => 'Atlantic salmon fillet, rich in omega-3',
+            'price' => 15.00
         ]);
 
-        Item::factory()->ingredient()->create([
-            'name' => 'Mushrooms',
-            'type' => 'ingredient',
-            'description' => 'Fresh shiitake and button mushrooms',
-            'price' => 3.50
+        Item::factory()->meat()->create([
+            'name' => 'Shrimp',
+            'description' => 'Fresh jumbo shrimp, sweet and succulent',
+            'price' => 10.00
         ]);
 
-        // Create popular sauces
-        Item::factory()->sauce()->create([
+        Item::factory()->meat()->create([
+            'name' => 'Duck Breast',
+            'description' => 'Premium duck breast with crispy skin',
+            'price' => 18.00
+        ]);
+
+        Item::factory()->meat()->create([
+            'name' => 'Lamb Chops',
+            'description' => 'Tender lamb chops with herbs',
+            'price' => 20.00
+        ]);
+
+        // Create specific source/sauce items
+        Item::factory()->source()->create([
+            'name' => 'Soy Sauce',
+            'description' => 'Traditional aged soy sauce',
+            'price' => 1.00
+        ]);
+
+        Item::factory()->source()->create([
+            'name' => 'Oyster Sauce',
+            'description' => 'Rich and savory oyster sauce',
+            'price' => 1.50
+        ]);
+
+        Item::factory()->source()->create([
             'name' => 'Teriyaki Sauce',
-            'type' => 'sauce',
             'description' => 'Sweet and savory Japanese-style sauce',
             'price' => 1.50
         ]);
 
-        Item::factory()->sauce()->create([
+        Item::factory()->source()->create([
             'name' => 'Sweet & Sour Sauce',
-            'type' => 'sauce',
             'description' => 'Classic Chinese-style sweet and tangy sauce',
             'price' => 1.50
         ]);
 
-        Item::factory()->sauce()->create([
+        Item::factory()->source()->create([
             'name' => 'Black Bean Sauce',
-            'type' => 'sauce',
             'description' => 'Rich and savory black bean sauce',
             'price' => 2.00
         ]);
 
-        Item::factory()->sauce()->create([
-            'name' => 'Garlic Sauce',
-            'type' => 'sauce',
-            'description' => 'Aromatic garlic-infused sauce',
-            'price' => 1.50
-        ]);
-
-        Item::factory()->sauce()->create([
-            'name' => 'Spicy Chili Sauce',
-            'type' => 'sauce',
-            'description' => 'Hot and spicy chili sauce for heat lovers',
-            'price' => 1.00
-        ]);
-
-        // Create popular addons
-        Item::factory()->addon()->create([
-            'name' => 'Extra Cheese',
-            'type' => 'addon',
-            'description' => 'Premium melted cheese topping',
-            'price' => 2.50
-        ]);
-
-        Item::factory()->addon()->create([
-            'name' => 'Fried Egg',
-            'type' => 'addon',
-            'description' => 'Perfect sunny-side up egg',
-            'price' => 2.00
-        ]);
-
-        Item::factory()->addon()->create([
-            'name' => 'Avocado',
-            'type' => 'addon',
-            'description' => 'Fresh sliced avocado',
+        Item::factory()->source()->create([
+            'name' => 'XO Sauce',
+            'description' => 'Premium seafood-based spicy sauce',
             'price' => 3.50
         ]);
 
-        Item::factory()->addon()->create([
-            'name' => 'Bacon Bits',
-            'type' => 'addon',
-            'description' => 'Crispy bacon pieces',
+        Item::factory()->source()->create([
+            'name' => 'Hoisin Sauce',
+            'description' => 'Sweet and tangy Chinese barbecue sauce',
+            'price' => 2.00
+        ]);
+
+        // Create specific soup items
+        Item::factory()->soup()->create([
+            'name' => 'Chicken Broth',
+            'description' => 'Rich and flavorful chicken bone broth',
+            'price' => 4.00
+        ]);
+
+        Item::factory()->soup()->create([
+            'name' => 'Beef Bone Broth',
+            'description' => 'Deep and hearty beef bone broth',
+            'price' => 5.00
+        ]);
+
+        Item::factory()->soup()->create([
+            'name' => 'Vegetable Stock',
+            'description' => 'Light and nutritious vegetable broth',
             'price' => 3.00
         ]);
 
-        Item::factory()->addon()->create([
-            'name' => 'Extra Meat',
-            'type' => 'addon',
-            'description' => 'Double portion of your chosen protein',
-            'price' => 6.00
+        Item::factory()->soup()->create([
+            'name' => 'Miso Soup',
+            'description' => 'Traditional Japanese fermented soybean soup',
+            'price' => 3.50
         ]);
 
-        // Create side dishes
-        Item::factory()->create([
+        Item::factory()->soup()->create([
+            'name' => 'Tom Yum Soup',
+            'description' => 'Spicy and sour Thai soup with herbs',
+            'price' => 5.00
+        ]);
+
+        Item::factory()->soup()->create([
+            'name' => 'Hot & Sour Soup',
+            'description' => 'Traditional Chinese hot and sour soup',
+            'price' => 4.50
+        ]);
+
+        // Create specific staple items
+        Item::factory()->staple()->create([
             'name' => 'Steamed Rice',
-            'type' => 'side_dish',
             'description' => 'Fluffy jasmine rice, perfectly steamed',
             'price' => 2.50
         ]);
 
-        Item::factory()->create([
+        Item::factory()->staple()->create([
             'name' => 'Fried Rice',
-            'type' => 'side_dish',
             'description' => 'Wok-fried rice with egg and vegetables',
             'price' => 4.50
         ]);
 
-        Item::factory()->create([
-            'name' => 'French Fries',
-            'type' => 'side_dish',
-            'description' => 'Golden crispy potato fries',
-            'price' => 3.50
-        ]);
-
-        Item::factory()->create([
-            'name' => 'Garden Salad',
-            'type' => 'side_dish',
-            'description' => 'Fresh mixed greens with house dressing',
+        Item::factory()->staple()->create([
+            'name' => 'Fat Noodles (Udon)',
+            'description' => 'Thick Japanese wheat noodles',
             'price' => 4.00
         ]);
 
-        // Create beverages
-        Item::factory()->create([
-            'name' => 'Green Tea',
-            'type' => 'beverage',
-            'description' => 'Traditional Chinese green tea',
-            'price' => 2.00
-        ]);
-
-        Item::factory()->create([
-            'name' => 'Fresh Orange Juice',
-            'type' => 'beverage',
-            'description' => 'Freshly squeezed orange juice',
+        Item::factory()->staple()->create([
+            'name' => 'Fat Rice Noodles',
+            'description' => 'Wide flat rice noodles for stir-fry',
             'price' => 3.50
         ]);
 
-        Item::factory()->create([
-            'name' => 'Soft Drink',
-            'type' => 'beverage',
-            'description' => 'Choice of cola, sprite, or other sodas',
+        Item::factory()->staple()->create([
+            'name' => 'Thick Wheat Noodles',
+            'description' => 'Hearty thick wheat noodles',
+            'price' => 3.50
+        ]);
+
+        Item::factory()->staple()->create([
+            'name' => 'Thin Egg Noodles',
+            'description' => 'Delicate thin egg noodles',
+            'price' => 3.50
+        ]);
+
+        Item::factory()->staple()->create([
+            'name' => 'Angel Hair Noodles',
+            'description' => 'Ultra-thin delicate noodles',
+            'price' => 4.00
+        ]);
+
+        Item::factory()->staple()->create([
+            'name' => 'Ramen Noodles',
+            'description' => 'Fresh ramen noodles with perfect texture',
+            'price' => 4.50
+        ]);
+
+        // Create specific vegetable items
+        Item::factory()->vegetable()->create([
+            'name' => 'Bok Choy',
+            'description' => 'Fresh Asian greens with crisp texture',
+            'price' => 4.50
+        ]);
+
+        Item::factory()->vegetable()->create([
+            'name' => 'Chinese Broccoli',
+            'description' => 'Tender Chinese broccoli with perfect crunch',
+            'price' => 4.00
+        ]);
+
+        Item::factory()->vegetable()->create([
+            'name' => 'Snow Peas',
+            'description' => 'Crisp and sweet snow peas',
+            'price' => 3.50
+        ]);
+
+        Item::factory()->vegetable()->create([
+            'name' => 'Bell Peppers',
+            'description' => 'Colorful sweet bell peppers',
+            'price' => 3.00
+        ]);
+
+        Item::factory()->vegetable()->create([
+            'name' => 'Mushrooms',
+            'description' => 'Fresh shiitake and button mushrooms',
+            'price' => 3.50
+        ]);
+
+        Item::factory()->vegetable()->create([
+            'name' => 'Bean Sprouts',
+            'description' => 'Fresh crunchy bean sprouts',
             'price' => 2.50
         ]);
 
-        // Create condiments and seasonings
-        Item::factory()->free()->create([
-            'name' => 'Soy Sauce',
-            'type' => 'condiment',
-            'description' => 'Premium light soy sauce',
-            'price' => 0.00
+        Item::factory()->vegetable()->create([
+            'name' => 'Cabbage',
+            'description' => 'Fresh cabbage leaves',
+            'price' => 2.00
         ]);
 
-        Item::factory()->free()->create([
-            'name' => 'Chili Flakes',
-            'type' => 'condiment',
-            'description' => 'Dried red chili flakes for extra heat',
-            'price' => 0.00
+        Item::factory()->vegetable()->create([
+            'name' => 'Carrots',
+            'description' => 'Sweet and crunchy carrots',
+            'price' => 2.50
         ]);
 
-        Item::factory()->free()->create([
-            'name' => 'Sesame Oil',
-            'type' => 'condiment',
-            'description' => 'Aromatic sesame oil for finishing',
-            'price' => 0.00
-        ]);
-
-        // Create garnishes
-        Item::factory()->create([
-            'name' => 'Green Onions',
-            'type' => 'garnish',
-            'description' => 'Fresh chopped green onions',
-            'price' => 0.50
-        ]);
-
-        Item::factory()->create([
-            'name' => 'Cilantro',
-            'type' => 'garnish',
-            'description' => 'Fresh cilantro leaves',
-            'price' => 0.50
-        ]);
-
-        Item::factory()->create([
-            'name' => 'Sesame Seeds',
-            'type' => 'garnish',
-            'description' => 'Toasted sesame seeds',
-            'price' => 0.50
-        ]);
-
-        // Create additional random items using factory
-        Item::factory(20)->create();
+        // Create additional random items using factory methods
+        Item::factory(10)->meat()->create();
+        Item::factory(8)->source()->create();
+        Item::factory(6)->soup()->create();
+        Item::factory(8)->staple()->create();
+        Item::factory(12)->vegetable()->create();
 
         // Create some expensive premium items
-        Item::factory(8)->expensive()->create();
+        Item::factory(5)->expensive()->create();
 
-        // Create more specific type items
-        Item::factory(5)->ingredient()->create();
-        Item::factory(5)->sauce()->create();
-        Item::factory(5)->addon()->create();
+        // Create some free items for testing
+        Item::factory(3)->free()->create();
+
+        $this->command->info('Created ' . Item::count() . ' items successfully.');
+        $this->command->info('Meat items: ' . Item::where('type', 'meat')->count());
+        $this->command->info('Source items: ' . Item::where('type', 'source')->count());
+        $this->command->info('Soup items: ' . Item::where('type', 'soup')->count());
+        $this->command->info('Staple items: ' . Item::where('type', 'staple')->count());
+        $this->command->info('Vegetable items: ' . Item::where('type', 'vegetable')->count());
     }
 }

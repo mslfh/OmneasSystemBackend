@@ -13,74 +13,63 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        // Create main categories
-        $mainCategories = [
-            [
-                'title' => 'Main Dishes',
-                'hint' => 'Hearty main courses including rice, noodles, meat and seafood',
-                'status' => 'active',
-                'subcategories' => ['Rice Dishes', 'Noodles', 'Meat', 'Seafood', 'Vegetarian']
-            ],
-            [
-                'title' => 'Soups',
-                'hint' => 'Nutritious and warming soups for every taste',
-                'status' => 'active',
-                'subcategories' => ['Clear Soup', 'Thick Soup', 'Hot Pot', 'Broth']
-            ],
-            [
-                'title' => 'Appetizers',
-                'hint' => 'Light and refreshing starters to awaken your appetite',
-                'status' => 'active',
-                'subcategories' => ['Cold Dishes', 'Salads', 'Finger Foods', 'Sharing Plates']
-            ],
-            [
-                'title' => 'Desserts',
-                'hint' => 'Sweet treats and delightful desserts',
-                'status' => 'active',
-                'subcategories' => ['Cakes', 'Ice Cream', 'Traditional Sweets', 'Puddings']
-            ],
-            [
-                'title' => 'Beverages',
-                'hint' => 'Fresh drinks and beverages to quench your thirst',
-                'status' => 'active',
-                'subcategories' => ['Juices', 'Tea', 'Coffee', 'Soft Drinks']
-            ],
-            [
-                'title' => 'Specialty Items',
-                'hint' => 'Unique chef specials and seasonal offerings',
-                'status' => 'active',
-                'subcategories' => ['Seasonal', 'Chef Special', 'Limited Edition', 'Signature']
-            ]
-        ];
+        // Create main categories using factory
+        $mealCategory = Category::factory()->active()->create([
+            'title' => 'Meal',
+            'hint' => 'Traditional flavors perfect for everyone',
+        ]);
 
-        foreach ($mainCategories as $mainCategory) {
-            // Create main category
-            $category = Category::create([
-                'parent_id' => null,
-                'title' => $mainCategory['title'],
-                'hint' => $mainCategory['hint'],
-                'status' => $mainCategory['status'],
-            ]);
+        $drinkCategory = Category::factory()->active()->create([
+            'title' => 'Drink',
+            'hint' => 'Light and refreshing, perfect for health-conscious diners',
+        ]);
 
-            // Create subcategories
-            foreach ($mainCategory['subcategories'] as $subcategoryTitle) {
-                Category::create([
-                    'parent_id' => $category->id,
-                    'title' => $subcategoryTitle,
-                    'hint' => 'Premium ' . $subcategoryTitle . ' with guaranteed quality',
-                    'status' => 'active',
-                ]);
-            }
-        }
+        $soupCategory = Category::factory()->active()->create([
+            'title' => 'Soup',
+            'hint' => 'Healthy and nutritious ingredients sourced fresh daily',
+        ]);
 
-        // Remove extra random categories creation since we only want 6 main categories
-        // Create some additional subcategories for variety
+        $snackCategory = Category::factory()->active()->create([
+            'title' => 'Snack',
+            'hint' => 'Sweet and delightful, loved by all ages',
+        ]);
+
+        // Create subcategories using factory with proper parent relationships
+        // Meal subcategories
+        Category::factory()->subcategory($mealCategory->id)->active()->create([
+            'title' => 'Noodle',
+            'hint' => 'Delicious noodle dishes with rich flavors',
+        ]);
+
+        Category::factory()->subcategory($mealCategory->id)->active()->create([
+            'title' => 'Fry Rice',
+            'hint' => 'Perfectly seasoned fried rice variations',
+        ]);
+
+        // Drink subcategories
+        Category::factory()->subcategory($drinkCategory->id)->active()->create([
+            'title' => '200ml Tin',
+            'hint' => 'Convenient single-serving beverages',
+        ]);
+
+        Category::factory()->subcategory($drinkCategory->id)->active()->create([
+            'title' => '600ml bottle',
+            'hint' => 'Large sharing size beverages',
+        ]);
+
+        // Create some additional random main categories
+        Category::factory(2)->active()->create();
+
+        // Create some additional subcategories
         $parentCategories = Category::whereNull('parent_id')->pluck('id')->toArray();
         foreach ($parentCategories as $parentId) {
-            if (rand(1, 4) == 1) { // 25% chance to create additional subcategory
-                Category::factory(1)->subcategory($parentId)->create();
+            if (rand(1, 3) == 1) { // 33% chance to create additional subcategory
+                Category::factory()->subcategory($parentId)->create();
             }
         }
+
+        // Create some inactive categories for testing
+        Category::factory(2)->inactive()->create();
 
         $this->command->info('Created ' . Category::count() . ' categories successfully.');
         $this->command->info('Main categories: ' . Category::whereNull('parent_id')->count());

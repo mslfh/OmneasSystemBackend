@@ -21,6 +21,7 @@ class AttributeService
         return $this->attributeRepository->getAll();
     }
 
+
     /**
      * Get attribute by ID
      */
@@ -110,5 +111,14 @@ class AttributeService
             'data' => $data,
             'total' => $total,
         ];
+    }
+
+    /**
+     * mixed
+     */
+    public function getGroupAttributes()
+    {
+        $attributes = $this->attributeRepository->getAll();
+        return $attributes->groupBy('type');
     }
 }

@@ -37,6 +37,19 @@ class CategoryController extends BaseController
         ]);
     }
 
+
+    public function getAllCategories(Request $request)
+    {
+        // try {
+        dd('ok');
+            $categories = $this->categoryService->getAllCategories();
+
+            return $this->sendResponse($categories, 'All categories retrieved successfully');
+        // } catch (\Exception $e) {
+            // return $this->sendError('Error retrieving categories', [$e->getMessage()]);
+        // }
+    }
+
     /**
      * Store a newly created resource in storage.
      */

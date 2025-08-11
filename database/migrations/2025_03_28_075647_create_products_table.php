@@ -33,6 +33,8 @@ return new class extends Migration {
                 ->comment('Available stock quantity, null is unlimited');
             $table->string('status')->default('active')
                 ->comment('active, inactive, draft');
+            $table->boolean('viewable')->default(true)
+                ->comment('Indicates if the product is viewable for customers');
 
             $table->string('image')->nullable()
                 ->comment('Main image of the product');

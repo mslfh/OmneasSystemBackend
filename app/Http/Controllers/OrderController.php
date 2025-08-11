@@ -6,6 +6,7 @@ use App\Services\OrderService;
 use App\Services\VoucherService;
 use DB;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class OrderController extends BaseController
 {
@@ -56,77 +57,54 @@ class OrderController extends BaseController
         }
     }
 
+    /**
+     * Place a new order for staff members
+     */
     public function placeOrder(Request $request)
     {
-        return response()->json(['message' => 'Order placed successfully'], 200);
-
-        $data = $request->validate([
-            'order_id' => 'required|exists:orders,id',
-            'order_status' => 'required|string',
-            'payment_method' => 'required|string',
-            'total_amount' => 'required|numeric',
-            'paid_amount' => 'required|numeric',
-            'operator_id' => 'nullable|exists:staff,id',
-            'operator_name' => 'nullable|string',
-            'payment_note' => 'nullable|string',
-            'split_payment' => 'nullable',
-            'voucher_code' => 'nullable|string',
-        ]);
-
+        //Test
+        return response()->json([], 200);
         try {
-            DB::beginTransaction();
+            // 验证请求数据
+            $validatedData = $request->validate([
+                'user_id' => 'nullable|integer|exists:users,id',
+                'type' => 'nullable|string|in:takeaway,eat-in,delivery',
+                'status' => 'nullable|string|in:pending,preparing,ready,completed,cancelled',
+                'tax_rate' => 'nullable|numeric|min:0|max:100',
+                'discount_amount' => 'nullable|numeric|min:0',
+                'payment_method' => 'nullable|string|in:cash,pos,voucher,split',
+                'tag' => 'nullable|string',
+                'note' => 'nullable|string|max:500',
+                'remark' => 'nullable|string|max:500',
+                'items' => 'required|array|min:1',
+                'items.*.product_id' => 'required|integer|exists:products,id',
+                'items.*.quantity' => 'required|integer|min:1',
+                'items.*.is_combo' => 'nullable|boolean',
+                'items.*.combo_id' => 'nullable|integer|exists:combos,id',
+                'items.*.is_customization' => 'nullable|boolean',
+                'payments' => 'nullable|array',
+                'payments.*.amount' => 'required_with:payments|numeric|min:0',
+                'payments.*.payment_method' => 'required_with:payments|string|in:cash,pos,voucher,split',
+                'payments.*.status' => 'nullable|string|in:pending,completed,failed',
+                'payments.*.tax_rate' => 'nullable|numeric|min:0|max:100',
+                'payments.*.tax_amount' => 'nullable|numeric|min:0',
+            ]);
 
-            // Set payment status based on payment method
-            if ($data['payment_method'] == 'unpaid') {
-                $data['payment_status'] = 'pending';
-            } else if ($data['payment_method'] == 'split_payment' && $data['order_status'] == 'pending') {
-                $data['payment_status'] = 'partially_paid';
-            } else {
-                $data['payment_status'] = 'paid';
-            }
+            $data = $request->all();
 
-            // Handle voucher if provided
-            if (isset($data['voucher_code'])) {
-                $voucherData = $this->voucherService->verifyVoucher($data['voucher_code']);
-                if ($voucherData['status'] == 'error') {
-                    DB::rollBack();
-                    return response()->json(['message' => $voucherData['message']], 400);
-                }
-                $voucher = $voucherData['data'];
-                if ($voucher->remaining_amount < $data['total_amount']) {
-                    $voucher->remaining_amount = 0;
-                } else {
-                    $voucher->remaining_amount -= $data['total_amount'];
-                }
-                $voucher->save();
-                $data['payment_note'] = ($data['payment_note'] ?? '') . ' Voucher Code: ' . $voucher->code;
-            }
+            // 调用服务层创建订单
+            $order = $this->orderService->placeOrder($data);
 
-            // Handle split payment
-            if ($data['split_payment']) {
-                $payment = [];
-                foreach ($data['split_payment'] as $index => $split_payment) {
-                    $payment[$index]['paid_by'] = $split_payment['method']['value'];
-                    if ($split_payment['method']['label'] != 'Unpaid') {
-                        $payment[$index]['status'] = 'Paid';
-                        $payment[$index]['paid_amount'] = $split_payment['amount'];
-                    } else {
-                        $payment[$index]['status'] = 'Unpaid';
-                        $payment[$index]['paid_amount'] = 0;
-                    }
-                    $payment[$index]['total_amount'] = $split_payment['amount'];
-                    $payment[$index]['remark'] = $data['payment_note'] ?? '';
-                }
-                $data['payment'] = $payment;
-                unset($data['split_payment']);
-            }
+            return response()->json([
+                'success' => true,
+                'data' => $order,
+                'message' => 'Order placed successfully'
+            ], 201);
 
-            $order = $this->orderService->updateOrder($data['order_id'], $data);
-            DB::commit();
-            return response()->json($order, 200);
+        } catch (ValidationException $e) {
+            return $this->sendError('Validation failed', $e->errors(), 422);
         } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['error' => 'Failed to finish order', 'message' => $e->getMessage()], 500);
+            return $this->sendError('Failed to place order', [$e->getMessage()], 500);
         }
     }
 

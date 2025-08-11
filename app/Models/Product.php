@@ -15,6 +15,7 @@ class Product extends Model
         'title',
         'second_title',
         'acronym',
+        'viewable',
         'description',
         'tip',
         'price',

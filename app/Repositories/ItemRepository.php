@@ -94,4 +94,12 @@ class ItemRepository implements ItemContract
     {
         return $this->model->count();
     }
+
+    /**
+     * mixed
+     */
+    public function getActiveItems()
+    {
+        return $this->model->get();
+    }
 }

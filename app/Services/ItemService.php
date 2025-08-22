@@ -121,4 +121,13 @@ class ItemService
             'total' => $total,
         ];
     }
+
+
+    /**
+     * mixed
+     */
+    public function getActiveItems()
+    {
+        return $this->itemRepository->getActiveItems();
+    }
 }

@@ -185,4 +185,18 @@ class ItemController extends BaseController
             return $this->sendError('Error retrieving item count', [$e->getMessage()]);
         }
     }
+
+    /**
+     * Get active items.
+     */
+    public function getActiveItems()
+    {
+        try {
+            $items = $this->itemService->getActiveItems();
+            return $this->sendResponse($items, 'Active items retrieved successfully');
+        } catch (\Exception $e) {
+            return $this->sendError('Error retrieving active items', [$e->getMessage()]);
+        }
+    }
+
 }

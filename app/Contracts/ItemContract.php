@@ -13,4 +13,5 @@ interface ItemContract
     public function findByPriceRange(float $minPrice, float $maxPrice);
     public function exists(int $id);
     public function count();
+    public function getActiveItems();
 }

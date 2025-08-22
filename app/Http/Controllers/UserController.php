@@ -94,4 +94,23 @@ class UserController extends BaseController
         $this->userService->deleteUser($id);
         return response()->json(['message' => 'User deleted successfully']);
     }
+
+    //Change role's password (need current_password)
+    public function changePassword(Request $request)
+    {
+        $data = $request->validate([
+            'current_password' => 'required|string|min:8',
+            'new_password' => 'required|string|min:8|',
+        ]);
+        return response()->json($this->userService->changePassword($data));
+    }
+
+    //Change user's password
+    public function changeUserPassword(Request $request, $id)
+    {
+        $data = $request->validate([
+            'new_password' => 'required|string|min:8|',
+        ]);
+        return response()->json($this->userService->changeUserPassword($id, $data));
+    }
 }

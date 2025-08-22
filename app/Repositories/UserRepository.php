@@ -84,4 +84,10 @@ class UserRepository implements UserContract
         $user = $this->findById($id);
         return $user->delete();
     }
+
+    public function verifyCurrentPassword($currentPassword)
+    {
+        $user = auth()->user();
+        return password_verify($currentPassword, $user->password);
+    }
 }

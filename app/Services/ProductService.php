@@ -34,6 +34,9 @@ class ProductService
      */
     public function createProduct(array $data)
     {
+        dd($data);
+
+
         return $this->productRepository->create($data);
     }
 

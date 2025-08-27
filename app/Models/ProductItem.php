@@ -8,7 +8,9 @@ class ProductItem extends Model
 {
     protected $fillable = [
         'product_id',
-        'attribute_id',
+        'item_id',
+        'quantity',
+        'unit',
     ];
 
 }

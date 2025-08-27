@@ -18,6 +18,8 @@ return new class extends Migration {
                 ->comment('Type of the product item, e.g., material, ingredient, sauce, taste etc.');
             $table->text('description')->nullable()->comment('Description of the product item');
             $table->decimal('price', 10, 2)->comment('Price of the product item');
+            $table->decimal('extra_price', 10, 2)
+            ->default(0.00)->comment('Extra price if add this product item');
             $table->softDeletes();
             $table->timestamps();
         });

@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Item;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class ItemSeeder extends Seeder
@@ -40,7 +39,8 @@ class ItemSeeder extends Seeder
                     ['type' => $type, 'name' => $name],
                     [
                         'description' => 'Premium quality ingredient',
-                        'price' => $this->getDefaultPrice($type)
+                        'price' => $this->getDefaultPrice($type),
+                        'extra_price' => $this->getDefaultExtraPrice($type)
                     ]
                 );
             }
@@ -58,12 +58,25 @@ class ItemSeeder extends Seeder
     private function getDefaultPrice(string $type): float
     {
         return match ($type) {
-            'MAIN' => 5.00,
-            'VEGETABLE' => 2.50,
-            'MEAT' => 8.00,
-            'SEAFOOD' => 10.00,
-            'SOURCE' => 1.50,
-            default => 3.00
+            'MAIN' => random_int(5, 10),
+            'VEGETABLE' => random_int(2, 5),
+            'MEAT' => random_int(8, 12),
+            'SEAFOOD' => random_int(10, 15),
+            'SOURCE' => random_int(1, 3),
+            default => random_int(3, 6)
         };
     }
+
+    private function getDefaultExtraPrice(string $type): float
+    {
+        return match ($type) {
+            'MAIN' => random_int(1, 3),
+            'VEGETABLE' => random_int(0, 2),
+            'MEAT' => random_int(2, 4),
+            'SEAFOOD' => random_int(3, 5),
+            'SOURCE' => random_int(0, 1),
+            default => random_int(1, 2)
+        };
+    }
+
 }

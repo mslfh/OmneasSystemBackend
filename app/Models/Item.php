@@ -13,10 +13,12 @@ class Item extends Model
         'type',
         'description',
         'price',
+        'extra_price'
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
+        'extra_price' => 'decimal:2',
     ];
 
     public function products()

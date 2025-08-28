@@ -29,6 +29,13 @@ use App\Http\Controllers\ProfileController;
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 
+//Client-Side routes
+Route::get('/get-products', [ProductController::class, 'getAllProducts']);
+Route::get('/get-product/{id}', [ProductController::class, 'getProductById']);
+Route::get('/get-categories', [CategoryController::class, 'getAllCategories']);
+Route::get('/get-category/{id}', [CategoryController::class, 'getCategoryById']);
+
+
 // Protected routes
 Route::middleware(['auth:sanctum'])->group(function () {
     // Schedule management

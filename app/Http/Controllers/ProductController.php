@@ -184,4 +184,24 @@ class ProductController extends BaseController
             return $this->sendError('Error retrieving product count', [$e->getMessage()]);
         }
     }
+
+    public function getAllProducts()
+    {
+        try {
+            $products = $this->productService->getAllForClient();
+            return $this->sendResponse($products, 'Products retrieved successfully');
+        } catch (\Exception $e) {
+            return $this->sendError('Error retrieving products', [$e->getMessage()]);
+        }
+    }
+
+    public function getProductById($id)
+    {
+        try {
+            $product = $this->productService->getProductByIdForClient($id);
+            return $this->sendResponse($product, 'Product retrieved successfully');
+        } catch (\Exception $e) {
+            return $this->sendError('Error retrieving products', [$e->getMessage()]);
+        }
+    }
 }

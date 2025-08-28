@@ -28,6 +28,7 @@ class Product extends Model
         'tag',
         'sort',
         'is_featured',
+        'customizable'
     ];
 
     protected $casts = [
@@ -37,6 +38,7 @@ class Product extends Model
         'stock' => 'integer',
         'sort' => 'integer',
         'is_featured' => 'boolean',
+        'customizable' => 'boolean',
         'image_list' => 'array',
     ];
 
@@ -47,7 +49,17 @@ class Product extends Model
 
     public function items()
     {
+        return $this->belongsToMany(Item::class, 'product_items');
+    }
+
+    public function productItems()
+    {
         return $this->hasMany(ProductItem::class);
+    }
+
+    public function customizationItems()
+    {
+        return $this->hasMany(ProductCustomization::class);
     }
 
     public function profiles()

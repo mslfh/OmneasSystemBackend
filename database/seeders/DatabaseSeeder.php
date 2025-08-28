@@ -20,7 +20,6 @@ class DatabaseSeeder extends Seeder
             ItemSeeder::class,
             ProductSeeder::class,
             ComboSeeder::class,
-            OrderSeeder::class,
             // Note: OrderItemSeeder and OrderPaymentSeeder are included in OrderSeeder
             // Uncomment below if you want to run them separately
             // OrderItemSeeder::class,

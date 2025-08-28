@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\ProductContract;
+use DB;
 
 class ProductService
 {
@@ -22,7 +23,7 @@ class ProductService
     }
 
     /**
-     * Get product by ID
+     * Get product by ID for admin
      */
     public function getProductById($id)
     {
@@ -30,14 +31,143 @@ class ProductService
     }
 
     /**
+     * Get all products for client
+     */
+    public function getAllForClient()
+    {
+        $data = $this->productRepository->getAll();
+        return $data->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'title' => $product->title,
+                'code' => $product->code,
+                'description' => $product->description,
+                'price' => $product->price,
+                'discount' => $product->discount,
+                'selling_price' => $product->selling_price,
+                'image' => $product->image,
+                'stock' => $product->stock,
+                'tag' => $product->tag,
+                'sort' => $product->sort,
+                'customizable' => $product->customizable,
+                'is_featured' => $product->is_featured,
+            ];
+        });
+    }
+
+    /**
+     * Get product by ID for client
+     */
+    public function getProductByIdForClient($id)
+    {
+        $product = $this->productRepository->findById($id);
+        if (!$product) {
+            return null;
+        }
+        $product->load(['categories', 'items', 'customizationItems']);
+
+        // 只返回关键字段，排除时间戳和 status
+        return [
+            'id' => $product->id,
+            'title' => $product->title,
+            'code' => $product->code,
+            'description' => $product->description,
+            'price' => $product->price,
+            'discount' => $product->discount,
+            'selling_price' => $product->selling_price,
+            'image' => $product->image,
+            'stock' => $product->stock,
+            'tag' => $product->tag,
+            'sort' => $product->sort,
+            'customizable' => $product->customizable,
+            'is_featured' => $product->is_featured,
+            'categories' => $product->categories->map(function ($cat) {
+                return [
+                    'id' => $cat->id,
+                    'name' => $cat->name,
+                ];
+            }),
+            'items' => $product->items->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'unit' => $item->unit,
+                    'quantity' => $item->quantity,
+                ];
+            }),
+            'customizationItems' => $product->customizationItems->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'item_id' => $item->item_id,
+                    'mode' => $item->mode,
+                    'replacement_list' => $item->replacement_list,
+                    'replacement_diff' => $item->replacement_diff,
+                    'replacement_extra' => $item->replacement_extra,
+                    'quantity_price' => $item->quantity_price,
+                ];
+            }),
+        ];
+    }
+
+    /**
      * Create new product
      */
     public function createProduct(array $data)
     {
-        dd($data);
 
+        $productData = [];
+        $categories = $data['categories'] ?? [];
+        unset($data['categories']);
 
-        return $this->productRepository->create($data);
+        $productItems = $data['ingredients'] ?? [];
+        unset($data['ingredients']);
+
+        $customizationItems = $data['customizations'] ?? [];
+        unset($data['customizations']);
+
+        if ($data['customizable']) {
+            $productData['customizable'] = true;
+        }
+        $productData = $data;
+
+        DB::beginTransaction();
+
+        try {
+
+            $product = $this->productRepository->create($productData);
+
+            if ($categories) {
+                $product->categories()->sync($categories);
+            }
+            if ($productItems) {
+                foreach ($productItems as $item) {
+                    $data = [];
+                    $data['product_id'] = $product->id;
+                    $data['item_id'] = $item['id'];
+                    $data['unit'] = $item['unit'];
+                    $data['quantity'] = $item['quantity'];
+                    $product->productItems()->create($data);
+                }
+            }
+            if ($customizationItems) {
+                foreach ($customizationItems as $item) {
+                    $data = [];
+                    $data['product_id'] = $product->id;
+                    $data['item_id'] = $item['ingredientId'];
+                    $data['mode'] = $item['mode'];
+                    $data['replacement_list'] = $item['enabledReplacements'];
+                    $data['replacement_diff'] = $item['replacements'];
+                    $data['replacement_extra'] = $item['replacementExtras'];
+                    $data['quantity_price'] = $item['quantityPricing'];
+                    $product->customizationItems()->create($data);
+                }
+            }
+            DB::commit();
+            return $product;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     /**

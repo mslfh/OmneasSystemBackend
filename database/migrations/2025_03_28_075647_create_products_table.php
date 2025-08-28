@@ -35,7 +35,6 @@ return new class extends Migration {
                 ->comment('active, inactive, draft');
             $table->boolean('viewable')->default(true)
                 ->comment('Indicates if the product is viewable for customers');
-
             $table->string('image')->nullable()
                 ->comment('Main image of the product');
             $table->text('image_list')->nullable()
@@ -46,6 +45,8 @@ return new class extends Migration {
                 ->comment('Sort order for display, lower numbers appear first');
             $table->boolean('is_featured')->default(false)
                 ->comment('Indicates if the product is featured');
+            $table->boolean('customizable')->default(false)
+                ->comment('Indicates if the product is customizable');
             $table->softDeletes();
             $table->timestamps();
         });

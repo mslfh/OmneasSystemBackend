@@ -56,7 +56,7 @@ class ProductService
     }
 
     /**
-     * Get product by ID for client
+     * Get product info by ID for client
      */
     public function getProductByIdForClient($id)
     {
@@ -86,7 +86,25 @@ class ProductService
                     'id' => $cat->id,
                     'name' => $cat->name,
                 ];
-            }),
+            })
+        ];
+    }
+
+     /**
+     * Get product Customization by ID for client
+     */
+    public function getProductCustomization($id)
+    {
+        $product = $this->productRepository->findById($id);
+        if (!$product) {
+            return null;
+        }
+        $product->load(['items', 'customizationItems']);
+
+        // 只返回关键字段，排除时间戳和 status
+        return [
+            'id' => $product->id,
+            'stock' => $product->stock,
             'items' => $product->items->map(function ($item) {
                 return [
                     'id' => $item->id,
@@ -268,4 +286,6 @@ class ProductService
             'total' => $total,
         ];
     }
+
+
 }

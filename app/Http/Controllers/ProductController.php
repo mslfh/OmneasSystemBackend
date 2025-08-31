@@ -204,4 +204,14 @@ class ProductController extends BaseController
             return $this->sendError('Error retrieving products', [$e->getMessage()]);
         }
     }
+
+    public function getProductCustomization($id)
+    {
+        try {
+            $customization = $this->productService->getProductCustomization($id);
+            return $this->sendResponse($customization, 'Product customization retrieved successfully');
+        } catch (\Exception $e) {
+            return $this->sendError('Error retrieving product customization', [$e->getMessage()]);
+        }
+    }
 }

@@ -14,4 +14,6 @@ interface ItemContract
     public function exists(int $id);
     public function count();
     public function getActiveItems();
+
+    public function getBulkItemsByIds(array $ids);
 }

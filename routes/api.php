@@ -32,8 +32,10 @@ Route::post('/register', [AuthController::class, 'register']);
 //Client-Side routes
 Route::get('/get-products', [ProductController::class, 'getAllProducts']);
 Route::get('/get-product/{id}', [ProductController::class, 'getProductById']);
+Route::get('/get-product-customization/{id}', [ProductController::class, 'getProductCustomization']);
 Route::get('/get-categories', [CategoryController::class, 'getAllCategories']);
 Route::get('/get-category/{id}', [CategoryController::class, 'getCategoryById']);
+Route::get('/get-bulk-items/{ids}', [ItemController::class, 'getBulkItemsByIds']);
 
 
 // Protected routes

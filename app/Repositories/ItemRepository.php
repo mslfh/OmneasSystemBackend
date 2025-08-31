@@ -102,4 +102,11 @@ class ItemRepository implements ItemContract
     {
         return $this->model->get();
     }
+
+    public function getBulkItemsByIds(array $ids)
+    {
+        return $this->model
+        ->select('id', 'name', 'type', 'description')
+        ->whereIn('id', $ids)->get();
+    }
 }

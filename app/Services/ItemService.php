@@ -130,4 +130,10 @@ class ItemService
     {
         return $this->itemRepository->getActiveItems();
     }
+
+    public function getBulkItemsByIds($ids)
+    {
+        return $this->itemRepository->getBulkItemsByIds($ids);
+    }
+
 }

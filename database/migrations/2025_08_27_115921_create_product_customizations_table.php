@@ -22,7 +22,7 @@ return new class extends Migration {
                 ->comment('Json list of extra cost when replacing into this item');
             $table->string('replacement_extra')->nullable()
                 ->comment('Json list of extra cost when add more quantity after replacing');
-            $table->decimal('quantity_price', 10, 2)->nullable()
+            $table->string('quantity_price')->nullable()
                 ->comment('Json of cost when adding or reducing quantity in variable mode');
             $table->timestamps();
         });

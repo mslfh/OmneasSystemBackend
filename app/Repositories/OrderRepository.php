@@ -22,7 +22,7 @@ class OrderRepository implements OrderContract
 
     public function findById($id)
     {
-        return $this->model->where('id', $id)->with('payment')->first();
+        return $this->model->where('id', $id)->with('payments')->first();
     }
 
     public function create(array $data)

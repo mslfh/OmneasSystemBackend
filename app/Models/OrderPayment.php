@@ -12,7 +12,8 @@ class OrderPayment extends Model
 
     protected $fillable = [
         'order_id',
-        'amount',
+        'received_amount',
+        'paid_amount',
         'payment_method',
         'status',
         'tax_rate',
@@ -21,7 +22,8 @@ class OrderPayment extends Model
 
     protected $casts = [
         'order_id' => 'integer',
-        'amount' => 'decimal:2',
+        'received_amount' => 'decimal:2',
+        'paid_amount' => 'decimal:2',
         'tax_rate' => 'decimal:2',
         'tax_amount' => 'decimal:2',
     ];

@@ -11,7 +11,9 @@ class Order extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'order_no',
         'order_number',
+        'place_in',
         'user_id',
         'type',
         'status',
@@ -25,6 +27,8 @@ class Order extends Model
         'tag',
         'note',
         'remark',
+        'synced_at',
+        'created_at',
     ];
 
     protected $casts = [
@@ -50,5 +54,10 @@ class Order extends Model
     public function payments()
     {
         return $this->hasMany(OrderPayment::class);
+    }
+
+    public function additions()
+    {
+        return $this->hasMany(OrderAddition::class);
     }
 }

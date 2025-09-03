@@ -32,16 +32,11 @@ return new class extends Migration {
             $table->string('combo_item_name')
                 ->nullable()
                 ->comment('Name of the combo item if this item is part of a combo');
-            $table->boolean('is_customization')
-                ->default(false)
-                ->comment('Indicates if the product is a customization');
+
             $table->string('product_title')
                 ->comment('Title of the product');
             $table->string('product_second_title')
                 ->comment('Second title of the product');
-            $table->string('product_items')->nullable()
-                ->comment('Items of the product, if applicable like customizations');
-
             $table->decimal('product_price', 10, 2)
                 ->comment('Price of the product at the time of the order');
             $table->decimal('product_discount', 10, 2)
@@ -50,6 +45,16 @@ return new class extends Migration {
             $table->decimal('product_selling_price', 10, 2)
                 ->default(0)
                 ->comment('Selling price of the product at the time of the order');
+
+            $table->text('product_items')->nullable()
+                ->comment('JSON of Items Backup for the product or combo');
+
+            $table->boolean('is_customization')
+                ->default(false)
+                ->comment('Indicates if the product is a customization');
+            $table->text('customization')->nullable()
+                ->comment('JSON of customization options for the product or combo');
+
             $table->decimal('final_amount', 10, 2)
                 ->comment('Final amount for the order item');
             $table->softDeletes();

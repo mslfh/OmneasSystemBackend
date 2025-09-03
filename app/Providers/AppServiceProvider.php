@@ -48,6 +48,8 @@ use App\Contracts\UserContract;
 use App\Repositories\UserRepository;
 use App\Contracts\VoucherContract;
 use App\Repositories\VoucherRepository;
+use App\Contracts\OrderAdditionContract;
+use App\Repositories\OrderAdditionRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -79,6 +81,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SystemSettingContract::class, SystemSettingRepository::class);
         $this->app->bind(UserContract::class, UserRepository::class);
         $this->app->bind(VoucherContract::class, VoucherRepository::class);
+    
+        $this->app->bind(OrderAdditionContract::class, OrderAdditionRepository::class);
+
     }
 
     /**

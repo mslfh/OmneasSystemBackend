@@ -14,8 +14,12 @@ return new class extends Migration {
             $table->id();
             $table->string('order_number')->unique()
                 ->comment('Automatically created unique identifier for the order');
+            $table->integer('order_no')->nullable()
+                ->comment('Order number visible to customers, 1,2....');
             $table->integer('user_id')->nullable()
                 ->comment('ID of the user who placed the order, null if not applicable');
+            $table->string('place_in')->default('in-store')
+                ->comment('Where the order was placed, e.g., online, in-store');
             $table->string('type')->default('takeaway')
                 ->comment('Type of order, e.g. eat-in, takeaway, delivery');
             $table->string('status')->default('pending')
@@ -41,6 +45,8 @@ return new class extends Migration {
                 ->comment('Additional notes for the order by the customer');
             $table->string('remark')->nullable()
                 ->comment('Additional remarks of this order by the staff');
+            $table->dateTime('synced_at')->nullable()
+                ->comment('Timestamp when the order was synced');
             $table->softDeletes();
             $table->timestamps();
         });

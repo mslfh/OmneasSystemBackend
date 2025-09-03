@@ -35,11 +35,12 @@ Route::get('/get-product/{id}', [ProductController::class, 'getProductById']);
 Route::get('/get-product-customization/{id}', [ProductController::class, 'getProductCustomization']);
 Route::get('/get-categories', [CategoryController::class, 'getAllCategories']);
 Route::get('/get-category/{id}', [CategoryController::class, 'getCategoryById']);
-Route::get('/get-bulk-items/{ids}', [ItemController::class, 'getBulkItemsByIds']);
+Route::post('/get-bulk-items', [ItemController::class, 'getBulkItemsByIds']);
+Route::post('/place-order', [OrderController::class, 'placeOrder']);
 
 
 // Protected routes
-Route::middleware(['auth:sanctum'])->group(function () {
+// Route::middleware(['auth:sanctum'])->group(function () {
     // Schedule management
     Route::post('/insert-schedule', [ScheduleController::class, 'insert']);
     Route::get('/getStaffSchedule', [ScheduleController::class, 'getStaffSchedule']);
@@ -83,7 +84,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/attributes/{id}/exists', [AttributesController::class, 'exists']);
     Route::get('/attributes/count', [AttributesController::class, 'count']);
     Route::apiResource('attributes', AttributesController::class);
-
 
     // Item management
     Route::get('/items/active', [ItemController::class, 'getActiveItems']);
@@ -145,10 +145,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('profiles', ProfileController::class);
 
 
-    Route::post('orders/place', [OrderController::class, 'placeOrder']);
+    Route::post('orders/staff-place', [OrderController::class, 'placeStaffOrder']);
     Route::apiResource('orders', OrderController::class);
 
-});
+// });
 
 Route::get('/phpinfo', function () {
     phpinfo();

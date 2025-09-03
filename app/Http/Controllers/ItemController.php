@@ -199,10 +199,11 @@ class ItemController extends BaseController
         }
     }
 
-    public function getBulkItemsByIds($ids)
+    public function getBulkItemsByIds(Request $request)
     {
         try {
-            $ids = explode(',', $ids);
+            $ids = $request->input('ids', []);
+            $ids = is_array($ids) ? $ids : explode(',', $ids);
             $items = $this->itemService->getBulkItemsByIds($ids);
             return $this->sendResponse($items, 'Bulk items retrieved successfully');
         } catch (\Exception $e) {

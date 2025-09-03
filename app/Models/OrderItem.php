@@ -34,6 +34,8 @@ class OrderItem extends Model
         'is_combo' => 'boolean',
         'combo_id' => 'integer',
         'is_customization' => 'boolean',
+        'product_items' => 'array',
+        'customization' => 'array',
         'product_price' => 'decimal:2',
         'product_discount' => 'decimal:2',
         'product_selling_price' => 'decimal:2',
@@ -53,5 +55,26 @@ class OrderItem extends Model
     public function combo()
     {
         return $this->belongsTo(Combo::class);
+    }
+
+       // Accessors & Mutators for product_items and customization
+    public function getProductItemsAttribute($value)
+    {
+        return $value ? json_decode($value, true) : [];
+    }
+
+    public function setProductItemsAttribute($value)
+    {
+        $this->attributes['product_items'] = is_array($value) ? json_encode($value) : $value;
+    }
+
+    public function getCustomizationAttribute($value)
+    {
+        return $value ? json_decode($value, true) : [];
+    }
+
+    public function setCustomizationAttribute($value)
+    {
+        $this->attributes['customization'] = is_array($value) ? json_encode($value) : $value;
     }
 }

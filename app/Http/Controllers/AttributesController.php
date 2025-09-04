@@ -183,4 +183,17 @@ class AttributesController extends BaseController
             return $this->sendError('Error retrieving attribute count', [$e->getMessage()]);
         }
     }
+
+    /**
+     * Get attribute types.
+     */
+    public function getAttributeType()
+    {
+        try {
+            $types = $this->attributeService->getAttributeTypes();
+            return $this->sendResponse($types, 'Attribute types retrieved successfully');
+        } catch (\Exception $e) {
+            return $this->sendError('Error retrieving attribute types', [$e->getMessage()]);
+        }
+    }
 }

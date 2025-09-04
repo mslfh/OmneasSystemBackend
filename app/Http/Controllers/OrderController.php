@@ -128,4 +128,26 @@ class OrderController extends BaseController
     {
         return response()->json($this->orderService->deleteOrder($id));
     }
+
+    public function fetchNewOrder($latestId)
+    {
+        try {
+            $order = $this->orderService->fetchNewOrder($latestId);
+            if ($order) {
+                return response()->json([
+                    'success' => true,
+                    'data' => $order,
+                    'message' => 'New order fetched successfully'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'data' => null,
+                    'message' => 'No new orders'
+                ]);
+            }
+        } catch (\Exception $e) {
+            return $this->sendError('Failed to fetch new order', [$e->getMessage()], 500);
+        }
+    }
 }

@@ -188,6 +188,8 @@ class OrderService
         // 预处理订单项，通过product_id查询产品信息
         $processedItems = $this->processStaffOrderItems($data['items']);
 
+        //准备订单数据
+
         // 订单金额
         $orderPay = [];
         $orderPay['tax_rate'] = $data['tax_rate'] ?? 10.00;
@@ -197,7 +199,6 @@ class OrderService
 
         //保留两位小数
         $orderPay['tax_amount'] = round($orderPay['total_amount'] * ($orderPay['tax_rate'] / 100), 2);
-
         $orderPay['payment_method'] = $data['cash_amount'] > 0 ?
             $data['pos_amount'] > 0 ? 'cash & pos' : 'cash' : 'pos';
 
@@ -207,7 +208,7 @@ class OrderService
             //现金支付
             $payments[] = [
                 'received_amount' => $data['cash_amount'],
-                'paid_amount' => $orderPay['total_amount'],
+                'paid_amount' => $data['cash_change'] ? $data['cash_amount'] - $data['cash_change'] : $data['cash_amount'],
                 'payment_method' => 'cash',
                 'status' => 'completed',
                 'tax_rate' => $orderPay['tax_rate'],
@@ -230,12 +231,15 @@ class OrderService
         //"order_time": "2025-09-04T01:24:36.007675",
         $orderTime = $data['order_time'] ?? now();
 
-        // 准备订单数据
+        // 订单
         $orderData = [
             'order_number' => $data['order_id'],
             'order_no' => $data['order_no'],
-            'type' => $data['diningType'] ?? 'takeaway',
-            'status' => 'finished',
+            'type' => $data['type'] ?? 'takeaway',
+
+            'status' => 'completed',
+            'sync_status' => 'synced',
+            'print_status' => $data['print_status'] ?? 'printFailed',
 
             'total_amount' => $orderPay['total_amount'],
             'tax_rate' => $orderPay['tax_rate'],
@@ -245,6 +249,7 @@ class OrderService
 
             'paid_amount' => $orderPay['total_amount'],
             'payment_method' => $orderPay['payment_method'],
+            'note' => $data['note'] ?? null,
             'synced_at' => now(),
             'created_at' => $orderTime,
         ];
@@ -440,5 +445,21 @@ class OrderService
         }
 
         return $processedItems;
+    }
+
+    public function fetchNewOrder($latestId)
+    {
+        return Order::with([
+            'items' => function ($query) {
+                $query->select('id', 'order_id', 'product_id', 'quantity', 'product_title', 'product_selling_price', 'final_amount', 'customization');
+            },
+            'additions' => function ($query) {
+                $query->select('id', 'order_id', 'customer_name', 'customer_phone', 'pickup_time', 'extend_info');
+            },
+            'payments'
+        ])
+            ->where('id', '>', $latestId)
+            ->orderBy('id', 'asc')
+            ->get();
     }
 }

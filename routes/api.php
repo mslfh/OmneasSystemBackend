@@ -35,6 +35,9 @@ Route::get('/get-product/{id}', [ProductController::class, 'getProductById']);
 Route::get('/get-product-customization/{id}', [ProductController::class, 'getProductCustomization']);
 Route::get('/get-categories', [CategoryController::class, 'getAllCategories']);
 Route::get('/get-category/{id}', [CategoryController::class, 'getCategoryById']);
+
+Route::get('/get-attribute-type', [AttributesController::class, 'getAttributeType']);
+Route::get('/get-item-type', [ItemController::class, 'getItemType']);
 Route::post('/get-bulk-items', [ItemController::class, 'getBulkItemsByIds']);
 Route::post('/place-order', [OrderController::class, 'placeOrder']);
 
@@ -129,7 +132,6 @@ Route::post('/place-order', [OrderController::class, 'placeOrder']);
     Route::get('/products/active', [ProductController::class, 'getActiveProducts']);
     Route::apiResource('products', ProductController::class);
 
-
     // Product Attribute management
     Route::get('/product-attributes/product/{productId}', [ProductAttributeController::class, 'getByProductId']);
     Route::apiResource('product-attributes', ProductAttributeController::class);
@@ -146,6 +148,7 @@ Route::post('/place-order', [OrderController::class, 'placeOrder']);
 
 
     Route::post('orders/staff-place', [OrderController::class, 'placeStaffOrder']);
+    Route::get('orders/fetch-new-order/{latestId}', [OrderController::class, 'fetchNewOrder']);
     Route::apiResource('orders', OrderController::class);
 
 // });

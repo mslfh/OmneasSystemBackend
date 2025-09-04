@@ -136,4 +136,9 @@ class ItemService
         return $this->itemRepository->getBulkItemsByIds($ids);
     }
 
+    public function getItemTypes()
+    {
+        $allItems =  $this->itemRepository->getAll();
+        return $allItems->pluck('type')->unique()->values();
+    }
 }

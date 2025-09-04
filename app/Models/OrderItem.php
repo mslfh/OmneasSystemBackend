@@ -17,14 +17,15 @@ class OrderItem extends Model
         'is_combo',
         'combo_id',
         'combo_item_name',
-        'is_customization',
         'product_title',
         'product_second_title',
-        'product_items',
         'product_price',
         'product_discount',
         'product_selling_price',
         'final_amount',
+        'product_items',
+        'is_customization',
+        'customization',
     ];
 
     protected $casts = [
@@ -33,13 +34,13 @@ class OrderItem extends Model
         'quantity' => 'integer',
         'is_combo' => 'boolean',
         'combo_id' => 'integer',
-        'is_customization' => 'boolean',
-        'product_items' => 'array',
-        'customization' => 'array',
         'product_price' => 'decimal:2',
         'product_discount' => 'decimal:2',
         'product_selling_price' => 'decimal:2',
         'final_amount' => 'decimal:2',
+        'product_items' => 'array',
+        'is_customization' => 'boolean',
+        'customization' => 'array',
     ];
 
     public function order()

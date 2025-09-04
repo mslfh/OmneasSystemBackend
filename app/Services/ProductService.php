@@ -25,6 +25,19 @@ class ProductService
     /**
      * Get product by ID for admin
      */
+    public function getProductInfoById($id)
+    {
+        $product =  $this->productRepository->findById($id);
+        if (!$product) {
+            return null;
+        }
+        $product->load(['categories', 'items', 'customizationItems']);
+        return $product;
+    }
+
+    /**
+     * Get product by ID
+     */
     public function getProductById($id)
     {
         return $this->productRepository->findById($id);

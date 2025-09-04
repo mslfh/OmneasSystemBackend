@@ -211,4 +211,13 @@ class ItemController extends BaseController
         }
     }
 
+    public function getItemType()
+    {
+        try {
+            $types = $this->itemService->getItemTypes();
+            return $this->sendResponse($types, 'Item types retrieved successfully');
+        } catch (\Exception $e) {
+            return $this->sendError('Error retrieving item types', [$e->getMessage()]);
+        }
+    }
 }

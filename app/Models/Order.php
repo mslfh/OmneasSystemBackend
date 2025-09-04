@@ -16,6 +16,8 @@ class Order extends Model
         'place_in',
         'user_id',
         'type',
+        'sync_status',
+        'print_status',
         'status',
         'total_amount',
         'tax_rate',

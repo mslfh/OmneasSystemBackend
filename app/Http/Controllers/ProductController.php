@@ -69,7 +69,7 @@ class ProductController extends BaseController
     public function show($id)
     {
         try {
-            $product = $this->productService->getProductById($id);
+            $product = $this->productService->getProductInfoById($id);
             if (!$product) {
                 return $this->sendError('Product not found');
             }

@@ -121,4 +121,13 @@ class AttributeService
         $attributes = $this->attributeRepository->getAll();
         return $attributes->groupBy('type');
     }
+
+    /**
+     * Get attribute types
+     */
+    public function getAttributeTypes()
+    {
+        $attributes = $this->attributeRepository->getAll();
+        return $attributes->pluck('type')->unique()->values();
+    }
 }

@@ -22,8 +22,13 @@ return new class extends Migration {
                 ->comment('Where the order was placed, e.g., online, in-store');
             $table->string('type')->default('takeaway')
                 ->comment('Type of order, e.g. eat-in, takeaway, delivery');
+
             $table->string('status')->default('pending')
                 ->comment('Order status, e.g., pending, completed, cancelled');
+            $table->string('sync_status')->default('pending')
+                ->comment('Order sync status, e.g., pending, success, failed');
+            $table->string('print_status')->default('pending')
+                ->comment('Order print status, e.g., pending, success, failed');
 
             $table->decimal('total_amount', 10, 2)
                 ->comment('Total amount for the order');

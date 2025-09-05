@@ -14,8 +14,8 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->foreignId('item_id')->constrained()->cascadeOnDelete();
-            // $table->string('type')->default('sync')
-            // ->comment('customization type: sync with product item or customize');
+            $table->integer('type')->default(0)
+                ->comment('customization type: 0-sync with product item or 1-customize');
             $table->string('mode')->default('fixed')
                 ->comment('replaceable_variable,replaceable,variable,fixed, etc.');
             $table->string('replacement_list')->nullable()

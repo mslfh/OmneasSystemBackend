@@ -13,4 +13,13 @@ class ProductItem extends Model
         'unit',
     ];
 
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function item()
+    {
+        return $this->belongsTo(Item::class);
+    }
 }

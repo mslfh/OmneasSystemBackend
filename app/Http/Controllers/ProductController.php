@@ -43,7 +43,7 @@ class ProductController extends BaseController
     public function getActiveProducts()
     {
         try {
-            $products = $this->productService->getAllProducts();
+            $products = $this->productService->getActiveProducts();
             return $this->sendResponse($products, 'Active products retrieved successfully');
         } catch (\Exception $e) {
             return $this->sendError('Error retrieving active products', [$e->getMessage()]);

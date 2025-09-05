@@ -11,6 +11,7 @@ class ProductCustomization extends Model
         'product_id',
         'item_id',
         'mode',
+        'type',
         'replacement_list',
         'replacement_diff',
         'replacement_extra',

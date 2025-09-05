@@ -23,6 +23,15 @@ class ProductRepository implements ProductContract
     }
 
     /**
+     * Get all active products
+     */
+    public function getAllActive()
+    {
+        return $this->model->where('status', 'active')
+        ->with('categories:id')->get();
+    }
+
+    /**
      * Find product by ID
      */
     public function findById($id)

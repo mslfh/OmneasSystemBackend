@@ -5,6 +5,7 @@ namespace App\Contracts;
 interface ProductContract
 {
     public function getAll();
+    public function getAllActive();
     public function findById($id);
     public function create(array $data);
     public function update($id, array $data);

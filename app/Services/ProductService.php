@@ -14,12 +14,21 @@ class ProductService
         $this->productRepository = $productRepository;
     }
 
-    /**
+        /**
      * Get all products
      */
     public function getAllProducts()
     {
         return $this->productRepository->getAll();
+    }
+
+
+    /**
+     * Get all active products with category_ids for terminal
+     */
+    public function getActiveProducts()
+    {
+        return $this->productRepository->getAllActive();
     }
 
     /**
@@ -112,18 +121,18 @@ class ProductService
         if (!$product) {
             return null;
         }
-        $product->load(['items', 'customizationItems']);
+        $product->load(['productItems.item', 'customizationItems']);
 
         // 只返回关键字段，排除时间戳和 status
         return [
             'id' => $product->id,
             'stock' => $product->stock,
-            'items' => $product->items->map(function ($item) {
+            'items' => $product->productItems->map(function ($productItem) {
                 return [
-                    'id' => $item->id,
-                    'name' => $item->name,
-                    'unit' => $item->unit,
-                    'quantity' => $item->quantity,
+                    'id' => $productItem->item->id,
+                    'name' => $productItem->item->name,
+                    'unit' => $productItem->unit,
+                    'quantity' => $productItem->quantity,
                 ];
             }),
             'customizationItems' => $product->customizationItems->map(function ($item) {
@@ -186,6 +195,7 @@ class ProductService
                     $data['product_id'] = $product->id;
                     $data['item_id'] = $item['ingredientId'];
                     $data['mode'] = $item['mode'];
+                    $data['type'] = $item['type'];
                     $data['replacement_list'] = $item['enabledReplacements'];
                     $data['replacement_diff'] = $item['replacements'];
                     $data['replacement_extra'] = $item['replacementExtras'];
@@ -206,7 +216,64 @@ class ProductService
      */
     public function updateProduct($id, array $data)
     {
-        return $this->productRepository->update($id, $data);
+        $categories = $data['categories'] ?? [];
+        unset($data['categories']);
+
+        $productItems = $data['ingredients'] ?? [];
+        unset($data['ingredients']);
+
+        $customizationItems = $data['customizations'] ?? [];
+        unset($data['customizations']);
+
+        if (isset($data['customizable'])) {
+            $data['customizable'] = (bool)$data['customizable'];
+        }
+
+        DB::beginTransaction();
+        try {
+            $product = $this->productRepository->update($id, $data);
+            $productModel = $this->productRepository->findById($id);
+
+            if ($categories !== null) {
+                $productModel->categories()->sync($categories);
+            }
+
+            if ($productItems !== null) {
+                // 先删除原有配料
+                $productModel->productItems()->delete();
+                foreach ($productItems as $item) {
+                    $itemData = [];
+                    $itemData['product_id'] = $productModel->id;
+                    $itemData['item_id'] = $item['id'];
+                    $itemData['unit'] = $item['unit'];
+                    $itemData['quantity'] = $item['quantity'];
+                    $productModel->productItems()->create($itemData);
+                }
+            }
+
+            if ($customizationItems !== null) {
+                // 先删除原有自定义项
+                $productModel->customizationItems()->delete();
+                foreach ($customizationItems as $item) {
+                    $customData = [];
+                    $customData['product_id'] = $productModel->id;
+                    $customData['item_id'] = $item['ingredientId'];
+                    $customData['mode'] = $item['mode'];
+                    $customData['type'] = $item['type'];
+                    $customData['replacement_list'] = $item['enabledReplacements'];
+                    $customData['replacement_diff'] = $item['replacements'];
+                    $customData['replacement_extra'] = $item['replacementExtras'];
+                    $customData['quantity_price'] = $item['quantityPricing'];
+                    $productModel->customizationItems()->create($customData);
+                }
+            }
+
+            DB::commit();
+            return $productModel;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     /**

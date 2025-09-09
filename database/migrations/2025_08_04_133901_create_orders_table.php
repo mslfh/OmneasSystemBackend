@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('order_number')->unique()
                 ->comment('Automatically created unique identifier for the order');
-            $table->integer('order_no')->nullable()
+            $table->string('order_no')->nullable()
                 ->comment('Order number visible to customers, 1,2....');
             $table->integer('user_id')->nullable()
                 ->comment('ID of the user who placed the order, null if not applicable');

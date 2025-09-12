@@ -14,7 +14,7 @@ class ProductService
         $this->productRepository = $productRepository;
     }
 
-        /**
+    /**
      * Get all products
      */
     public function getAllProducts()
@@ -36,11 +36,11 @@ class ProductService
      */
     public function getProductInfoById($id)
     {
-        $product =  $this->productRepository->findById($id);
+        $product = $this->productRepository->findById($id);
         if (!$product) {
             return null;
         }
-        $product->load(['categories', 'items', 'customizationItems']);
+        $product->load(['categories', 'items', 'customizationItems','profiles']);
         return $product;
     }
 
@@ -112,7 +112,7 @@ class ProductService
         ];
     }
 
-     /**
+    /**
      * Get product Customization by ID for client
      */
     public function getProductCustomization($id)
@@ -170,6 +170,8 @@ class ProductService
         }
         $productData = $data;
 
+        $profileId = $data['profile_id'] ?: null;
+
         DB::beginTransaction();
 
         try {
@@ -203,6 +205,9 @@ class ProductService
                     $product->customizationItems()->create($data);
                 }
             }
+            if ($profileId) {
+                $product->profiles()->attach($profileId);
+            }
             DB::commit();
             return $product;
         } catch (\Exception $e) {
@@ -226,13 +231,13 @@ class ProductService
         unset($data['customizations']);
 
         if (isset($data['customizable'])) {
-            $data['customizable'] = (bool)$data['customizable'];
+            $data['customizable'] = (bool) $data['customizable'];
         }
 
+        $profileId = $data['profile_id'] ?: null;
         DB::beginTransaction();
         try {
-            $product = $this->productRepository->update($id, $data);
-            $productModel = $this->productRepository->findById($id);
+            $productModel = $this->productRepository->update($id, $data);
 
             if ($categories !== null) {
                 $productModel->categories()->sync($categories);
@@ -268,6 +273,9 @@ class ProductService
                 }
             }
 
+            if ($profileId !== null) {
+                $productModel->profiles()->sync($profileId);
+            }
             DB::commit();
             return $productModel;
         } catch (\Exception $e) {

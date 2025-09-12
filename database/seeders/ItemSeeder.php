@@ -18,13 +18,13 @@ class ItemSeeder extends Seeder
                 'Flat Rice Noodle', 'Spinach Noodle', 'Rice', 'Fresh Egg Noodle(Soup Only)'
             ],
             'VEGETABLE' => [
-                'Pineapple', 'Cabbage', 'Mushroom', 'Capsicum', 'Tofu', 'Tomato', 'Onion', 'Bokchoy', 'Carrot'
+                'Veg Combo','Pineapple', 'Cabbage', 'Mushroom', 'Capsicum', 'Tofu', 'Tomato', 'Onion', 'Bokchoy', 'Carrot'
             ],
             'MEAT' => [
-                'BBQ Pork', 'Beef', 'Chicken', 'Egg'
+                '3Meat Combo', 'BBQ Pork', 'Beef', 'Chicken', 'Egg'
             ],
             'SEAFOOD' => [
-                'Prawn', 'Shrimp', 'FishCake', 'Squid', 'SeafoodEXT'
+                'Seafood Combo', 'Prawn', 'Shrimp', 'FishCake', 'Squid', 'SeafoodEXT'
             ],
             'SOURCE' => [
                 'Asia Source', 'Yaki Source', 'Satay Source', 'Gluten Free( Singapore)', 'HotBox Source',

@@ -15,6 +15,8 @@ return new class extends Migration {
             $table->id();
             $table->string('name')
                 ->comment('Name of the profile');
+            $table->string('type')->default('tax')
+                ->comment('Type of the profile (e.g., tax, discount, shipping)');
             $table->text('description')
                 ->nullable()
                 ->comment('Description of the profile');

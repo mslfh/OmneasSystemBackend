@@ -50,6 +50,16 @@ class ProfileController extends BaseController
         }
     }
 
+    public function getActiveProfiles()
+    {
+        try {
+            $profiles = $this->profileService->getActiveProfiles();
+            return $this->sendResponse($profiles, 'Active profiles retrieved successfully');
+        } catch (\Exception $e) {
+            return $this->sendError('Error retrieving active profiles', [$e->getMessage()]);
+        }
+    }
+
     /**
      * Display the specified resource.
      */
@@ -97,4 +107,6 @@ class ProfileController extends BaseController
             return $this->sendError('Error deleting profile', [$e->getMessage()]);
         }
     }
+
+
 }

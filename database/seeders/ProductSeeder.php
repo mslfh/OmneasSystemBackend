@@ -32,8 +32,51 @@ class ProductSeeder extends Seeder
     private function createMealProducts(): void
     {
         $mealCategory = Category::where('title', 'Meal')->whereNull('parent_id')->first();
+        $friedRiceCategory = Category::where('title', 'Fried Rice')->first();
+        $noodleCategory = Category::where('title', 'Noodle')->first();
 
-        $mealProducts = [
+
+        $friedRiceProducts = [
+            [
+                'code' => 'M004',
+                'title' => 'Nasi Goreng',
+                'second_title' => '印尼炒饭',
+                'acronym' => 'NG',
+                'description' => 'Indonesian-style fried rice with aromatic spices and traditional flavors',
+                'tip' => 'Spicy level adjustable, contains shrimp paste',
+                'price' => 21.00,
+                'discount' => 0,
+                'selling_price' => 21.00,
+                'stock' => 45,
+                'status' => 'active',
+                'image' => 'https://picsum.photos/400/300?random=7',
+                'image_list' => ['https://picsum.photos/400/300?random=7', 'https://picsum.photos/400/300?random=8'],
+                'tag' => 'Indonesian,Spicy',
+                'sort' => 4,
+                'is_featured' => false,
+            ],
+            [
+                'code' => 'M005',
+                'title' => 'Combo Fried Rice',
+                'second_title' => '综合炒饭',
+                'acronym' => 'CFR',
+                'description' => 'Mixed fried rice with various ingredients and rich flavors',
+                'tip' => 'Contains eggs, suitable for sharing',
+                'price' => 26.00,
+                'discount' => 0,
+                'selling_price' => 26.00,
+                'stock' => 30,
+                'status' => 'active',
+                'image' => 'https://picsum.photos/400/300?random=9',
+                'image_list' => ['https://picsum.photos/400/300?random=9', 'https://picsum.photos/400/300?random=10'],
+                'tag' => 'Popular,Combo',
+                'sort' => 5,
+                'is_featured' => true,
+            ],
+
+        ];
+
+        $friedNoodleProducts = [
             [
                 'code' => 'M001',
                 'title' => 'Asia Box',
@@ -87,42 +130,6 @@ class ProductSeeder extends Seeder
                 'tag' => 'Healthy,Vegetarian',
                 'sort' => 3,
                 'is_featured' => false,
-            ],
-            [
-                'code' => 'M004',
-                'title' => 'Nasi Goreng',
-                'second_title' => '印尼炒饭',
-                'acronym' => 'NG',
-                'description' => 'Indonesian-style fried rice with aromatic spices and traditional flavors',
-                'tip' => 'Spicy level adjustable, contains shrimp paste',
-                'price' => 21.00,
-                'discount' => 0,
-                'selling_price' => 21.00,
-                'stock' => 45,
-                'status' => 'active',
-                'image' => 'https://picsum.photos/400/300?random=7',
-                'image_list' => ['https://picsum.photos/400/300?random=7', 'https://picsum.photos/400/300?random=8'],
-                'tag' => 'Indonesian,Spicy',
-                'sort' => 4,
-                'is_featured' => false,
-            ],
-            [
-                'code' => 'M005',
-                'title' => 'Combo Frid Rice',
-                'second_title' => '综合炒饭',
-                'acronym' => 'CFR',
-                'description' => 'Mixed fried rice with various ingredients and rich flavors',
-                'tip' => 'Contains eggs, suitable for sharing',
-                'price' => 26.00,
-                'discount' => 0,
-                'selling_price' => 26.00,
-                'stock' => 30,
-                'status' => 'active',
-                'image' => 'https://picsum.photos/400/300?random=9',
-                'image_list' => ['https://picsum.photos/400/300?random=9', 'https://picsum.photos/400/300?random=10'],
-                'tag' => 'Popular,Combo',
-                'sort' => 5,
-                'is_featured' => true,
             ],
             [
                 'code' => 'M006',
@@ -252,14 +259,29 @@ class ProductSeeder extends Seeder
             ],
         ];
 
-        foreach ($mealProducts as $productData) {
+        foreach ($friedRiceProducts as $productData) {
             $product = Product::create($productData);
-            if ($mealCategory) {
-                $product->categories()->attach($mealCategory->id);
+            if ($friedRiceCategory) {
+                // Attach the product to the fried rice category and meal category
+                $product->categories()->attach([
+                    $friedRiceCategory->id,
+                    $mealCategory->id,
+                ]);
             }
         }
 
-        $this->command->info('Created ' . count($mealProducts) . ' meal products.');
+        foreach ($friedNoodleProducts as $productData) {
+            $product = Product::create($productData);
+            if ($noodleCategory) {
+                // Attach the product to the noodle category and meal category
+                $product->categories()->attach([
+                    $noodleCategory->id,
+                    $mealCategory->id,
+                ]);
+            }
+        }
+
+        $this->command->info('Created Meal products.');
     }
 
     /**
@@ -414,162 +436,76 @@ class ProductSeeder extends Seeder
     private function createDrinkProducts(): void
     {
         $drinkCategory = Category::where('title', 'Drink')->whereNull('parent_id')->first();
+        $tinCategory = Category::where('title', '200ml Tin')->first();
+        $bottleCategory = Category::where('title', '600ml bottle')->first();
 
-        $drinkProducts = [
+        $tinProducts = [
             [
                 'code' => 'D001',
-                'title' => 'Fresh Orange Juice',
-                'second_title' => '鲜榨橙汁',
-                'acronym' => 'FOJ',
-                'description' => 'Freshly squeezed orange juice with natural sweetness',
-                'tip' => 'No added sugar, 100% natural',
+                'title' => 'Cola (Can)',
+                'second_title' => '可乐罐装',
+                'acronym' => 'CC',
+                'description' => 'Classic cola in convenient can size',
+                'tip' => '200ml tin, contains caffeine',
+                'price' => 18.00,
+                'discount' => 0,
+                'selling_price' => 18.00,
+                'stock' => 120,
+                'status' => 'active',
+                'image' => 'https://picsum.photos/400/300?random=39',
+                'image_list' => ['https://picsum.photos/400/300?random=39', 'https://picsum.photos/400/300?random=40'],
+                'tag' => 'Cola,Tin,Classic',
+                'sort' => 1,
+                'is_featured' => true,
+            ],
+        ];
+
+        $bottleProducts = [
+            [
+                'code' => 'D002',
+                'title' => 'Cola (Bottle)',
+                'second_title' => '可乐瓶装',
+                'acronym' => 'CB',
+                'description' => 'Classic cola in convenient bottle size',
+                'tip' => '600ml bottle, contains caffeine',
                 'price' => 25.00,
                 'discount' => 0,
                 'selling_price' => 25.00,
                 'stock' => 80,
                 'status' => 'active',
-                'image' => 'https://picsum.photos/400/300?random=39',
-                'image_list' => ['https://picsum.photos/400/300?random=39', 'https://picsum.photos/400/300?random=40'],
-                'tag' => 'Fresh,Natural,Healthy',
-                'sort' => 1,
-                'is_featured' => true,
-            ],
-            [
-                'code' => 'D002',
-                'title' => 'Green Tea',
-                'second_title' => '绿茶',
-                'acronym' => 'GT',
-                'description' => 'Traditional green tea with antioxidants and refreshing taste',
-                'tip' => 'Contains caffeine, hot or cold available',
-                'price' => 20.00,
-                'discount' => 0,
-                'selling_price' => 20.00,
-                'stock' => 100,
-                'status' => 'active',
                 'image' => 'https://picsum.photos/400/300?random=41',
                 'image_list' => ['https://picsum.photos/400/300?random=41', 'https://picsum.photos/400/300?random=42'],
-                'tag' => 'Tea,Healthy,Antioxidant',
+                'tag' => 'Cola,Bottle,Classic',
                 'sort' => 2,
-                'is_featured' => false,
-            ],
-            [
-                'code' => 'D003',
-                'title' => 'Iced Lemon Tea',
-                'second_title' => '冰柠檬茶',
-                'acronym' => 'ILT',
-                'description' => 'Refreshing iced tea with fresh lemon slices',
-                'tip' => 'Refreshing and cooling, perfect for hot weather',
-                'price' => 25.00,
-                'discount' => 3.00,
-                'selling_price' => 22.00,
-                'stock' => 90,
-                'status' => 'active',
-                'image' => 'https://picsum.photos/400/300?random=43',
-                'image_list' => ['https://picsum.photos/400/300?random=43', 'https://picsum.photos/400/300?random=44'],
-                'tag' => 'Iced,Lemon,Deal',
-                'sort' => 3,
-                'is_featured' => false,
-            ],
-            [
-                'code' => 'D004',
-                'title' => 'Coconut Water',
-                'second_title' => '椰子水',
-                'acronym' => 'CW',
-                'description' => 'Natural coconut water with electrolytes and tropical flavor',
-                'tip' => 'Natural electrolytes, perfect for hydration',
-                'price' => 28.00,
-                'discount' => 0,
-                'selling_price' => 28.00,
-                'stock' => 60,
-                'status' => 'active',
-                'image' => 'https://picsum.photos/400/300?random=45',
-                'image_list' => ['https://picsum.photos/400/300?random=45', 'https://picsum.photos/400/300?random=46'],
-                'tag' => 'Natural,Coconut,Electrolytes',
-                'sort' => 4,
-                'is_featured' => false,
-            ],
-            [
-                'code' => 'D005',
-                'title' => 'Mango Smoothie',
-                'second_title' => '芒果奶昔',
-                'acronym' => 'MS',
-                'description' => 'Creamy mango smoothie made with fresh mangoes and yogurt',
-                'tip' => 'Contains dairy, rich in vitamins',
-                'price' => 30.00,
-                'discount' => 0,
-                'selling_price' => 30.00,
-                'stock' => 50,
-                'status' => 'active',
-                'image' => 'https://picsum.photos/400/300?random=47',
-                'image_list' => ['https://picsum.photos/400/300?random=47', 'https://picsum.photos/400/300?random=48'],
-                'tag' => 'Smoothie,Mango,Creamy',
-                'sort' => 5,
-                'is_featured' => true,
-            ],
-            [
-                'code' => 'D006',
-                'title' => 'Cola (Can)',
-                'second_title' => '可乐罐装',
-                'acronym' => 'CC',
-                'description' => 'Classic cola in convenient can size',
-                'tip' => '320ml can, contains caffeine',
-                'price' => 21.00,
-                'discount' => 0,
-                'selling_price' => 21.00,
-                'stock' => 120,
-                'status' => 'active',
-                'image' => 'https://picsum.photos/400/300?random=49',
-                'image_list' => ['https://picsum.photos/400/300?random=49', 'https://picsum.photos/400/300?random=50'],
-                'tag' => 'Cola,Can,Classic',
-                'sort' => 6,
-                'is_featured' => false,
-            ],
-            [
-                'code' => 'D007',
-                'title' => 'Coffee Latte',
-                'second_title' => '咖啡拿铁',
-                'acronym' => 'CL',
-                'description' => 'Rich espresso with steamed milk and smooth foam',
-                'tip' => 'Contains caffeine and dairy, available hot or iced',
-                'price' => 26.00,
-                'discount' => 0,
-                'selling_price' => 26.00,
-                'stock' => 70,
-                'status' => 'active',
-                'image' => 'https://picsum.photos/400/300?random=51',
-                'image_list' => ['https://picsum.photos/400/300?random=51', 'https://picsum.photos/400/300?random=52'],
-                'tag' => 'Coffee,Latte,Caffeine',
-                'sort' => 7,
-                'is_featured' => false,
-            ],
-            [
-                'code' => 'D008',
-                'title' => 'Watermelon Juice',
-                'second_title' => '西瓜汁',
-                'acronym' => 'WJ',
-                'description' => 'Fresh watermelon juice, naturally sweet and hydrating',
-                'tip' => 'Seasonal fruit, perfect for summer',
-                'price' => 24.00,
-                'discount' => 0,
-                'selling_price' => 24.00,
-                'stock' => 45,
-                'status' => 'active',
-                'image' => 'https://picsum.photos/400/300?random=53',
-                'image_list' => ['https://picsum.photos/400/300?random=53', 'https://picsum.photos/400/300?random=54'],
-                'tag' => 'Fresh,Watermelon,Summer',
-                'sort' => 8,
                 'is_featured' => false,
             ],
         ];
 
-        foreach ($drinkProducts as $productData) {
+        // Create tin products
+        foreach ($tinProducts as $productData) {
             $product = Product::create($productData);
-            if ($drinkCategory) {
-                $product->categories()->attach($drinkCategory->id);
+            if ($tinCategory && $drinkCategory) {
+                // Attach the product to both the tin subcategory and main drink category
+                $product->categories()->attach([
+                    $tinCategory->id,
+                    $drinkCategory->id,
+                ]);
             }
         }
 
-        $this->command->info('Created ' . count($drinkProducts) . ' drink products.');
+        // Create bottle products
+        foreach ($bottleProducts as $productData) {
+            $product = Product::create($productData);
+            if ($bottleCategory && $drinkCategory) {
+                // Attach the product to both the bottle subcategory and main drink category
+                $product->categories()->attach([
+                    $bottleCategory->id,
+                    $drinkCategory->id,
+                ]);
+            }
+        }
+
+        $this->command->info('Created ' . (count($tinProducts) + count($bottleProducts)) . ' drink products.');
     }
 
     /**
@@ -582,147 +518,93 @@ class ProductSeeder extends Seeder
         $snackProducts = [
             [
                 'code' => 'SN001',
-                'title' => 'Crispy Chicken Wings',
-                'second_title' => '香脆鸡翅',
-                'acronym' => 'CCW',
-                'description' => 'Golden crispy chicken wings with special seasoning',
-                'tip' => 'Best served hot, contains bones',
-                'price' => 28.00,
+                'title' => 'Spring Roll',
+                'second_title' => '春卷',
+                'acronym' => 'SR',
+                'description' => 'Crispy spring rolls filled with fresh vegetables and served with sweet chili sauce',
+                'tip' => 'Vegetarian friendly, served hot',
+                'price' => 18.00,
                 'discount' => 0,
-                'selling_price' => 28.00,
+                'selling_price' => 18.00,
                 'stock' => 60,
                 'status' => 'active',
                 'image' => 'https://picsum.photos/400/300?random=55',
                 'image_list' => ['https://picsum.photos/400/300?random=55', 'https://picsum.photos/400/300?random=56'],
-                'tag' => 'Crispy,Chicken,Popular',
+                'tag' => 'Vegetarian,Crispy,Popular',
                 'sort' => 1,
                 'is_featured' => true,
             ],
             [
                 'code' => 'SN002',
-                'title' => 'French Fries',
-                'second_title' => '薯条',
-                'acronym' => 'FF',
-                'description' => 'Golden crispy french fries with perfect seasoning',
-                'tip' => 'Served with ketchup, best eaten fresh',
+                'title' => 'Fried DimSim',
+                'second_title' => '炸点心',
+                'acronym' => 'FDS',
+                'description' => 'Golden fried dim sim with savory filling and crispy exterior',
+                'tip' => 'Contains pork and vegetables, best served hot',
                 'price' => 22.00,
                 'discount' => 0,
                 'selling_price' => 22.00,
-                'stock' => 80,
+                'stock' => 50,
                 'status' => 'active',
                 'image' => 'https://picsum.photos/400/300?random=57',
                 'image_list' => ['https://picsum.photos/400/300?random=57', 'https://picsum.photos/400/300?random=58'],
-                'tag' => 'Crispy,Potato,Classic',
+                'tag' => 'Fried,DimSim,Popular',
                 'sort' => 2,
                 'is_featured' => false,
             ],
             [
                 'code' => 'SN003',
-                'title' => 'Onion Rings',
-                'second_title' => '洋葱圈',
-                'acronym' => 'OR',
-                'description' => 'Crispy battered onion rings with sweet onion inside',
-                'tip' => 'Vegetarian friendly, served hot',
-                'price' => 26.00,
-                'discount' => 4.00,
-                'selling_price' => 22.00,
-                'stock' => 45,
+                'title' => 'Steamed DimSim',
+                'second_title' => '蒸点心',
+                'acronym' => 'SDS',
+                'description' => 'Traditional steamed dim sim with tender filling and soft wrapper',
+                'tip' => 'Contains pork and vegetables, healthier option',
+                'price' => 20.00,
+                'discount' => 0,
+                'selling_price' => 20.00,
+                'stock' => 55,
                 'status' => 'active',
                 'image' => 'https://picsum.photos/400/300?random=59',
                 'image_list' => ['https://picsum.photos/400/300?random=59', 'https://picsum.photos/400/300?random=60'],
-                'tag' => 'Vegetarian,Crispy,Deal',
+                'tag' => 'Steamed,DimSim,Healthy',
                 'sort' => 3,
                 'is_featured' => false,
             ],
             [
                 'code' => 'SN004',
-                'title' => 'Mixed Nuts',
-                'second_title' => '综合坚果',
-                'acronym' => 'MN',
-                'description' => 'Premium mixed nuts with almonds, cashews, and peanuts',
-                'tip' => 'Contains nuts, healthy snack option',
-                'price' => 25.00,
+                'title' => 'Curry Puff',
+                'second_title' => '咖喱泡芙',
+                'acronym' => 'CP',
+                'description' => 'Flaky pastry filled with spiced curry potato and vegetables',
+                'tip' => 'Contains curry spices, mildly spicy',
+                'price' => 16.00,
                 'discount' => 0,
-                'selling_price' => 25.00,
-                'stock' => 40,
+                'selling_price' => 16.00,
+                'stock' => 70,
                 'status' => 'active',
                 'image' => 'https://picsum.photos/400/300?random=61',
                 'image_list' => ['https://picsum.photos/400/300?random=61', 'https://picsum.photos/400/300?random=62'],
-                'tag' => 'Healthy,Nuts,Premium',
+                'tag' => 'Curry,Pastry,Spicy',
                 'sort' => 4,
                 'is_featured' => false,
             ],
             [
                 'code' => 'SN005',
-                'title' => 'Chocolate Brownies',
-                'second_title' => '巧克力布朗尼',
-                'acronym' => 'CB',
-                'description' => 'Rich chocolate brownies with fudgy texture',
-                'tip' => 'Contains dairy and eggs, sweet dessert',
-                'price' => 24.00,
+                'title' => 'Prawn Cracker',
+                'second_title' => '虾片',
+                'acronym' => 'PC',
+                'description' => 'Light and crispy prawn crackers with authentic seafood flavor',
+                'tip' => 'Contains seafood, gluten-free option',
+                'price' => 14.00,
                 'discount' => 0,
-                'selling_price' => 24.00,
-                'stock' => 35,
+                'selling_price' => 14.00,
+                'stock' => 80,
                 'status' => 'active',
                 'image' => 'https://picsum.photos/400/300?random=63',
                 'image_list' => ['https://picsum.photos/400/300?random=63', 'https://picsum.photos/400/300?random=64'],
-                'tag' => 'Sweet,Chocolate,Dessert',
+                'tag' => 'Prawn,Crispy,Gluten-Free',
                 'sort' => 5,
                 'is_featured' => true,
-            ],
-            [
-                'code' => 'SN006',
-                'title' => 'Cheese Sticks',
-                'second_title' => '芝士条',
-                'acronym' => 'CS',
-                'description' => 'Crispy breaded cheese sticks with melted cheese inside',
-                'tip' => 'Contains dairy, served with marinara sauce',
-                'price' => 26.00,
-                'discount' => 0,
-                'selling_price' => 26.00,
-                'stock' => 50,
-                'status' => 'active',
-                'image' => 'https://picsum.photos/400/300?random=65',
-                'image_list' => ['https://picsum.photos/400/300?random=65', 'https://picsum.photos/400/300?random=66'],
-                'tag' => 'Cheese,Crispy,Popular',
-                'sort' => 6,
-                'is_featured' => false,
-            ],
-            [
-                'code' => 'SN007',
-                'title' => 'Fish & Chips',
-                'second_title' => '炸鱼薯条',
-                'acronym' => 'FC',
-                'description' => 'Golden battered fish with crispy chips, served with tartar sauce',
-                'tip' => 'Contains fish, served with lemon wedge',
-                'price' => 30.00,
-                'discount' => 0,
-                'selling_price' => 30.00,
-                'stock' => 30,
-                'status' => 'active',
-                'image' => 'https://picsum.photos/400/300?random=67',
-                'image_list' => ['https://picsum.photos/400/300?random=67', 'https://picsum.photos/400/300?random=68'],
-                'tag' => 'Fish,Classic,British',
-                'sort' => 7,
-                'is_featured' => false,
-            ],
-            [
-                'code' => 'SN008',
-                'title' => 'Calamari Rings',
-                'second_title' => '鱿鱼圈',
-                'acronym' => 'CR',
-                'description' => 'Tender squid rings with crispy coating and spicy mayo',
-                'tip' => 'Contains seafood, served with aioli sauce',
-                'price' => 29.00,
-                'discount' => 7.00,
-                'selling_price' => 22.00,
-                'stock' => 25,
-                'status' => 'active',
-                'image' => 'https://picsum.photos/400/300?random=69',
-                'image_list' => ['https://picsum.photos/400/300?random=69', 'https://picsum.photos/400/300?random=70'],
-                'tag' => 'Seafood,Crispy,Deal',
-                'sort' => 8,
-                'is_featured' => false,
             ],
         ];
 
@@ -746,13 +628,8 @@ class ProductSeeder extends Seeder
 
         if ($profiles->count() > 0) {
             foreach ($products as $product) {
-                // 30% of products will be assigned to profiles
-                if (rand(1, 100) <= 30) {
-                    $randomProfiles = $profiles->random(rand(1, min(2, $profiles->count())));
-                    $product->profiles()->attach($randomProfiles->pluck('id')->toArray());
-                }
+                $product->profiles()->attach($profiles->pluck('id')->toArray());
             }
-
             $this->command->info('Assigned profiles to products.');
         } else {
             $this->command->info('No active profiles found to assign to products.');

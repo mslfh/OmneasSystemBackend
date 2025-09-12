@@ -19,13 +19,13 @@ class CategorySeeder extends Seeder
                 'hint' => 'Traditional flavors perfect for everyone',
                 'subcategories' => [
                     'Noodle' => 'Delicious noodle dishes with rich flavors',
-                    'Fry Rice' => 'Perfectly seasoned fried rice variations'
+                    'Fried Rice' => 'Perfectly seasoned fried rice variations'
                 ]
             ],
             'Drink' => [
                 'hint' => 'Light and refreshing, perfect for health-conscious diners',
                 'subcategories' => [
-                    '200ml Tin' => 'Convenient single-serving beverages',
+                    '320ml Tin' => 'Convenient single-serving beverages',
                     '600ml bottle' => 'Large sharing size beverages'
                 ]
             ],

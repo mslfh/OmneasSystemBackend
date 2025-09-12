@@ -19,6 +19,15 @@ class ProfileService
         return $this->profileRepository->getAll();
     }
 
+    public function getActiveProfiles()
+    {
+        $profiles = $this->profileRepository->getAll();
+        $activeProfiles = $profiles->filter(function ($profile) {
+            return $profile->status === 'active';
+        });
+        return $activeProfiles;
+    }
+
     public function findById($id)
     {
         return $this->profileRepository->findById($id);

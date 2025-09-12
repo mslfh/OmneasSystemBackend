@@ -30,6 +30,12 @@ class AttributeSeeder extends Seeder
             'ONLY' => [
                 'Only Chicken', 'Only Beef', 'Only Pork', 'Only Seafood', 'Only Veg', 'Only 3Meat', 'Only Noodles',
             ],
+            'CHANGE' => [
+                'Flat Noodle', 'Thick Egg Noodle', 'Thin Rice', 'Thin Egg Noodle','Udon Noodle',
+                'Asia Source', 'Yaki Source', 'Satay Source', 'Gluten Free( Singapore)', 'HotBox Source',
+                'HokkieMEE Source', 'Sambal Source', 'MaMaMEE Source', 'SweetBox Source', 'BlackBean Source',
+                'Garlic Source', 'SweetHoney Source', 'Oyster Source'
+            ]
         ];
 
         foreach ($data as $type => $names) {

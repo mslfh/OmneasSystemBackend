@@ -24,11 +24,15 @@ return new class extends Migration {
                 ->comment('Detailed description of the product');
             $table->string('tip')->nullable()
                 ->comment('Helpful tip for the product');
+
             $table->decimal('price', 10, 2)->comment('Base price of the product');
             $table->decimal('discount', 10, 2)->default(0)
                 ->comment('Discount amount for the product');
             $table->decimal('selling_price', 10, 2)->default(0)
                 ->comment('Selling price of the product');
+            $table->decimal('tax_rate', 5, 2)->default(0)
+                ->comment('Tax rate percentage for the product');
+
             $table->integer('stock')->nullable()
                 ->comment('Available stock quantity, null is unlimited');
             $table->string('status')->default('active')

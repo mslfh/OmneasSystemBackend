@@ -144,6 +144,7 @@ Route::post('/place-order', [OrderController::class, 'placeOrder']);
     Route::apiResource('product-profiles', ProductProfileController::class);
 
     // Profile management
+    Route::get('/profiles/active', [ProfileController::class, 'getActiveProfiles']);
     Route::apiResource('profiles', ProfileController::class);
 
 

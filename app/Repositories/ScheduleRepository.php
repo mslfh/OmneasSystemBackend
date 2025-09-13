@@ -82,6 +82,6 @@ class ScheduleRepository implements ScheduleContract
         if ($endDate) {
             $query->whereDate('work_date', '<=', $endDate);
         }
-        return $query->with('staff')->get();
+        return $query->where('status', 'active')->with('staff')->get();
     }
 }

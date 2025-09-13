@@ -234,7 +234,7 @@ class ProductService
             $data['customizable'] = (bool) $data['customizable'];
         }
 
-        $profileId = $data['profile_id'] ?: null;
+        $profileId = $data['profile_id'] ?? null;
         DB::beginTransaction();
         try {
             $productModel = $this->productRepository->update($id, $data);
@@ -364,7 +364,7 @@ class ProductService
         }
 
         $sortDirection = $descending ? 'desc' : 'asc';
-        $query->with(['categories'])->withTrashed()->orderBy($sortBy, $sortDirection);
+        $query->with(['categories'])->orderBy($sortBy, $sortDirection);
 
         $total = $query->count();
         $data = $query->skip($start)->take($count)->get();
